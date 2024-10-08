@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const AdminDashboard = () => {
+const Dashboard = () => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AdminDashboard;
+export default Dashboard;
 
 
 

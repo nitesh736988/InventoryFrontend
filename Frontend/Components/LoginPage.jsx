@@ -13,26 +13,25 @@ const LoginPage = () => {
 
     if (!email || !password) {
       Alert.alert("Error", "Please fill out both fields");
-      return;``
+      return;
     }
-
     setLoading(true); 
     console.log(email + " " + password);
     try {
-      const response = await axios.post('http://192.168.1.29:8080/user/login', { email, password });
+      const response = await axios.post('http://192.168.1.22:8080/user/login', { email, password },{timeout: 2000});
       if (response.status === 200) {
-        //   
+       
         // navigation.navigate('Inventory_Stocks');
-        navigation.navigate('Home')
+        navigation.navigate('AdminDashboard')
       }
     } catch (error) {
       console.log(error);
-      Alert.alert("Login Failed", JSON.stringify(error.response.data));
+      Alert.alert("Login Failed", JSON.stringify(error.request));
     } finally {
       setLoading(false); 
     }
   };
-
+    
   return (
     <SafeAreaView style={styles.container}>
       <Image source={require('../assets/galologo.png')} style={styles.image} resizeMode="contain" />
