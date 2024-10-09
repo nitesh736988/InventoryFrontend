@@ -3,6 +3,7 @@ import { Alert, ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, T
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
+
 const LoginPage = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -18,11 +19,11 @@ const LoginPage = () => {
     setLoading(true); 
     console.log(email + " " + password);
     try {
-      const response = await axios.post('http://192.168.1.22:8080/user/login', { email, password },{timeout: 2000});
+      const response = await axios.post('http://192.168.68.108:8080/user/login', { email, password },{timeout: 2000});
       if (response.status === 200) {
        
         // navigation.navigate('Inventory_Stocks');
-        navigation.navigate('AdminDashboard')
+        navigation.navigate('Navigation')
       }
     } catch (error) {
       console.log(error);

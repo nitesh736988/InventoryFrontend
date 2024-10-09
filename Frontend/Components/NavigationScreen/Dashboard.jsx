@@ -1,21 +1,48 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 const Dashboard = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch data from the API
+    const fetchData = async () => {
+      try {
+        const response = await post('http://192.168.68.108/admin/viewItems');
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        
         <Text style={styles.cardTitle}>Total Pump</Text>
-        <Text style={styles.cardValue}>120</Text>
+        <Text style={styles.cardValue}>{data ? data.totalPump : 'N/A'}</Text>
       </View>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Total Motor</Text>
-        <Text style={styles.cardValue}>96</Text>
+        <Text style={styles.cardValue}>{data ? data.totalMotor : 'N/A'}</Text>
       </View>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Total Controller</Text>
-        <Text style={styles.cardValue}>121</Text>
+        <Text style={styles.cardValue}>{data ? data.totalController : 'N/A'}</Text>
       </View>
     </View>
   );
@@ -54,7 +81,3 @@ const styles = StyleSheet.create({
 });
 
 export default Dashboard;
-
-
-
-
