@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data from the API
+ 
     const fetchData = async () => {
       try {
-        const response = await post('http://192.168.68.108/admin/viewItems');
-        const result = await response.json();
+
+        const response = await axios.get('http://192.168.68.100:8080/admin/viewItems', {timeout: 2000});
+        const result = await response.data.data;
         setData(result);
+        Alert.alert("warnaning",JSON.stringify(result))
+
       } catch (error) {
+        Alert.alert("warnaning",JSON.stringify(error.response))
         console.error('Error fetching data:', error);
+
       } finally {
         setLoading(false);
       }
@@ -32,18 +38,14 @@ const Dashboard = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Total Pump</Text>
-        <Text style={styles.cardValue}>{data ? data.totalPump : 'N/A'}</Text>
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Total Motor</Text>
-        <Text style={styles.cardValue}>{data ? data.totalMotor : 'N/A'}</Text>
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Total Controller</Text>
-        <Text style={styles.cardValue}>{data ? data.totalController : 'N/A'}</Text>
-      </View>
+    {
+      data.map(({_id,itemName,stock}) => (
+          <View key={_id} style={styles.card}>
+            <Text style={styles.cardTitle}>{itemName}</Text>
+            <Text style={styles.cardValue}>{stock ? stock : 0}</Text>
+        </View>
+      ))
+    }
     </View>
   );
 };

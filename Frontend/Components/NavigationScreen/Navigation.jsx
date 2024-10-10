@@ -73,7 +73,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dashboard from './Dashboard';
-import OrderTrack from './OrderTrack';
+import OrderDetails from './OrderDetails';
 
 const headerColor = '#186cbf';  
 
@@ -107,8 +107,9 @@ const TabNavigator = () => {
 
           if (route.name === 'Dashboard') {
             iconName = 'home';
-          } else if (route.name === 'OrderTrack') {
-            iconName = 'trending-up';
+          } 
+          else if (route.name === 'OrderDetails') {
+            iconName = 'layers-triple';
           }
 
           return (
@@ -127,9 +128,9 @@ const TabNavigator = () => {
         options={{ title: 'Dashboard' }}
       />
       <Tab.Screen 
-        name="OrderTrack" 
-        component={OrderTrack} 
-        options={{ title: 'Track Orders' }} 
+        name="OrderDetails" 
+        component={OrderDetails} 
+        options={{ title: 'OrderDetails' }} 
       />
     </Tab.Navigator>
   );
