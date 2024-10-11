@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
-import Video from 'react-native-video'; // Import react-native-video for playing videos
+// import Video from 'react-native-video'; // Import react-native-video for playing videos
 import axios from 'axios'; 
 
 const OrderDetails = () => {
@@ -10,7 +10,7 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://192.168.68.100:8080/admin/transactions/allTransactions');
+        const response = await axios.get('http://192.168.68.114:8080/admin/transactions/allTransactions');
         if (response.status === 200) {
           setOrders(response.data.data); 
         }
@@ -33,7 +33,7 @@ const OrderDetails = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Order History</Text>
       {
-      orders.map(({ _id, servicePerson, items, videoProof }) => (
+      orders.map(({ _id, servicePerson, items}) => (
           <View key={_id} style={styles.card}>
             <Text style={styles.cardTitle}>{servicePerson.name}</Text>
             <Text style={styles.cardTitle}>{servicePerson.contact}</Text>
@@ -46,14 +46,14 @@ const OrderDetails = () => {
               ))
             }
            
-            {videoProof && (
+            {/* {videoProof && (
               <Video
                 source={{ url: videoProof }}  
                 style={styles.video}
                 controls={true}  
                 resizeMode="contain"
               />
-            )}
+            )} */}
           </View>
       ))
     }
