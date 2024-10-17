@@ -10,7 +10,7 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://192.168.68.114:8080/admin/transactions/allTransactions');
+        const response = await axios.get('http://192.168.68.104:8080/admin/transactions/allTransactions');
         if (response.status === 200) {
           setOrders(response.data.data); 
         }

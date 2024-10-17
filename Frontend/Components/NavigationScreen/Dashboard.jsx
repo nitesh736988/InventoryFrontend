@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import Sidebar from '../WareHouse/Sidebar';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -12,7 +11,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
 
-        const response = await axios.get('http://192.168.68.114:8080/admin/viewItems', {timeout: 2000});
+        const response = await axios.get('http://192.168.68.104:8080/admin/viewItems', {timeout: 2000});
         const result = await response.data.data;
         setData(result);
         Alert.alert("warnaning",JSON.stringify(result))

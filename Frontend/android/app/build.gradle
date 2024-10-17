@@ -1,6 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -117,3 +119,7 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+project.ext.react = [
+  enableHermes: true  // Set this to true to enable Hermes
+]

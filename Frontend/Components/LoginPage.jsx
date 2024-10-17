@@ -10,7 +10,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState(""); 
   const [loading, setLoading] = useState(false);
-  const [ showSideMenu, setShowSideMenu ] = useState(true);
 
   const handleSubmit = async () => {
     if (!email || !password || !userType) {
@@ -22,32 +21,25 @@ const LoginPage = () => {
     console.log(email + " " + password + " " + userType);
     
     try {
-      const response = await axios.post('http://192.168.68.114:8080/user/login', { email, password, userType }, {timeout: 2000});
+      const response = await axios.post('http://192.168.68.104:8080/user/login', { email, password, userType }, { timeout: 2000 });
       if (response.status === 200) {
-       if(userType !== 'Admin'){
-          setShowSideMenu(true);
-       }
-        navigation.navigate('Navigation', { showSideMenu });
+        navigation.navigate('Navigation');
       }
     } catch (error) {
       console.log(error);
-      Alert.alert("Login Failed", JSON.stringify(error.request));
+      Alert.alert("Login Failed", error.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false); 
     }
   };
-  
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Project Name Header */}
-  
       <Image source={require('../assets/galologo.png')} style={styles.image} resizeMode="contain" />
       <Text style={styles.projectName}>Inventory System</Text>
-
       <Text style={styles.title}>Login</Text>
       <View style={styles.inputView}>
-
-      <Picker
+        <Picker
           selectedValue={userType}
           style={styles.picker}
           onValueChange={(itemValue) => setUserType(itemValue)}
@@ -57,8 +49,6 @@ const LoginPage = () => {
           <Picker.Item label="Warehouse" value="Warehouse" />
           <Picker.Item label="Service Person" value="ServicePerson" />
         </Picker>
-
-        {/* Conditionally render the input fields based on userType */}
         {userType !== "" && (
           <>
             <TextInput
@@ -80,9 +70,7 @@ const LoginPage = () => {
             />
           </>
         )}
-        
       </View>
-
       <View style={styles.buttonView}>
         <Pressable style={styles.button} onPress={handleSubmit} disabled={loading}>
           {loading ? (
@@ -90,6 +78,15 @@ const LoginPage = () => {
           ) : (
             <Text style={styles.buttonText}>LOGIN</Text>
           )}
+        </Pressable>
+      </View>
+      <View style={styles.registerBtnContainer}>
+        <Pressable 
+          style={styles.registrationButton} 
+          onPress={() => navigation.navigate('ServicePersonRegistration')}
+        >
+          <Text style={{ color: 'black' }}>Click here for </Text>
+          <Text style={styles.buttonclick}>Registration</Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -136,7 +133,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
-    paddingHorizontal: 20,
     borderColor: '#070604',
     borderWidth: 1,
     borderRadius: 7, 
@@ -144,25 +140,38 @@ const styles = StyleSheet.create({
   buttonView: {
     width: '100%',
     paddingHorizontal: 50,
-    
   },
   button: {
     backgroundColor: '#070604',
     height: 45,
-    borderColor: 'gray',
-    borderWidth: 1,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 15,
-    
-  
+  },
+  registrationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    gap: 2,
   },
   buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-
+  },
+  registerBtnContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingBottom: 16,
+  },
+  buttonclick: {
+    color: '#070604',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    textDecorationStyle: 'solid',
+    textDecorationColor: 'black',
   },
 });
 
