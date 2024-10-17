@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, TextInput, Button, StyleSheet, Text, Alert} from 'react-native';
 import axios from 'axios';
 
-const UpdateItem = () => {
+const NewItem = () => {
   const [itemName, setItemName] = useState('');
   const [stock, setStock] = useState('');
 
@@ -14,7 +14,7 @@ const UpdateItem = () => {
 
     try {
       const response = await axios.post(
-        'http://192.168.68.104:8080/warehouse-admin/updateItem',
+        'http://192.168.68.104:8080/warehouse-admin/deleteItem',
         itemData,
       );
       console.log('Response:', response.data);
@@ -37,7 +37,7 @@ const UpdateItem = () => {
             <Text style={styles.cardValue}>{stock ? stock : 0}</Text>
           </View>
         ))}
-      <Button title="Update Item" onPress={handleSubmit} />
+      <Button title="Delete Item" onPress={handleSubmit} />
     </View>
   );
 };
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UpdateItem;
+export default NewItem;

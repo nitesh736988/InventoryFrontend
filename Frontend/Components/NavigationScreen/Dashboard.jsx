@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, ActivityIndicator, Alert} from 'react-native';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -7,19 +7,18 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
- 
     const fetchData = async () => {
       try {
-
-        const response = await axios.get('http://192.168.68.104:8080/admin/viewItems', {timeout: 2000});
+        const response = await axios.get(
+          'http://192.168.68.104:8080/admin/viewItems',
+          {timeout: 2000},
+        );
         const result = await response.data.data;
         setData(result);
-        Alert.alert("warnaning",JSON.stringify(result))
-
+        Alert.alert('warnaning', JSON.stringify(result));
       } catch (error) {
-        Alert.alert("warnaning",JSON.stringify(error.response))
+        Alert.alert('warnaning', JSON.stringify(error.response));
         console.error('Error fetching data:', error);
-
       } finally {
         setLoading(false);
       }
@@ -38,16 +37,15 @@ const Dashboard = () => {
 
   return (
     <>
-    <View style={styles.container}>
-    {
-      data !== null && data.map(({_id,itemName,stock}) => (
-          <View key={_id} style={styles.card}>
-            <Text style={styles.cardTitle}>{itemName}</Text>
-            <Text style={styles.cardValue}>{stock ? stock : 0}</Text>
-        </View>
-      ))
-    }
-    </View>
+      <View style={styles.container}>
+        {data !== null &&
+          data.map(({_id, itemName, stock}) => (
+            <View key={_id} style={styles.card}>
+              <Text style={styles.cardTitle}>{itemName}</Text>
+              <Text style={styles.cardValue}>{stock ? stock : 0}</Text>
+            </View>
+          ))}
+      </View>
     </>
   );
 };
