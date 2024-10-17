@@ -3,9 +3,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dashboard from './Dashboard';
 import OrderDetails from './OrderDetails';
-import More from '../WareHouse/More/More';
-import NewItem from '../WareHouse/More/Item/NewItem';
 import { createStackNavigator } from '@react-navigation/stack';
+import AddItem from '../WareHouse/AddItem';
+import Order from '../WareHouse/More/Transaction/Order';
+
 
 const headerColor = '#186cbf';  
 
@@ -44,8 +45,12 @@ const TabNavigator = () => {
           else if (route.name === 'OrderDetails') {
             iconName = 'layers-triple';
           }
-          else if (route.name === 'More') {
-            iconName = 'dots-horizontal'; 
+          else if (route.name === 'AddItem') {
+            iconName = 'folder-add';
+          }
+
+          else if (route.name === 'Order') {
+            iconName = 'reorder'; 
           }
 
           return (
@@ -69,9 +74,15 @@ const TabNavigator = () => {
         options={{ title: 'OrderDetails' }} 
       />
       <Tab.Screen 
-        name="More" 
-        component={More} 
-        options={{ title: 'More' }} 
+        name="AddItem" 
+        component={AddItem} 
+        options={{ title: 'AddItem' }} 
+      />
+
+      <Tab.Screen 
+        name="Order" 
+        component={Order} 
+        options={{ title: 'Order' }} 
       >
         {/* <Stack.Navigator> */}
             {/* <Stack.Screen name='add' component={NewItem} /> */}

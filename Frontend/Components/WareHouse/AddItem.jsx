@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import axios from 'axios'; 
 
-const NewItem = () => {
+const AddItem = () => {
     const [itemName, setItemName] = useState('');
     const [stock, setStock] = useState('');
 
@@ -14,7 +14,7 @@ const NewItem = () => {
 
         try {
            
-            const response = await axios.post('http://192.168.68.104:8080/warehouse-admin/transaction/newTransaction', itemData);
+            const response = await axios.post('http://192.168.68.104:8080/warehouse-admin/newItem', itemData);
             console.log('Response:', response.data);
             Alert.alert('Success', 'Item added successfully!');
 
@@ -62,4 +62,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NewItem;
+export default AddItem;
