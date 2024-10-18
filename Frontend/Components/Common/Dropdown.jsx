@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 
-const Dropdown = ({dropdownTitle, optionList, optionHandlerList}) => {
+const Dropdown = ({ dropdownTitle, optionList, onSelect }) => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
 
   const toggleDropdown = () => {
     setDropdownVisible(!isDropdownVisible);
-  };
-
-  const handleAction = (action) => {
-    alert(`${action} Item`);
-    setDropdownVisible(false);
   };
 
   return (
@@ -21,23 +16,22 @@ const Dropdown = ({dropdownTitle, optionList, optionHandlerList}) => {
       </TouchableOpacity>
       
       {isDropdownVisible && (
-      <View style={{position: 'absolute', width: '100%',  top: 100, paddingHorizontal: 12,  }}>
-        <View style={styles.dropdown}>
+        <View style={{ position: 'absolute', width: '100%', top: 100, paddingHorizontal: 12 }}>
+          <View style={styles.dropdown}>
             {optionList.map((item, index) => (
-                <Button key={index} title= {item} onPress={() => {
-                  setDropdownVisible(false)
-                  optionHandlerList[index];
-                  
-                }} />
+              <Button
+                key={index}
+                title={item}
+                onPress={() => {
+                  onSelect(item); // Invoke the onSelect callback with the item
+                  setDropdownVisible(false); // Close dropdown
+                }}
+              />
             ))}
-        </View>
-        
+          </View>
         </View>
       )}
-
-      
     </View>
-
   );
 };
 
@@ -72,7 +66,7 @@ const styles = StyleSheet.create({
   dropdown: {
     width: '100%',
     borderColor: '#070604',
-    margin: 'auto',  
+    margin: 'auto',
   },
 });
 

@@ -7,7 +7,7 @@ import Navigation from './Components/NavigationScreen/Navigation';
 import LoginPage from './Components/LoginPage';
 import Dashboard from './Components/NavigationScreen/Dashboard';
 import ServicePersonRegistration from './Components/ServicePerson/ServicePersonRegistration';
-
+import AddTransactionScreen from './Components/WareHouse/Transaction/Dropdown'
 
 
 const Stack = createStackNavigator();
@@ -23,24 +23,18 @@ const App = () => {
         component={LoginPage} 
         options={{ title: 'LoginPage', headerShown: false }} 
       />
-
-      <Stack.Screen 
-        name="ServicePersonRegistration"
-        component={ServicePersonRegistration}
-        options={{ title: 'ServicePersonRegistration', headerShown: false }} 
-       />
-
-        <Stack.Screen 
-          name="Dashboard" 
-          component={Dashboard} 
-          options={{ title: 'Dashboard', headerShown: false }} 
-        /> 
-
+ 
+    
+ 
         <Stack.Screen 
           name="Navigation" 
           component={Navigation} 
           options={{ title: 'Navigation', headerShown: false }} 
         /> 
+    
+  <Stack.Screen name="AddTransaction" component={AddTransactionScreen} />
+ 
+
 
       </Stack.Navigator>
     </NavigationContainer>

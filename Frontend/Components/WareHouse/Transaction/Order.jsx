@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import Transaction from './Transaction';
+import Transaction from './Transaction'
 
 
 const Order = () => {

@@ -5,7 +5,7 @@ import Dashboard from './Dashboard';
 import OrderDetails from './OrderDetails';
 import { createStackNavigator } from '@react-navigation/stack';
 import AddItem from '../WareHouse/AddItem';
-import Order from '../WareHouse/More/Transaction/Order';
+import Order from '../WareHouse/Transaction/Order';
 
 
 const headerColor = '#186cbf';  
@@ -46,7 +46,7 @@ const TabNavigator = () => {
             iconName = 'layers-triple';
           }
           else if (route.name === 'AddItem') {
-            iconName = 'folder-add';
+            iconName = 'add';
           }
 
           else if (route.name === 'Order') {
