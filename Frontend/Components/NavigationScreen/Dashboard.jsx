@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
-import {RadioButton} from 'react-native-paper';
+
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -53,11 +53,11 @@ const Dashboard = () => {
         Alert.alert('Error', 'Stock cannot be negative');
         return;
       }
-
-      const response = await axios.post(
-        `http://192.168.68.104:8080/admin/updateItem/${selectedItem._id}`,
+      // console.log(selectedItem._id , updatedStock)   
+      const response = await axios.patch(
+        `http://192.168.68.104:8080/warehouse-admin/updateItem?id=${selectedItem._id}`,
         {stock: updatedStock},
-      );
+      );     
       Alert.alert('Success', 'Item updated successfully');
 
       const updatedData = data.map(item =>
@@ -68,6 +68,7 @@ const Dashboard = () => {
       setData(updatedData);
       setModalVisible(false);
     } catch (error) {
+      console.log(error)
       Alert.alert('Error', 'Failed to update item');
     }
   };
@@ -93,10 +94,11 @@ const Dashboard = () => {
 
   const handleDelete = async _id => {
     try {
-      await axios.delete(`http://192.168.68.104:8080/admin/deleteItem/${_id}`);
+      await axios.delete(`http://192.168.68.104:8080/warehouse-admin/deleteItem/${_id}`);
       Alert.alert('Success', 'Item deleted successfully');
       setData(data.filter(item => item._id !== _id));
     } catch (error) {
+
       Alert.alert('Error', 'Failed to delete item');
     }
   };
@@ -182,25 +184,6 @@ const Dashboard = () => {
                   <Text style={styles.quantityButtonText}>+</Text>
                 </TouchableOpacity>
               </View>
-
-              <Text>Select Option:</Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <RadioButton
-                  value="in"
-                  status={checked === 'in' ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked('in')}
-                />
-                <Text>In</Text>
-              </View>
-
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <RadioButton
-                  value="out"
-                  status={checked === 'out' ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked('out')}
-                />
-                <Text>Out</Text>
-              </View>
               <Button title="Submit" onPress={handleUpdate} />
               <Button
                 title="Cancel"
@@ -219,7 +202,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fbd33b'
   },
   card: {
     backgroundColor: '#fff',

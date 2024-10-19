@@ -1,28 +1,45 @@
-import React from 'react';
-import Dropdown from './Dropdown';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; 
+import AddTransaction from './AddTransaction'; 
 
-const TransactionDropDown = () => {
-  const navigation = useNavigation();
 
-  const optionsList = ['Add Transaction', 'One Transaction'];
-
-  const handleSelect = (selectedOption) => {
-    if (selectedOption === 'Add Transaction') {
-      navigation.navigate('AddTransaction');
-    } 
-    else if (selectedOption === 'One Transaction') {
-      navigation.navigate('OneTransaction');
-    }
+const Transaction = () => {
+  const [selectedOption, setSelectedOption] = useState(''); 
+  const handleOptionChange = (value) => {
+    setSelectedOption(value);
   };
 
   return (
-    <Dropdown 
-      dropdownTitle='Transaction'
-      optionList={optionsList}
-      onSelect={handleSelect} 
-    />
+    <View style={styles.container}>
+      <Text>Select Transaction Type:</Text>
+      <Picker
+        selectedValue={selectedOption}
+        onValueChange={handleOptionChange}
+        style={styles.picker}
+      >
+        <Picker.Item label="Select" value="" />
+        <Picker.Item label="Add Transaction" value="add" />
+        {/* <Picker.Item label="One Transaction" value="one" /> */}
+      </Picker>
+
+      {selectedOption === 'add' && <AddTransaction />} 
+      {selectedOption === 'all' && <AllTransaction />}
+      {/* {selectedOption === 'one' && <OneTransaction />}  */}
+
+    </View>
   );
 };
 
-export default TransactionDropDown;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+});
+
+export default Transaction;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
-// import Video from 'react-native-video'; // Import react-native-video for playing videos
+import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios'; 
 
 const OrderDetails = () => {
@@ -26,37 +25,39 @@ const OrderDetails = () => {
   }, []);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />;
   }
+
+  if (orders.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>Order History</Text>
+        <Text>No orders found.</Text>
+      </View>
+    );
+  }
+
+  const renderOrder = ({ item }) => (
+    <View key={item._id} style={styles.card}>
+      <Text style={styles.cardTitle}>{item.servicePerson.name}</Text>
+      <Text style={styles.cardTitle}>{item.servicePerson.contact}</Text>
+      {item.items.map(({ _id, itemName, quantity }) => (
+        <View key={_id} style={styles.itemContainer}>
+          <Text style={styles.cardTitle}>{itemName}</Text>
+          <Text style={styles.cardTitle}>{quantity}</Text>
+        </View>
+      ))}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Order History</Text>
-      {
-      orders.map(({ _id, servicePerson, items}) => (
-          <View key={_id} style={styles.card}>
-            <Text style={styles.cardTitle}>{servicePerson.name}</Text>
-            <Text style={styles.cardTitle}>{servicePerson.contact}</Text>
-            {
-              items.map(({ _id, itemName, quantity }) => (
-                <View key={_id} style={styles.card}>
-                  <Text style={styles.cardTitle}>{itemName}</Text>
-                  <Text style={styles.cardTitle}>{quantity}</Text>
-                </View>
-              ))
-            }
-           
-            {/* {videoProof && (
-              <Video
-                source={{ url: videoProof }}  
-                style={styles.video}
-                controls={true}  
-                resizeMode="contain"
-              />
-            )} */}
-          </View>
-      ))
-    }
+      <FlatList
+        data={orders}
+        renderItem={renderOrder}
+        keyExtractor={item => item._id} // Use unique ID as key
+      />
     </View>
   );
 };
@@ -65,6 +66,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fbd33b',
   },
   header: {
     fontSize: 24,
@@ -81,10 +83,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  video: {
-    width: '100%',
-    height: 200,
-    marginVertical: 10,
+  itemContainer: {
+    padding: 8,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 5,
+    marginVertical: 4,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fbd33b',
   },
   cardTitle: {
     fontSize: 18,

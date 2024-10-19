@@ -5,9 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Navigation from './Components/NavigationScreen/Navigation';
 import LoginPage from './Components/LoginPage';
-import Dashboard from './Components/NavigationScreen/Dashboard';
 import ServicePersonRegistration from './Components/ServicePerson/ServicePersonRegistration';
-import AddTransactionScreen from './Components/WareHouse/Transaction/Dropdown'
 
 
 const Stack = createStackNavigator();
@@ -24,18 +22,17 @@ const App = () => {
         options={{ title: 'LoginPage', headerShown: false }} 
       />
  
-    
- 
         <Stack.Screen 
           name="Navigation" 
           component={Navigation} 
           options={{ title: 'Navigation', headerShown: false }} 
         /> 
-    
-  <Stack.Screen name="AddTransaction" component={AddTransactionScreen} />
- 
 
-
+        <Stack.Screen 
+          name="ServicePersonRegistration" 
+          component={ServicePersonRegistration} 
+          options={{ title: 'ServicePersonRegistration', headerShown: false }} 
+        /> 
       </Stack.Navigator>
     </NavigationContainer>
     

@@ -13,7 +13,6 @@ const AddItem = () => {
         };
 
         try {
-           
             const response = await axios.post('http://192.168.68.104:8080/warehouse-admin/newItem', itemData);
             console.log('Response:', response.data);
             Alert.alert('Success', 'Item added successfully!');
@@ -48,17 +47,20 @@ const AddItem = () => {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,  
         padding: 20,
+        backgroundColor: '#fbd33b',
     },
     label: {
         marginVertical: 10,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: '#070604',  
         borderRadius: 5,
         padding: 10,
         marginBottom: 15,
+        backgroundColor: '#fff', 
     },
 });
 

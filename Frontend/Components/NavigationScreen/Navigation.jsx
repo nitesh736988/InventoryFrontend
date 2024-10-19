@@ -3,15 +3,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dashboard from './Dashboard';
 import OrderDetails from './OrderDetails';
-import { createStackNavigator } from '@react-navigation/stack';
 import AddItem from '../WareHouse/AddItem';
 import Order from '../WareHouse/Transaction/Order';
-
 
 const headerColor = '#186cbf';  
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 const TabNavigator = () => {
   return (
@@ -27,15 +24,7 @@ const TabNavigator = () => {
           height: 60,
           paddingTop: 0,
         },
-        headerStyle: {
-          backgroundColor: headerColor,
-        },
-        headerTintColor: 'white',
-        headerTitleAlign: 'center', 
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-        headerTitle: route.name,  
+        headerShown: false, // This will hide the header for all screens
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
@@ -46,11 +35,10 @@ const TabNavigator = () => {
             iconName = 'layers-triple';
           }
           else if (route.name === 'AddItem') {
-            iconName = 'add';
+            iconName = 'plus';
           }
-
           else if (route.name === 'Order') {
-            iconName = 'reorder'; 
+            iconName = 'cart'; 
           }
 
           return (
@@ -78,24 +66,19 @@ const TabNavigator = () => {
         component={AddItem} 
         options={{ title: 'AddItem' }} 
       />
-
       <Tab.Screen 
         name="Order" 
         component={Order} 
         options={{ title: 'Order' }} 
-      >
-        {/* <Stack.Navigator> */}
-            {/* <Stack.Screen name='add' component={NewItem} /> */}
-        {/* </Stack.Navigator> */}
-      </Tab.Screen>
+      />
     </Tab.Navigator>
   );
 };
 
 const Navigation = () => {
   return (
-      <TabNavigator />
+    <TabNavigator />
   );
 };
 
-export default Navigation;  
+export default Navigation;
