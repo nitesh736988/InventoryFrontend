@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { API_URL } from '@env';
 
 const ServicePersonRegistration = () => {
   const [name, setName] = useState('');
@@ -27,7 +28,7 @@ const ServicePersonRegistration = () => {
     console.log('Registered User:', user);
 
     try {
-      const response = await axios.post('http://192.168.68.114:8080/user/service-person-signup', user, { timeout: 2000 });
+      const response = await axios.post(`${API_URL}/user/service-person-signup`, user, { timeout: 2000 });
       if (response.status === 200) {
         Alert.alert('Registration Successful', 'You will be redirected to the login page.');
         navigation.navigate('LoginPage');

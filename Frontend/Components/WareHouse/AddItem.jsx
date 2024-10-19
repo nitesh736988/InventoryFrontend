@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
 import axios from 'axios'; 
+import { API_URL } from '@env';
 
 const AddItem = () => {
     const [itemName, setItemName] = useState('');
@@ -13,7 +14,7 @@ const AddItem = () => {
         };
 
         try {
-            const response = await axios.post('http://192.168.68.104:8080/warehouse-admin/newItem', itemData);
+            const response = await axios.post(`${API_URL}/warehouse-admin/newItem`, itemData);
             console.log('Response:', response.data);
             Alert.alert('Success', 'Item added successfully!');
 

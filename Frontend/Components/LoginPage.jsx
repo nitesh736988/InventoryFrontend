@@ -3,6 +3,7 @@ import { Alert, ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, T
 import { Picker } from '@react-native-picker/picker'; 
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { API_URL } from '@env';
 
 const LoginPage = () => {
   const navigation = useNavigation();
@@ -11,27 +12,49 @@ const LoginPage = () => {
   const [userType, setUserType] = useState(""); 
   const [loading, setLoading] = useState(false);
 
+
   const handleSubmit = async () => {
-    if (!email || !password || !userType) {
-      Alert.alert("Error", "Please fill out all fields including selecting a role");
-      return;
-    }
+  if (!email || !password || !userType) {
+    Alert.alert("Error", "Please fill out all fields including selecting a role");
+    return;
+  }
+
+  setLoading(true); 
+  console.log(email + " " + password + " " + userType);
+
+  try {
+    const response = await axios.post(`${API_URL}/user/login`, { email, password, userType }, { timeout: 2000 });
     
-    setLoading(true); 
-    console.log(email + " " + password + " " + userType);
-    
-    try {
-      const response = await axios.post('http://192.168.68.104:8080/user/login', { email, password, userType }, { timeout: 2000 });
-      if (response.status === 200) {
-        navigation.navigate('Navigation');
+    if (response.status === 200) {
+      if (userType === 'ServicePerson') {
+        navigation.navigate('ServicePersonDashboard');
+      } else {
+        navigation.navigate('Navigation');  // Other role navigation
       }
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Login Failed", error.response?.data?.message || "An error occurred");
-    } finally {
-      setLoading(false); 
     }
-  };
+  } catch (error) {
+    console.log(error);
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          Alert.alert("Login Failed", "Incorrect credentials. Please try again.");
+          break;
+        case 500:
+          Alert.alert("Server Error", "There is an issue with the server. Please try again later.");
+          break;
+        default:
+          Alert.alert("Login Failed", error.response.data?.message || "An error occurred.");
+      }
+    } else if (error.request) {
+      Alert.alert("Network Error", "Please check your internet connection.");
+    } else {
+      Alert.alert("Error", "An unexpected error occurred.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.container}>

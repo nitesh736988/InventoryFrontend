@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome'; 
+import { API_URL } from '@env';
 
 
 const Dashboard = () => {
@@ -26,14 +27,14 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          'http://192.168.68.104:8080/admin/viewItems',
+          'http://88.222.214.93:8000/admin/viewItems',
           {timeout: 2000},
         );
         const result = await response.data.data;
         setData(result);
       } catch (error) {
         Alert.alert('Error', JSON.stringify(error.response));
-        console.error('Error fetching data:', error);
+        console.log('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
@@ -55,7 +56,7 @@ const Dashboard = () => {
       }
       // console.log(selectedItem._id , updatedStock)   
       const response = await axios.patch(
-        `http://192.168.68.104:8080/warehouse-admin/updateItem?id=${selectedItem._id}`,
+        `http://88.222.214.93:8000/warehouse-admin/updateItem?id=${selectedItem._id}`,
         {stock: updatedStock},
       );     
       Alert.alert('Success', 'Item updated successfully');
@@ -94,7 +95,7 @@ const Dashboard = () => {
 
   const handleDelete = async _id => {
     try {
-      await axios.delete(`http://192.168.68.104:8080/warehouse-admin/deleteItem/${_id}`);
+      await axios.delete(`${API_URL}/warehouse-admin/deleteItem/${_id}`);
       Alert.alert('Success', 'Item deleted successfully');
       setData(data.filter(item => item._id !== _id));
     } catch (error) {

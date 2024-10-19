@@ -24,7 +24,6 @@ const Transaction = () => {
       </Picker>
 
       {selectedOption === 'add' && <AddTransaction />} 
-      {selectedOption === 'all' && <AllTransaction />}
       {/* {selectedOption === 'one' && <OneTransaction />}  */}
 
     </View>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios'; 
+import { API_URL } from '@env';
 
 const OrderDetails = () => {
   const [orders, setOrders] = useState([]);
@@ -9,7 +10,7 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://192.168.68.104:8080/admin/transactions/allTransactions');
+        const response = await axios.get(`${API_URL}/admin/transactions/allTransactions`);
         if (response.status === 200) {
           setOrders(response.data.data); 
         }

@@ -3,6 +3,7 @@ import { View, Text, TextInput, Alert, StyleSheet, Modal, TouchableOpacity } fro
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
+import { API_URL } from '@env';
 
 const AddTransaction = () => {
   const [name, setName] = useState('');
@@ -65,7 +66,7 @@ const AddTransaction = () => {
 
     console.log(data);
     try {
-      const response = await axios.post('http://192.168.68.104:8080/warehouse-admin/transactions/newTransaction', data);
+      const response = await axios.post(`${API_URL}/warehouse-admin/transactions/newTransaction`, data);
 
       if (response.status === 200) {
         Alert.alert('Success', 'Transaction saved successfully');

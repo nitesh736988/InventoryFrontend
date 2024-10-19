@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Navigation from './Components/NavigationScreen/Navigation';
 import LoginPage from './Components/LoginPage';
 import ServicePersonRegistration from './Components/ServicePerson/ServicePersonRegistration';
+import ServicePersonDashboard from './Components/ServicePerson/ServicePersonDashboard';
 
 
 const Stack = createStackNavigator();
@@ -32,7 +33,9 @@ const App = () => {
           name="ServicePersonRegistration" 
           component={ServicePersonRegistration} 
           options={{ title: 'ServicePersonRegistration', headerShown: false }} 
-        /> 
+        />
+
+        <Stack.Screen name="ServicePersonDashboard" component={ServicePersonDashboard} />
       </Stack.Navigator>
     </NavigationContainer>
     
