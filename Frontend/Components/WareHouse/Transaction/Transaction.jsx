@@ -4,7 +4,8 @@ import { Picker } from '@react-native-picker/picker';
 import AddTransaction from './AddTransaction'; 
 
 
-const Transaction = () => {
+const Transaction = ( { route }) => {
+  // const { isClicked } = route.params;
   const [selectedOption, setSelectedOption] = useState(''); 
   const handleOptionChange = (value) => {
     setSelectedOption(value);
@@ -23,7 +24,7 @@ const Transaction = () => {
         {/* <Picker.Item label="One Transaction" value="one" /> */}
       </Picker>
 
-      {selectedOption === 'add' && <AddTransaction />} 
+      {selectedOption === 'add' && <AddTransaction  />} 
       {/* {selectedOption === 'one' && <OneTransaction />}  */}
 
     </View>

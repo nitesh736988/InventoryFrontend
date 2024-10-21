@@ -22,26 +22,32 @@ const Dashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [updatedQuantity, setUpdatedQuantity] = useState('');
   const [checked, setChecked] = useState('in'); 
+  const [ isRefreshClicked, setIsRefreshClicked ] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        'http://88.222.214.93:8000/admin/viewItems',
+        {timeout: 2000},
+      );
+      const result = await response.data.data;
+      setData(result);
+    } catch (error) {
+      Alert.alert('Error', JSON.stringify(error.response));
+      console.log('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          'http://88.222.214.93:8000/admin/viewItems',
-          {timeout: 2000},
-        );
-        const result = await response.data.data;
-        setData(result);
-      } catch (error) {
-        Alert.alert('Error', JSON.stringify(error.response));
-        console.log('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if(isRefreshClicked)
+      fetchData();
+  }, [isRefreshClicked]);
 
   const handleUpdate = async () => {
     try {
@@ -147,7 +153,16 @@ const Dashboard = () => {
                 <Icon name="trash" size={24} color="red" />
               </TouchableOpacity>
             </View>
-          ))}
+          ))
+        }
+        <TouchableOpacity style={{ position: 'absolute', bottom: 40, right: 40 }} 
+          onPress={ () => {
+            console.log("btn Clicked");
+            setIsRefreshClicked(true);
+          }} 
+        >
+          <Icon name='refresh' size={30} color='black' />
+        </TouchableOpacity>
       </View>
 
       {selectedItem && (

@@ -15,14 +15,18 @@ const AddItem = () => {
 
         try {
             const response = await axios.post(`${API_URL}/warehouse-admin/newItem`, itemData);
+            console.log(response);
             console.log('Response:', response.data);
             Alert.alert('Success', 'Item added successfully!');
 
             setItemName('');
             setStock('');
         } catch (error) {
-            console.error('Error adding item:', error);
-            Alert.alert('Error', 'There was an error adding the item.');
+            console.log('Error adding item:', error);
+           
+            if(error.response.message === "servicePerson not found"){
+                Alert.alert("Service Person Doesn't exits");
+            }
         }
     };
 

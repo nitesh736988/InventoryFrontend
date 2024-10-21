@@ -12,6 +12,8 @@ import ServicePersonDashboard from './Components/ServicePerson/ServicePersonDash
 const Stack = createStackNavigator();
 
 const App = () => {
+
+  // const [ isAddTransactionClicked, setIsTransactionClicked ] = useState(false);
   return (
 
     <NavigationContainer>
@@ -26,6 +28,7 @@ const App = () => {
         <Stack.Screen 
           name="Navigation" 
           component={Navigation} 
+          // initialParams={{ isClicked: setIsTransactionClicked }}
           options={{ title: 'Navigation', headerShown: false }} 
         /> 
 

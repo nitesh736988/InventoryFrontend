@@ -5,7 +5,8 @@ import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { API_URL } from '@env';
 
-const AddTransaction = () => {
+const AddTransaction = ( { route } ) => {
+  // const { isClicked } route.params;
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
@@ -64,21 +65,25 @@ const AddTransaction = () => {
       status,
     };
 
-    console.log(data);
+    // console.log(data);
     try {
       const response = await axios.post(`${API_URL}/warehouse-admin/transactions/newTransaction`, data);
 
       if (response.status === 200) {
         Alert.alert('Success', 'Transaction saved successfully');
+        // isClicked(true);
       
         resetForm();
         setModalVisible(false);
-      } else {
+      }  
+      else {
         Alert.alert('Error', 'Failed to save transaction');
       }
+
     } catch (error) {
-      Alert.alert('Error', 'Failed to save transaction');
-      console.error(error);
+      if((error.response.data.message) === "servicePerson not found"){
+        Alert.alert("Service Person Doesn't exist");
+    }
     }
   };
 

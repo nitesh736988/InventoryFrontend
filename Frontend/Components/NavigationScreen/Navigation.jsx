@@ -10,7 +10,8 @@ const headerColor = '#186cbf';
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = () => {
+const TabNavigator = ( { route }) => {
+  // const { isClicked } = route.params;
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -69,6 +70,7 @@ const TabNavigator = () => {
       <Tab.Screen 
         name="Order" 
         component={Order} 
+        // initialParams={ { isClicked }}
         options={{ title: 'Order' }} 
       />
     </Tab.Navigator>
