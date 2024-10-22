@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import axios from 'axios'; 
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { API_URL } from '@env';
 
 const OrderDetails = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshClicked, setIsRefreshClicked] = useState(false);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/admin/transactions/allTransactions`);
+      if (response.status === 200) {
+        setOrders(response.data.data); 
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Unable to fetch orders");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/admin/transactions/allTransactions`);
-        if (response.status === 200) {
-          setOrders(response.data.data); 
-        }
-      } catch (error) {
-        console.log(error);
-        Alert.alert("Error", "Unable to fetch orders");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrders();
   }, []);
+  
+  useEffect(() => {
+    fetchOrders();
+  }, [isRefreshClicked])
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />;
@@ -59,6 +65,15 @@ const OrderDetails = () => {
         renderItem={renderOrder}
         keyExtractor={item => item._id} // Use unique ID as key
       />
+
+        <TouchableOpacity style={{ position: 'absolute', top: 16, right: 32 }} 
+          onPress={ () => {
+            console.log("btn Clicked");
+            setIsRefreshClicked(true);
+          }} 
+        >
+          <Icon name='refresh' size={30} color='black' />
+        </TouchableOpacity>
     </View>
   );
 };

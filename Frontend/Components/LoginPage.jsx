@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState(""); 
   const [loading, setLoading] = useState(false);
+  const [ showPassword, setShowPassword ] = useState(true);
 
 
   const handleSubmit = async () => {
@@ -82,15 +83,19 @@ const LoginPage = () => {
               autoCorrect={false}
               autoCapitalize="none"
             />
-            <TextInput
-              style={styles.input}
-              placeholder="PASSWORD"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-              autoCorrect={false}
-              autoCapitalize="none"
-            />
+            <View style={{ width: '100%', borderRadius: 5, backgroundColor: '#fbd33b', borderColor: '#070604', borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12 }}> 
+              <TextInput
+                placeholder="PASSWORD"
+                secureTextEntry={showPassword}
+                value={password}
+                onChangeText={setPassword}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Text style={{ color: 'black' }}>Show</Text>
+              </TouchableOpacity>
+            </View>
           </>
         )}
       </View>
@@ -120,13 +125,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 70,
+    paddingTop: 50,
     backgroundColor: '#fbd33b',
+    borderColorn: 'red',
+    // borderWidth: 1
   },
   projectName: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: -10,
     color: '#070604',
   },
   image: {
@@ -162,7 +169,7 @@ const styles = StyleSheet.create({
   },
   buttonView: {
     width: '100%',
-    paddingHorizontal: 50,
+    paddingHorizontal: 40,
   },
   button: {
     backgroundColor: '#070604',

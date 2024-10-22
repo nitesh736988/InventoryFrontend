@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { API_URL } from '@env';
@@ -43,38 +43,44 @@ const ServicePersonRegistration = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/galologo.png')} style={styles.image} resizeMode="contain" />
-      <Text style={styles.title}>Service Person Registration</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-        required
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contact"
-        value={contact}
-        onChangeText={setContact}
-        keyboardType="phone-pad"
-        required
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        required
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={contact}
-        editable={false}
-      />
-      <Button title="Register" onPress={handleSubmit} disabled={loading} />
+      <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center'}}>
+          <Image source={require('../../assets/galologo.png')} style={styles.image} resizeMode="contain" /> 
+      </View>
+      <View style={{ flex: 1, justifyContent: 'center', marginTop: -64 }}>
+        <Text style={styles.title}>Service Person Registration</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+          required
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contact"
+          value={contact}
+          onChangeText={setContact}
+          keyboardType="phone-pad"
+          required
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          required
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={contact}
+          editable={false}
+        />
+        <TouchableOpacity title="Register" style={{ backgroundColor: 'black', padding: 16, borderRadius: 5 }} onPress={handleSubmit} disabled={loading}>
+            <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>Register</Text>  
+        </TouchableOpacity>
+      </View> 
     </View>
   );
 };
@@ -82,7 +88,6 @@ const ServicePersonRegistration = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     padding: 16,
     backgroundColor: '#fbd33b',
   },
@@ -99,11 +104,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    height: 40,
+    height: 50,
     borderColor: '#070604',
+    borderRadius: 5,
     borderWidth: 1,
     marginBottom: 15,
-    paddingLeft: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });
 

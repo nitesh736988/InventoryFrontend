@@ -7,6 +7,7 @@ import Navigation from './Components/NavigationScreen/Navigation';
 import LoginPage from './Components/LoginPage';
 import ServicePersonRegistration from './Components/ServicePerson/ServicePersonRegistration';
 import ServicePersonDashboard from './Components/ServicePerson/ServicePersonDashboard';
+import { StatusBar } from 'react-native';
 
 
 const Stack = createStackNavigator();
@@ -15,7 +16,8 @@ const App = () => {
 
   // const [ isAddTransactionClicked, setIsTransactionClicked ] = useState(false);
   return (
-
+    <>
+    <StatusBar backgroundColor='#fbd33b' barStyle='dark-content' />
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoginPage">
 
@@ -41,7 +43,7 @@ const App = () => {
         <Stack.Screen name="ServicePersonDashboard" component={ServicePersonDashboard} />
       </Stack.Navigator>
     </NavigationContainer>
-    
+  </>    
   );
 }
 
