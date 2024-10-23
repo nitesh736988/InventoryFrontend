@@ -27,10 +27,11 @@ const LoginPage = () => {
     const response = await axios.post(`${API_URL}/user/login`, { email, password, userType }, { timeout: 2000 });
     
     if (response.status === 200) {
+      console.log(userType);
       if (userType === 'ServicePerson') {
-        navigation.navigate('ServicePersonDashboard');
+        navigation.navigate('ServicePersonNavigation');
       } else {
-        navigation.navigate('Navigation');  // Other role navigation
+        navigation.navigate('Navigation');  
       }
     }
   } catch (error) {
@@ -55,7 +56,6 @@ const LoginPage = () => {
     setLoading(false);
   }
 };
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,7 +93,7 @@ const LoginPage = () => {
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Text style={{ color: 'black' }}>Show</Text>
+                <Text style={{ color: 'black' }}>{showPassword?'Show':'Hide'}</Text>
               </TouchableOpacity>
             </View>
           </>
@@ -108,15 +108,7 @@ const LoginPage = () => {
           )}
         </Pressable>
       </View>
-      <View style={styles.registerBtnContainer}>
-        <Pressable 
-          style={styles.registrationButton} 
-          onPress={() => navigation.navigate('ServicePersonRegistration')}
-        >
-          <Text style={{ color: 'black' }}>Click here for </Text>
-          <Text style={styles.buttonclick}>Registration</Text>
-        </Pressable>
-      </View>
+     
     </SafeAreaView>
   );
 };
@@ -206,3 +198,5 @@ const styles = StyleSheet.create({
 });
 
 export default LoginPage;
+
+

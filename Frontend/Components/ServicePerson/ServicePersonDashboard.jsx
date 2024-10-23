@@ -34,36 +34,6 @@ const ServicePersonDashboard = () => {
     fetchServicePersons();
   }, []);
 
-  // const handleServicePersonSelect = async (person) => {
-  //   setSelectedServicePerson(person);
-  //   await fetchTransactions(person.mobile); // Fetch transactions using the mobile number
-  // };
-
-  // const fetchTransactions = async (mobile) => {
-  //   try {
-  //     const response = await axios.get(`${API_URL}/service-person/transactions?mobile=${mobile}`);
-  //     console.log('Transaction Response:', response.data);
-
-  //     if (Array.isArray(response.data) && response.data.length > 0) {
-  //       setTransactions(response.data);
-  //     } else {
-  //       setTransactions([]); // Set to zero transactions if none exist
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching transactions:', error);
-  //     setTransactions([]); // Set to zero transactions in case of an error
-  //   }
-  // };
-
-  // const updateTransactionStatus = async (transactionId, status) => {
-  //   try {
-  //     const response = await axios.patch(`${API_URL}/transactions/${transactionId}`, { status });
-  //     console.log('Transaction updated:', response.data);
-  //   } catch (error) {
-  //     console.error('Error updating transaction status:', error);
-  //   }
-  // };
-
   const renderTransaction = ({ item }) => (
     <View style={styles.transactionContainer}>
       <Text style={styles.transactionText}>Item: {item.itemName}</Text>

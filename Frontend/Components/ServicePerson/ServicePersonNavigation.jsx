@@ -1,22 +1,22 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Dashboard from './Dashboard';
+import ServicePersonDashboard from './ServicePersonDashboard';
 import OrderDetails from './OrderDetails';
-import AddItem from '../WareHouse/AddItem';
-import returnItem from '../WareHouse/Transaction/ReturnItem'
+import RequestItem from './RequestItem';
 
-const headerColor = '#186cbf';  
+const headerColor = '#186cbf'; 
+
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = () => {
+const ServicePersonTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: headerColor,
         tabBarLabelStyle: {
-          fontSize: 16,
+          fontSize: 15,
           paddingBottom: 5,
           fontWeight: '700',
         },
@@ -28,18 +28,13 @@ const TabNavigator = () => {
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          if (route.name === 'Dashboard') {
+        
+          if (route.name === 'ServicePersonDashboard') {
             iconName = 'home';
-          } 
-          else if (route.name === 'OrderDetails') {
-            iconName = 'cube-outline';
-          }
-          else if (route.name === 'AddItem') {
+          } else if (route.name === 'OrderDetails') {
+            iconName = 'layers-triple';
+          } else if (route.name === 'RequestItem') {
             iconName = 'plus';
-          }
-          
-          else if (route.name === 'returnItem') {
-            iconName = 'truck-delivery'; 
           }
 
           return (
@@ -52,36 +47,31 @@ const TabNavigator = () => {
         },
       })}
     >
+  
       <Tab.Screen 
-        name="Dashboard" 
-        component={Dashboard}
-        options={{ title: 'Home' }}
+        name="ServicePersonDashboard" 
+        component={ServicePersonDashboard} 
+        options={{ title: 'ServicePersonDashboard' }} 
       />
+     
       <Tab.Screen 
         name="OrderDetails" 
         component={OrderDetails} 
-        options={{ title: 'Orders' }} 
-      />
-      <Tab.Screen 
-        name="AddItem" 
-        component={AddItem} 
-        options={{ title: 'AddItem' }} 
+        options={{ title: 'Order Details' }} 
       />
 
-
+    
       <Tab.Screen 
-        name="returnItem" 
-        component={returnItem} 
-        options={{ title: 'return' }} 
+        name="RequestItem" 
+        component={RequestItem} 
+        options={{ title: 'Request Item' }} 
       />
     </Tab.Navigator>
   );
 };
 
-const Navigation = () => {
-  return (
-    <TabNavigator />
-  );
+const ServicePersonNavigation = () => {
+  return <ServicePersonTabNavigator />;
 };
 
-export default Navigation;
+export default ServicePersonNavigation;

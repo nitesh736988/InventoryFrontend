@@ -75,7 +75,7 @@ const ServicePersonRegistration = () => {
           style={styles.input}
           placeholder="Password"
           value={contact}
-          editable={false}
+          editable={true      }
         />
         <TouchableOpacity title="Register" style={{ backgroundColor: 'black', padding: 16, borderRadius: 5 }} onPress={handleSubmit} disabled={loading}>
             <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>Register</Text>  

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,32 +11,35 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome'; 
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env';
-
+import { useNavigation } from '@react-navigation/native';
 
 const Dashboard = () => {
+  const navigation = useNavigation(); 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [updatedQuantity, setUpdatedQuantity] = useState('');
-  const [checked, setChecked] = useState('in'); 
-  const [ isRefreshClicked, setIsRefreshClicked ] = useState(false);
+  const [checked, setChecked] = useState('in');
+  const [isRefreshClicked, setIsRefreshClicked] = useState(false);
 
   const fetchData = async () => {
+    setLoading(true); 
     try {
       const response = await axios.get(
         'http://88.222.214.93:8000/admin/viewItems',
-        {timeout: 2000},
+        { timeout: 2000 }
       );
-      const result = await response.data.data;
+      const result = response.data.data;
       setData(result);
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response));
       console.log('Error fetching data:', error);
     } finally {
       setLoading(false);
+      setIsRefreshClicked(false);
     }
   };
 
@@ -45,8 +48,9 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    if(isRefreshClicked)
+    if (isRefreshClicked) {
       fetchData();
+    }
   }, [isRefreshClicked]);
 
   const handleUpdate = async () => {
@@ -60,22 +64,22 @@ const Dashboard = () => {
         Alert.alert('Error', 'Stock cannot be negative');
         return;
       }
-      // console.log(selectedItem._id , updatedStock)   
+
       const response = await axios.patch(
         `http://88.222.214.93:8000/warehouse-admin/updateItem?id=${selectedItem._id}`,
-        {stock: updatedStock},
-      );     
+        { stock: updatedStock }
+      );
       Alert.alert('Success', 'Item updated successfully');
 
       const updatedData = data.map(item =>
         item._id === selectedItem._id
-          ? {...item, stock: updatedStock}
-          : item,
+          ? { ...item, stock: updatedStock }
+          : item
       );
       setData(updatedData);
       setModalVisible(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       Alert.alert('Error', 'Failed to update item');
     }
   };
@@ -95,7 +99,7 @@ const Dashboard = () => {
           onPress: () => handleDelete(_id),
         },
       ],
-      {cancelable: false},
+      { cancelable: false }
     );
   };
 
@@ -105,13 +109,11 @@ const Dashboard = () => {
       Alert.alert('Success', 'Item deleted successfully');
       setData(data.filter(item => item._id !== _id));
     } catch (error) {
-
       Alert.alert('Error', 'Failed to delete item');
     }
   };
 
-  // Function to handle increment and decrement
-  const handleQuantityChange = (action) => {
+  const handleQuantityChange = action => {
     let newQuantity = parseInt(updatedQuantity);
     if (action === 'increment') {
       newQuantity += 1;
@@ -133,11 +135,11 @@ const Dashboard = () => {
     <>
       <View style={styles.container}>
         {data !== null &&
-          data.map(({_id, itemName, stock}) => (
+          data.map(({ _id, itemName, stock }) => (
             <View key={_id} style={styles.card}>
               <TouchableOpacity
                 onPress={() => {
-                  setSelectedItem({_id, itemName, stock});
+                  setSelectedItem({ _id, itemName, stock });
                   setUpdatedQuantity(stock.toString());
                   setModalVisible(true);
                 }}
@@ -146,22 +148,23 @@ const Dashboard = () => {
                 <Text style={styles.cardValue}>{stock ? stock : 0}</Text>
               </TouchableOpacity>
 
-              {/* Delete Icon */}
               <TouchableOpacity
                 style={styles.deleteIcon}
                 onPress={() => confirmDelete(_id)}>
                 <Icon name="trash" size={24} color="red" />
               </TouchableOpacity>
             </View>
-          ))
-        }
-        <TouchableOpacity style={{ position: 'absolute', bottom: 40, right: 40 }} 
-          onPress={ () => {
-            console.log("btn Clicked");
+          ))}
+        <TouchableOpacity
+          style={{ position: 'absolute', bottom: 40, right: 40 }}
+          onPress={() => {
             setIsRefreshClicked(true);
-          }} 
-        >
-          <Icon name='refresh' size={30} color='black' />
+          }}>
+          <Icon name="refresh" size={30} color="black" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ServicePersonRegistration')}>
+          <Text style={styles.buttonText}>Service Person Registration</Text>
         </TouchableOpacity>
       </View>
 
@@ -178,7 +181,6 @@ const Dashboard = () => {
               <Text style={styles.modalTitle}>Update Item</Text>
               <Text style={styles.modalItemName}>{selectedItem.itemName}</Text>
 
-              {/* Quantity Input with + and - buttons */}
               <View style={styles.quantityContainer}>
                 <TouchableOpacity
                   style={styles.quantityButton}
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fbd33b'
+    backgroundColor: '#fbd33b',
   },
   card: {
     backgroundColor: '#fff',
@@ -250,6 +252,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginTop: 5,
+  },
+  button: {
+    backgroundColor: '#070604',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fbd33b',
+    fontSize: 16,
   },
   deleteIcon: {
     padding: 10,

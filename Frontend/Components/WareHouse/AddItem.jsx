@@ -1,19 +1,34 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import axios from 'axios'; 
 import { API_URL } from '@env';
 
 const AddItem = () => {
     const [itemName, setItemName] = useState('');
     const [stock, setStock] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
+        if (!itemName || !stock) {
+            Alert.alert('Error', 'Please fill in both fields.');
+            return;
+        }
+
+        const stockValue = parseInt(stock, 10);
+        if (isNaN(stockValue) || stockValue < 0) {
+            Alert.alert('Error', 'Stock must be a positive integer.');
+            return;
+        }
+
         const itemData = {
-            name: itemName,
-            stock: parseInt(stock, 10), 
+            itemName,
+            stock: stockValue, 
         };
 
+        setLoading(true);
+
         try {
+            console.log(itemData)
             const response = await axios.post(`${API_URL}/warehouse-admin/newItem`, itemData);
             console.log(response);
             console.log('Response:', response.data);
@@ -23,10 +38,9 @@ const AddItem = () => {
             setStock('');
         } catch (error) {
             console.log('Error adding item:', error);
-           
-            if(error.response.message === "servicePerson not found"){
-                Alert.alert("Service Person Doesn't exits");
-            }
+            Alert.alert('Error', 'Failed to add item. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -45,7 +59,13 @@ const AddItem = () => {
                 onChangeText={setStock}
                 keyboardType="numeric"
             />
-            <Button title="Add Item" onPress={handleSubmit} />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                {loading ? (
+                    <ActivityIndicator color="#ffffff" />
+                ) : (
+                    <Text style={styles.buttonText}>Add Item</Text>
+                )}
+            </TouchableOpacity>
         </View>
     );
 };
@@ -66,6 +86,16 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 15,
         backgroundColor: '#fff', 
+    },
+    button: {
+        backgroundColor: '#070604', 
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#ffffff', 
+        fontSize: 16,
     },
 });
 
