@@ -8,6 +8,7 @@ const ReturnItem = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false); 
+  const [ approvedSuccessfully, setApprovedSuccessfully ] = useState(false);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -22,7 +23,7 @@ const ReturnItem = () => {
       Alert.alert("Error", "Unable to fetch orders");
     } finally {
       setLoading(false);
-      setRefreshing(false); 
+      setRefreshing(false);
     }
   };
 
@@ -30,11 +31,29 @@ const ReturnItem = () => {
     fetchOrders();
   }, []);
   
+  const handleApproveBtn = async( sendTransactionId ) => {
+    try{
+      const sendRequest = await axios.put(`${API_URL}/warehouse-admin/update-status`, { status: true, pickupItemId: sendTransactionId });
+      console.log(sendRequest.data);
+      if(sendRequest.status === 200){
+        setApprovedSuccessfully(true);
+      } 
+    } catch(error){
+      Alert.alert(JSON.stringify(error));
+    }
+  }
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchOrders();
-  };
+  useEffect(() => {
+    // console.log(refreshing);
+    if(refreshing){
+      console.log("Refreshed");
+      fetchOrders();
+    }
+  }, [refreshing]);
+
+  const dateObject = (newDate) => {
+    return new Date(newDate)
+  }
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />;
@@ -44,7 +63,10 @@ const ReturnItem = () => {
     <View key={item._id} >
       {/* <Text>{JSON.stringify(item)}</Text>   */}
       <View style={{ flexDirection: 'column', borderWidth: 1, borderColor: 'white', borderRadius: 5, marginBottom: 10, backgroundColor: 'white', paddingHorizontal: 8 }}>
-        <Text style={{ color: '#000'}}>Name: {item.servicePerson.name}</Text>
+        <View style= {{ flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={{ color: '#000'}}>Name: {item.servicePerson.name}</Text>  
+          { (item.status || approvedSuccessfully) && <Text style={{ color: 'green' }}>Approved Success</Text> }
+        </View>
         <Text style={{ color: '#000'}}>Contact: {item.servicePerson.contact}</Text>
         <Text style={{ color: '#000'}}>Farmer Name: {item.farmerName}</Text>
         <Text style={{ color: '#000'}}>Farmer Contact: {item.farmerContact}</Text>
@@ -58,13 +80,24 @@ const ReturnItem = () => {
         </View>
         <Text style={{ color: '#000'}}>Serial Number: {item.serialNumber}</Text>
         <Text style={{ color: '#000'}}>Remark: {item.remark}</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5}}>
-          <TouchableOpacity style={{ width: '50%', borderRadius: 5, backgroundColor: 'red', padding: 8, marginRight: 4}}>
-            <Text style={{ color: '#fff', textAlign: 'center' }}>Decline</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{ width: '50%', borderRadius: 5, backgroundColor: 'green',  padding: 8}}>
-            <Text style={{ color: '#fff', textAlign: 'center'}}>Approve</Text>
-          </TouchableOpacity>
+        <Text style={{ color: '#000'}}>Date: {dateObject(item.pickupDate).getDate()}/{dateObject(item.pickupDate).getMonth()}/{dateObject(item.pickupDate).getFullYear()}</Text>
+        <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5}}>
+          { !(item.status) && !approvedSuccessfully &&  
+                <>
+                  <TouchableOpacity style={{ width: '49%', borderRadius: 5, backgroundColor: 'red', padding: 8 }}>
+                    <Text style={{ color: '#fff', textAlign: 'center' }}>Decline</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ width: '49%', borderRadius: 5, backgroundColor: 'green',  padding: 8}} 
+                      onPress={ () => {
+                          const sendTransactionId = item._id;
+                          handleApproveBtn(sendTransactionId);
+                        }
+                      }
+                  >
+                  <Text style={{ color: '#fff', textAlign: 'center'}}>Approve</Text>
+                  </TouchableOpacity> 
+                </>
+          }
       </View>
       </View>
     </View>
@@ -91,7 +124,10 @@ const ReturnItem = () => {
       {/* )} */}
       <TouchableOpacity 
         style={{ position: 'absolute', top: 16, right: 32 }} 
-        onPress={handleRefresh} 
+        onPress={() => { 
+            setRefreshing(true);
+          }
+        } 
       >
         <Icon name='refresh' size={30} color='black' />
       </TouchableOpacity>

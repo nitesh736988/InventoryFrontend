@@ -22,6 +22,7 @@ const OrderDetails = () => {
       Alert.alert("Error", "Unable to fetch orders");
     } finally {
       setLoading(false);
+      setIsRefreshClicked(false);
     }
   };
 

@@ -52,8 +52,8 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (isRefreshClicked) {
+ useEffect(() => {
+     if (isRefreshClicked) {
       fetchData();
     }
   }, [isRefreshClicked]);
