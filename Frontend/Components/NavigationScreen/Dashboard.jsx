@@ -10,6 +10,7 @@ import {
   Button,
   TouchableOpacity,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env';
@@ -23,7 +24,11 @@ const Dashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [updatedQuantity, setUpdatedQuantity] = useState('');
   const [checked, setChecked] = useState('in');
-  const [isRefreshClicked, setIsRefreshClicked] = useState(false);
+  const [ isRefreshClicked, setIsRefreshClicked ] = useState(false);
+  const [ selectedWherehouse, setSelectedWherehouse ] = useState('');
+  const [ placeName, setPlaceName ] = useState('');
+  const [ defectiveItems, setDefectiveItems ] = useState(0);
+  const [ clickedItemName, setClickedItemName ] = useState('');
 
   const fetchData = async () => {
     setLoading(true); 
@@ -55,6 +60,7 @@ const Dashboard = () => {
 
   const handleUpdate = async () => {
     try {
+      console.log({ itemName: clickedItemName, quantity: updatedQuantity, defectiveItem: defectiveItems, warehouse: selectedWherehouse, itemComingFrom: placeName })
       const updatedStock =
         checked === 'in'
           ? parseInt(selectedItem.stock) + parseInt(updatedQuantity)
@@ -65,11 +71,13 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await axios.patch(
-        `http://88.222.214.93:8000/warehouse-admin/updateItem?id=${selectedItem._id}`,
-        { stock: updatedStock }
+      const response = await axios.post(
+        `http://88.222.214.93:8000/warehouse-admin/updateItem`,
+        { itemName: clickedItemName, quantity: updatedQuantity, defectiveItem: defectiveItems, warehouse: selectedWherehouse, itemComingFrom: placeName }
       );
-      Alert.alert('Success', 'Item updated successfully');
+      if(response.status === 200){
+        Alert.alert('Success', 'Item updated successfully');
+      }
 
       const updatedData = data.map(item =>
         item._id === selectedItem._id
@@ -140,6 +148,7 @@ const Dashboard = () => {
               <TouchableOpacity
                 onPress={() => {
                   setSelectedItem({ _id, itemName, stock });
+                  setClickedItemName(itemName);
                   setUpdatedQuantity(stock.toString());
                   setModalVisible(true);
                 }}
@@ -202,6 +211,36 @@ const Dashboard = () => {
                   <Text style={styles.quantityButtonText}>+</Text>
                 </TouchableOpacity>
               </View>
+                <Picker
+                  selectedValue={selectedWherehouse}
+                  style={styles.picker}
+                  onValueChange={(itemValue) => setSelectedWherehouse(itemValue)}
+                >
+                  <Picker.Item label="Select the wherehouse" value="" />
+                  <Picker.Item label="Bhiwani" value="Bhiwani" />
+                  <Picker.Item label="Sirsa" value="Sirsa" />
+                  <Picker.Item label="Hisar" value="Hisar" />
+                </Picker>
+                <View>
+                  <Text>From</Text>
+                  <TextInput 
+                      style={{ paddingHorizontal: 5, paddingVertical: 5, borderWidth: 1, marginBottom: 10, borderRadius: 5}}
+                      value={placeName}
+                      onChangeText={setPlaceName}
+                      keyboardType="text"
+                      placeholder="Enter the place"
+                  />
+                </View>
+                <View>
+                  <Text>Defective Items</Text>
+                  <TextInput 
+                      style={{ paddingHorizontal: 5, paddingVertical: 5, borderWidth: 1, marginBottom: 10, borderRadius: 5}}
+                      value={defectiveItems}
+                      onChangeText={setDefectiveItems}
+                      keyboardType="numeric"
+                      placeholder="Enter the defective items"
+                  />
+                </View>
               <Button title="Submit" onPress={handleUpdate} />
               <Button
                 title="Cancel"

@@ -5,15 +5,15 @@ import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { API_URL } from '@env';
-import { FlatList } from 'react-native-gesture-handler';
+// import { FlatList } from 'react-native-gesture-handler';
 
-const RequestItem = ({ route }) => {
+const AddOrder = ({ route }) => {
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [farmerName, setFarmerName] = useState('');
   const [farmerContact, setFarmerContact] = useState('');
   const [farmerVillageName, setFarmerVilageName] = useState('');
-  const [remarks, setRemarks] = useState(''); // State for remarks
+  const [remarks, setRemarks] = useState(''); 
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
   const items = [
@@ -25,7 +25,6 @@ const RequestItem = ({ route }) => {
   const [status, setStatus] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [imageUri, setImageUri] = useState(null);
-  const [serialNumber, setSerialNumber ] = useState('');
   
   const warehouses = ['Bhiwani', 'Hisar', 'Sirsa'];
 
@@ -51,7 +50,7 @@ const RequestItem = ({ route }) => {
   };
 
   const validateInput = () => {
-    if (!name || !contact || !warehouse || !status || !farmerContact || !farmerName || !farmerVillageName ) {
+    if (!name || !contact || !warehouse || !status) {
       Alert.alert('Error', 'Please fill in all fields.');
       return false;
     }
@@ -85,49 +84,40 @@ const RequestItem = ({ route }) => {
   };
 
   const handleSubmit = async () => {
-    // const formData = new FormData();
-    console.log('btn clicked');
     if (!validateInput()) return;
-    console.log(selectedItems)
-    let itemSelected = []
+
+    const data = new FormData();
+    data.append('name', name);
+    data.append('contact', contact);
+    data.append('Farmer Name', farmerName);
+    data.append('Farmer Contact Number', farmerContact);
+    data.append('Farmer Village Number', farmerVillageName);
+    data.append('warehouse', warehouse);
+    data.append('status', status);
+    data.append('remarks', remarks);
+    console.log(data); 
+
     selectedItems.forEach(item => {
-      // data.append('items[]', JSON.stringify({ itemName: item, quantity: quantities[item] }));
-      itemSelected.push({itemName: item, quantity: parseInt(quantities[item])});
+      data.append('items[]', JSON.stringify({ itemName: item, quantity: quantities[item] }));
     });
-    console.log(itemSelected);
 
-    const data = { farmerName, farmerContact, farmerVillage: farmerVillageName, items: JSON.stringify(itemSelected), warehouse, remark: remarks, serialNumber }
-
-    // if (imageUri) {
-    //   const filename = imageUri.split('/').pop();
-    //   const imageType = `image/${filename.split('.').pop()}`;
-    //   // data.append('image', {
-    //   //   uri: imageUri,
-    //   //   name: fileName,
-    //   //   type: imageType,
-    //   // });
-    //   // data.image = {
-    //   //   uri: imageUri,
-    //   //   filename,
-    //   //   type: imageType
-    //   // }
-    //   data.image = filename;
-    // }
-
-    console.log(data);
+    if (imageUri) {
+      const fileName = imageUri.split('/').pop();
+      const imageType = `image/${fileName.split('.').pop()}`;
+      data.append('image', {
+        uri: imageUri,
+        name: fileName,
+        type: imageType,
+      });
+    }
 
     try {
-      const response = await axios.post(`${API_URL}/service-person/create-pickup-items`, data, 
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            // 'Content-Type': 'application/json'
+      const response = await axios.post(`${API_URL}/service-person/create-pickup-items`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-          },
-      }
-    );
-
-      console.log(response.data);
       Alert.alert(JSON.stringify(response.data));
 
       if (response.status === 200) {
@@ -138,7 +128,6 @@ const RequestItem = ({ route }) => {
         Alert.alert('Error', 'Failed to save transaction');
       }
     } catch (error) {
-      Alert.alert(JSON.stringify(error));
       if (error.response && error.response.data.message === "servicePerson not found") {
         Alert.alert("Service Person Doesn't exist");
       }
@@ -163,7 +152,7 @@ const RequestItem = ({ route }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
-        <Text style={styles.buttonText}>Request Item</Text>
+        <Text style={styles.buttonText}>Add Item</Text>
       </TouchableOpacity>
 
       <Modal
@@ -172,22 +161,7 @@ const RequestItem = ({ route }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={{ paddingHorizontal: 20, backgroundColor: '#fbd33b', paddingTop: 30}}>
-          <Text>Select Items:</Text>
-          <MultiSelect
-            items={items}
-            uniqueKey="itemName"
-            onSelectedItemsChange={handleItemSelect}
-            selectedItems={selectedItems}
-            selectText="Pick Items"
-            searchInputPlaceholderText="Search Items..."
-            displayKey="itemName"
-            hideSubmitButton={true}
-            styleListContainer={{ backgroundColor: '#fbd33b' }}
-            styleDropdownMenuSubsection={{ backgroundColor: '#fbd33b' }}
-          />
-        </View>
-        <ScrollView contentContainerStyle={{...styles.scrollContainer }}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}  scrollEnabled={true}>
           <View style={styles.modalContainer}>
             <Text>Service Person Name:</Text>
             <TextInput value={name} onChangeText={setName} placeholder="Enter Name" style={styles.input} />
@@ -204,6 +178,19 @@ const RequestItem = ({ route }) => {
             <Text>Farmer Village Name:</Text>
             <TextInput value={farmerVillageName} onChangeText={setFarmerVilageName} placeholder="Enter Contact" style={styles.input} />
 
+            <Text>Select Items:</Text>
+              <MultiSelect
+                items={items}
+                uniqueKey="itemName"
+                onSelectedItemsChange={handleItemSelect}
+                selectedItems={selectedItems}
+                selectText="Pick Items"
+                searchInputPlaceholderText="Search Items..."
+                displayKey="itemName"
+                hideSubmitButton={true}
+                styleListContainer={{ backgroundColor: '#fbd33b' }}
+                styleDropdownMenuSubsection={{ backgroundColor: '#fbd33b' }}
+              />
 
             {selectedItems.map((item, index) => (
               <View key={index}>
@@ -217,22 +204,6 @@ const RequestItem = ({ route }) => {
                 />
               </View>
             ))}
-
-            <Text>Serial Number</Text>
-            <TextInput 
-                  value={remarks} 
-                  onChangeText={setRemarks} 
-                  placeholder="Enter serial Number" 
-                  style={styles.input} 
-                  maxLength={100} 
-                  multiline 
-                  numberOfLines={4}
-                />
-            {/* <Text>Upload Image:</Text>
-            <TouchableOpacity style={styles.button} onPress={selectImage}>
-              <Text style={styles.buttonText}>Upload Image</Text>
-            </TouchableOpacity> */}
-            {/* {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />} */}
 
             <Text>Warehouse:</Text>
             <Picker
@@ -249,8 +220,8 @@ const RequestItem = ({ route }) => {
               <Text>Remarks:</Text>
               <ScrollView style={styles.scrollView}>
                 <TextInput 
-                  value={serialNumber} 
-                  onChangeText={setSerialNumber} 
+                  value={remarks} 
+                  onChangeText={setRemarks} 
                   placeholder="Enter Remarks" 
                   style={styles.input} 
                   maxLength={100} 
@@ -270,7 +241,7 @@ const RequestItem = ({ route }) => {
               <Picker.Item label="OUT" value="OUT" />
             </Picker>
 
-            <TouchableOpacity style={{...styles.button }} onPress={handleSubmit}>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
@@ -285,7 +256,6 @@ const RequestItem = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 200,
     padding: 20,
   },
   scrollContainer: {
@@ -341,4 +311,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RequestItem;
+export default AddOrder;

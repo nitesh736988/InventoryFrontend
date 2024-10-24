@@ -4,7 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import ServicePersonDashboard from './ServicePersonDashboard';
 import OrderDetails from './OrderDetails';
 import RequestItem from './RequestItem';
-
+import AddOrder from './AddOrder';
 const headerColor = '#186cbf'; 
 
 
@@ -33,6 +33,11 @@ const ServicePersonTabNavigator = () => {
             iconName = 'home';
           } else if (route.name === 'OrderDetails') {
             iconName = 'layers-triple';
+          }
+
+            else if (route.name === 'AddOrder') {
+              iconName = 'cart-arrow-right';
+           
           } else if (route.name === 'RequestItem') {
             iconName = 'plus';
           }
@@ -51,13 +56,19 @@ const ServicePersonTabNavigator = () => {
       <Tab.Screen 
         name="ServicePersonDashboard" 
         component={ServicePersonDashboard} 
-        options={{ title: 'ServicePersonDashboard' }} 
+        options={{ title: 'Dashboard' }} 
       />
      
       <Tab.Screen 
         name="OrderDetails" 
         component={OrderDetails} 
         options={{ title: 'Order Details' }} 
+      />
+
+      <Tab.Screen 
+        name="AddOrder" 
+        component={AddOrder} 
+        options={{ title: 'Add Order' }} 
       />
 
     

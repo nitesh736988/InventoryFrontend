@@ -12,9 +12,10 @@ const ReturnItem = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/admin/transactions/allTransactions`);
+      const response = await axios.get(`${API_URL}/warehouse-admin/all-pickup-items`);
+      console.log(response.data.pickupItems);
       if (response.status === 200) {
-        setOrders(response.data.data); 
+        setOrders(response.data.pickupItems); 
       }
     } catch (error) {
       console.log(error);
@@ -40,35 +41,54 @@ const ReturnItem = () => {
   }
 
   const renderOrderItem = ({ item }) => (
-    <View key={item._id} style={styles.card}>
-      <Text style={styles.cardTitle}>{item.servicePerson.name}</Text>
-      <Text style={styles.cardTitle}>{item.servicePerson.contact}</Text>
-      {item.items.map(({ _id, itemName, quantity }) => (
-        <View key={_id} style={styles.itemContainer}>
-          <Text style={styles.cardTitle}>{itemName}</Text>
-          <Text style={styles.cardTitle}>{quantity}</Text>
+    <View key={item._id} >
+      {/* <Text>{JSON.stringify(item)}</Text>   */}
+      <View style={{ flexDirection: 'column', borderWidth: 1, borderColor: 'white', borderRadius: 5, marginBottom: 10, backgroundColor: 'white', paddingHorizontal: 8 }}>
+        <Text style={{ color: '#000'}}>Name: {item.servicePerson.name}</Text>
+        <Text style={{ color: '#000'}}>Contact: {item.servicePerson.contact}</Text>
+        <Text style={{ color: '#000'}}>Farmer Name: {item.farmerName}</Text>
+        <Text style={{ color: '#000'}}>Farmer Contact: {item.farmerContact}</Text>
+        <Text style={{ color: '#000'}}>Village Name: {item.farmerVillage}</Text>
+        <View style={{ flexDirection: 'row'}}>
+          {
+            (item.items).map(({_id, itemName, quantity }, index) => {
+              return <Text key={_id} style={{ color: '#000'}}>{itemName}: {quantity}, </Text>
+            })  
+          }
         </View>
-      ))}
+        <Text style={{ color: '#000'}}>Serial Number: {item.serialNumber}</Text>
+        <Text style={{ color: '#000'}}>Remark: {item.remark}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 5}}>
+          <TouchableOpacity style={{ width: '50%', borderRadius: 5, backgroundColor: 'red', padding: 8, marginRight: 4}}>
+            <Text style={{ color: '#fff', textAlign: 'center' }}>Decline</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ width: '50%', borderRadius: 5, backgroundColor: 'green',  padding: 8}}>
+            <Text style={{ color: '#fff', textAlign: 'center'}}>Approve</Text>
+          </TouchableOpacity>
+      </View>
+      </View>
     </View>
+    
+
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Return Item</Text>
-      {orders.length === 0 ? (
+      {/* {orders.length === 0 ? (
         <View>
           <Text>No orders found.</Text>
           <TouchableOpacity onPress={handleRefresh}>
             <Text style={styles.refreshButton}>Retry</Text>
           </TouchableOpacity>
         </View>
-      ) : (
+      ) : ( */}
         <FlatList
           data={orders}
           renderItem={renderOrderItem}
           keyExtractor={item => item._id}
         />
-      )}
+      {/* )} */}
       <TouchableOpacity 
         style={{ position: 'absolute', top: 16, right: 32 }} 
         onPress={handleRefresh} 

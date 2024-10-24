@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dashboard from './Dashboard';
-import OrderDetails from './OrderDetails';
+import OrderDetails from './Order';
 import AddItem from '../WareHouse/AddItem';
 import returnItem from '../WareHouse/Transaction/ReturnItem'
 

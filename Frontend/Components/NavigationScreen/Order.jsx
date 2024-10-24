@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
 import axios from 'axios'; 
 import Icon from 'react-native-vector-icons/FontAwesome'; 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { API_URL } from '@env';
 
 const OrderDetails = () => {
@@ -11,9 +12,10 @@ const OrderDetails = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${API_URL}/admin/transactions/allTransactions`);
+      const response = await axios.get(`${API_URL}/warehouse-admin/order-details`);
       if (response.status === 200) {
-        setOrders(response.data.data); 
+        console.log(response.data.itemDetails);
+        setOrders(response.data.itemDetails); 
       }
     } catch (error) {
       console.log(error);
@@ -22,6 +24,10 @@ const OrderDetails = () => {
       setLoading(false);
     }
   };
+
+  const dateObject = (newDate) => {
+    return new Date(newDate);
+  }
 
   useEffect(() => {
     fetchOrders();
@@ -46,14 +52,30 @@ const OrderDetails = () => {
 
   const renderOrder = ({ item }) => (
     <View key={item._id} style={styles.card}>
-      <Text style={styles.cardTitle}>{item.servicePerson.name}</Text>
-      <Text style={styles.cardTitle}>{item.servicePerson.contact}</Text>
-      {item.items.map(({ _id, itemName, quantity }) => (
-        <View key={_id} style={styles.itemContainer}>
-          <Text style={styles.cardTitle}>{itemName}</Text>
-          <Text style={styles.cardTitle}>{quantity}</Text>
+      <View key={item._id} style={{ flexDirection: 'column'}}>
+        <View style={{...styles.itemContainer, backgroundColor: '#fbd33b'}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{...styles.cardTitle, width: 150}}>{item.itemComingFrom}</Text>
+            <MaterialCommunityIcons name='forward' size={30} color='white' />
+            <Text style={{ ...styles.cardTitle, width: 150, textAlign: 'right' }}>{item.warehouse}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{...styles.cardTitle, width: 150}}>{item.itemName}</Text>
+            <MaterialCommunityIcons name='forward' size={30} color='white' />
+            <Text style={{...styles.cardTitle, width: 150, textAlign: 'right'}}>{item.quantity}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{...styles.cardTitle, width: 150}}>Defective</Text>
+            <MaterialCommunityIcons name='forward' size={30} color='white' />
+            <Text style={{...styles.cardTitle, width: 150, textAlign: 'right'}}>{item.defectiveItem}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{...styles.cardTitle, width: 150}}>Arrival Date</Text>
+            <MaterialCommunityIcons name='forward' size={30} color='white' />
+            <Text style={{...styles.cardTitle, width: 150, textAlign: 'right'}}>`{dateObject(item.arrivedDate).getDate()}/{dateObject(item.arrivedDate).getMonth()}/{dateObject(item.arrivedDate).getFullYear()}`</Text>
+          </View>
         </View>
-      ))}
+      </View>
     </View>
   );
 

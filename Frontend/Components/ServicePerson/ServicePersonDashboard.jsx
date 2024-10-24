@@ -13,14 +13,14 @@ const ServicePersonDashboard = () => {
   const fetchServicePersons = async () => {
     try {
       const response = await axios.get(`${API_URL}/service-person/dashboard`);
-      console.log('API Response:', response.data);
+      console.log('API Response:', response.data.data.items);
       console.log(response.status);
 
       if (response.status === 200) {
-        setServicePersons(response.data.data);
+        setServicePersons(response.data.data.items);
         // Alert.alert("Response", JSON.stringify(response.data.data));
       } else if (response.data.servicePersons) {
-        setServicePersons(response.data.servicePersons);
+        setServicePersons(response.data.data.items);
       } else {
         console.log('Unexpected API response structure:', response.data);
       }
@@ -53,9 +53,9 @@ const ServicePersonDashboard = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Service Person Transaction Detail</Text>
+      <Text style={{ color: 'black', fontSize: 22 }}>Service Person Transaction Detail</Text>
       {servicePersons !== null &&
-        servicePersons.map(({name, value}, index) => (
+        servicePersons.map(({itemName, quantity}, index) => (
           <View key={index} style={styles.card}>
             <TouchableOpacity
               onPress={() => {
@@ -64,8 +64,8 @@ const ServicePersonDashboard = () => {
                 // setModalVisible(true);
               }}
               style={styles.cardContent}>
-              <Text style={styles.cardTitle}>{name}</Text>
-              <Text style={styles.cardValue}>{value ? value : 0}</Text>
+              <Text style={styles.cardTitle}>{itemName}</Text>
+              <Text style={styles.cardValue}>{quantity ? quantity : 0}</Text>
             </TouchableOpacity>
 
             {/* Delete Icon */}

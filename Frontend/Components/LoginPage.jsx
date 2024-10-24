@@ -85,6 +85,7 @@ const LoginPage = () => {
             />
             <View style={{ width: '100%', borderRadius: 5, backgroundColor: '#fbd33b', borderColor: '#070604', borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12 }}> 
               <TextInput
+                style={{ color: 'black', width: '90%'}}
                 placeholder="PASSWORD"
                 secureTextEntry={showPassword}
                 value={password}
@@ -152,12 +153,14 @@ const styles = StyleSheet.create({
     borderColor: '#070604',
     borderWidth: 1,
     borderRadius: 7,
+    color: 'black'
   },
   picker: {
     height: 50,
     borderColor: '#070604',
     borderWidth: 1,
     borderRadius: 7, 
+    color: 'black',
   },
   buttonView: {
     width: '100%',
