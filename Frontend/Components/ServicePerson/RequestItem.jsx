@@ -8,8 +8,8 @@ import { API_URL } from '@env';
 import { FlatList } from 'react-native-gesture-handler';
 
 const RequestItem = ({ route }) => {
-  const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
+  // const [name, setName] = useState('');
+  // const [contact, setContact] = useState('');
   const [farmerName, setFarmerName] = useState('');
   const [farmerContact, setFarmerContact] = useState('');
   const [farmerVillageName, setFarmerVilageName] = useState('');
@@ -51,7 +51,7 @@ const RequestItem = ({ route }) => {
   };
 
   const validateInput = () => {
-    if (!name || !contact || !warehouse || !status || !farmerContact || !farmerName || !farmerVillageName ) {
+    if ( !warehouse || !farmerContact || !farmerName || !farmerVillageName ) {
       Alert.alert('Error', 'Please fill in all fields.');
       return false;
     }
@@ -66,23 +66,23 @@ const RequestItem = ({ route }) => {
     return true;
   };
 
-  const selectImage = () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 1,
-    };
+  // const selectImage = () => {
+  //   const options = {
+  //     mediaType: 'photo',
+  //     quality: 1,
+  //   };
 
-    launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const source = response.assets[0].uri;
-        setImageUri(source);
-      }
-    });
-  };
+  //   launchImageLibrary(options, response => {
+  //     if (response.didCancel) {
+  //       console.log('User cancelled image picker');
+  //     } else if (response.error) {
+  //       console.log('ImagePicker Error: ', response.error);
+  //     } else {
+  //       const source = response.assets[0].uri;
+  //       setImageUri(source);
+  //     }
+  //   });
+  // };
 
   const handleSubmit = async () => {
     // const formData = new FormData();
@@ -96,7 +96,8 @@ const RequestItem = ({ route }) => {
     });
     console.log(itemSelected);
 
-    const data = { farmerName, farmerContact, farmerVillage: farmerVillageName, items: JSON.stringify(itemSelected), warehouse, remark: remarks, serialNumber }
+    const data = { farmerName, farmerContact, farmerVillage: farmerVillageName, items: itemSelected, warehouse, remark: remarks, serialNumber, incoming: true }
+    console.log(data);
 
     // if (imageUri) {
     //   const filename = imageUri.split('/').pop();
@@ -120,25 +121,25 @@ const RequestItem = ({ route }) => {
       const response = await axios.post(`${API_URL}/service-person/create-pickup-items`, data, 
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            // 'Content-Type': 'application/json'
+            // 'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json'
 
           },
       }
     );
 
       console.log(response.data);
-      Alert.alert(JSON.stringify(response.data));
+      // Alert.alert(JSON.stringify(response.data.response));
 
       if (response.status === 200) {
-        Alert.alert('Success', 'Transaction saved successfully');
         resetForm();
+        Alert.alert('Success', 'Transaction saved successfully');
         setModalVisible(false);
       } else {
         Alert.alert('Error', 'Failed to save transaction');
       }
     } catch (error) {
-      Alert.alert(JSON.stringify(error));
+      // Alert.alert(JSON.stringify(error.response));
       if (error.response && error.response.data.message === "servicePerson not found") {
         Alert.alert("Service Person Doesn't exist");
       }
@@ -146,8 +147,8 @@ const RequestItem = ({ route }) => {
   };
 
   const resetForm = () => {
-    setName('');
-    setContact('');
+    // setName('');
+    // setContact('');
     setFarmerName('');
     setFarmerContact('');
     setFarmerVilageName('');
@@ -156,7 +157,7 @@ const RequestItem = ({ route }) => {
     setWarehouse('');
     setStatus('');
     setRemarks(''); 
-    setImageUri(null);
+    // setImageUri(null);
   };
 
 
@@ -189,12 +190,6 @@ const RequestItem = ({ route }) => {
         </View>
         <ScrollView contentContainerStyle={{...styles.scrollContainer }}>
           <View style={styles.modalContainer}>
-            <Text>Service Person Name:</Text>
-            <TextInput value={name} onChangeText={setName} placeholder="Enter Name" style={styles.input} />
-
-            <Text>Service Person Contact:</Text>
-            <TextInput value={contact} onChangeText={setContact} placeholder="Enter Contact" style={styles.input} maxLength={10} />
-
             <Text>Farmer Name:</Text>
             <TextInput value={farmerName} onChangeText={setFarmerName} placeholder="Enter Contact" style={styles.input}   />
 
@@ -259,16 +254,6 @@ const RequestItem = ({ route }) => {
                 />
               </ScrollView>
             </View>
-
-            <Text>Status:</Text>
-            <Picker
-              selectedValue={status}
-              onValueChange={(itemValue) => setStatus(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item label="IN" value="IN" />
-              <Picker.Item label="OUT" value="OUT" />
-            </Picker>
 
             <TouchableOpacity style={{...styles.button }} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Submit</Text>

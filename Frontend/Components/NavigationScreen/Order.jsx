@@ -44,8 +44,18 @@ const OrderDetails = () => {
 
   if (orders.length === 0) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.header}>Order History</Text>
+      <View style={{...styles.container, width: '100%', paddingRight: 32}}>
+        <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{...styles.header, textAlign: 'start'}}>Order History</Text>
+          <TouchableOpacity 
+            onPress={ () => {
+              console.log("btn Clicked");
+              setIsRefreshClicked(true);
+            }} 
+          >
+            <Icon name='refresh' size={30} color='black' />
+          </TouchableOpacity>
+        </View>
         <Text>No orders found.</Text>
       </View>
     );
@@ -88,15 +98,15 @@ const OrderDetails = () => {
         renderItem={renderOrder}
         keyExtractor={item => item._id} // Use unique ID as key
       />
-
-        <TouchableOpacity style={{ position: 'absolute', top: 16, right: 32 }} 
+      <TouchableOpacity 
+          style={{ position: 'absolute', top: 16, right: 32}}
           onPress={ () => {
             console.log("btn Clicked");
             setIsRefreshClicked(true);
-          }} 
-        >
-          <Icon name='refresh' size={30} color='black' />
-        </TouchableOpacity>
+        }} 
+      >
+      <Icon name='refresh' size={30} color='black' />
+    </TouchableOpacity>
     </View>
   );
 };

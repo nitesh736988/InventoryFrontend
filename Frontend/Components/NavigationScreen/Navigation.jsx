@@ -23,6 +23,7 @@ const TabNavigator = () => {
         tabBarStyle: {
           height: 60,
           paddingTop: 0,
+    
         },
         headerShown: false, 
         tabBarIcon: ({ color, size }) => {
@@ -54,13 +55,13 @@ const TabNavigator = () => {
     >
       <Tab.Screen 
         name="Dashboard" 
-        component={Dashboard}
+        component={Dashboard} 
         options={{ title: 'Home' }}
-      />
+      /> 
       <Tab.Screen 
         name="OrderDetails" 
         component={OrderDetails} 
-        options={{ title: 'Orders' }} 
+        options={{ title: 'Orders' }}  
       />
       <Tab.Screen 
         name="AddItem" 

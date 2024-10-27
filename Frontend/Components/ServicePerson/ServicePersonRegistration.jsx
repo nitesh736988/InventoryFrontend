@@ -9,6 +9,7 @@ const ServicePersonRegistration = () => {
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const[createPassword, setCreatePassword] = useState()
   const navigation = useNavigation();
 
   const handleSubmit = async () => {
@@ -74,8 +75,10 @@ const ServicePersonRegistration = () => {
         <TextInput
           style={styles.input}
           placeholder="Password"
-          value={contact}
-          editable={true      }
+          value={createPassword}
+          onChange={setCreatePassword}
+          editable={true}
+          required
         />
         <TouchableOpacity title="Register" style={{ backgroundColor: 'black', padding: 16, borderRadius: 5 }} onPress={handleSubmit} disabled={loading}>
             <Text style={{ color: 'white', textAlign: 'center', fontSize: 16 }}>Register</Text>  

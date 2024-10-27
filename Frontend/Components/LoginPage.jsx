@@ -69,7 +69,7 @@ const LoginPage = () => {
           onValueChange={(itemValue) => setUserType(itemValue)}
         >
           <Picker.Item label="Select Role" value="" />
-          <Picker.Item label="Admin" value="Admin" />
+          {/* <Picker.Item label="Admin" value="Admin" /> */}
           <Picker.Item label="Warehouse" value="Warehouse" />
           <Picker.Item label="Service Person" value="ServicePerson" />
         </Picker>
