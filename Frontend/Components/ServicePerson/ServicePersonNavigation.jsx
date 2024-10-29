@@ -68,14 +68,14 @@ const ServicePersonTabNavigator = () => {
       <Tab.Screen 
         name="AddOrder" 
         component={AddOrder} 
-        options={{ title: 'Add Order' }} 
+        options={{ title: 'Out Order' }} 
       />
 
     
       <Tab.Screen 
         name="RequestItem" 
         component={RequestItem} 
-        options={{ title: 'Request Item' }} 
+        options={{ title: 'In Order' }} 
       />
     </Tab.Navigator>
   );

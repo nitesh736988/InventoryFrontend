@@ -280,8 +280,9 @@ const ReturnItem = () => {
       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
       <Text style={styles.infoText}>Remark: {item.remark}</Text>
       <Text style={styles.infoText}>
-        Date: {`${dateObject(item.pickupDate).getDate()}/${dateObject(item.pickupDate).getMonth()}/${dateObject(item.pickupDate).getFullYear()}`}
-      </Text>
+       Date: {`${new Date().getDate()}/${new Date().getMonth() + 1}/${new Date().getFullYear()}`}
+       </Text>
+
       
       <View style={styles.actionContainer}>
         { !(item.status) && 

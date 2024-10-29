@@ -38,7 +38,7 @@ const AddItem = () => {
             setStock('');
         } catch (error) {
             console.log('Error adding item:', error);
-            Alert.alert('Error', 'Failed to add item. Please try again.');
+            Alert.alert('Error', 'Item Already exists.');
         } finally {
             setLoading(false);
         }
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     input: {
+        color: 'black',
         borderWidth: 1,
         borderColor: '#070604',  
         borderRadius: 5,

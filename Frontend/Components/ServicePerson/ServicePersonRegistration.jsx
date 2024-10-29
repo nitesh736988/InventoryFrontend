@@ -23,13 +23,14 @@ const ServicePersonRegistration = () => {
       name,
       contact,
       email,
-      password: contact,
+      password: createPassword,
     };
 
     console.log('Registered User:', user);
 
     try {
       const response = await axios.post(`${API_URL}/user/service-person-signup`, user, { timeout: 2000 });
+      console.log(response.data);
       if (response.status === 200) {
         Alert.alert('Registration Successful', 'You will be redirected to the login page.');
         navigation.navigate('LoginPage');
@@ -62,6 +63,7 @@ const ServicePersonRegistration = () => {
           value={contact}
           onChangeText={setContact}
           keyboardType="phone-pad"
+          maxLength={10}
           required
         />
         <TextInput
@@ -76,8 +78,7 @@ const ServicePersonRegistration = () => {
           style={styles.input}
           placeholder="Password"
           value={createPassword}
-          onChange={setCreatePassword}
-          editable={true}
+          onChangeText={setCreatePassword}
           required
         />
         <TouchableOpacity title="Register" style={{ backgroundColor: 'black', padding: 16, borderRadius: 5 }} onPress={handleSubmit} disabled={loading}>

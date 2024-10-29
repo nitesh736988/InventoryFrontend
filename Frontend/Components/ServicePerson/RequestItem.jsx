@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, TextInput, Alert, StyleSheet, Modal, TouchableOpacity, ScrollView, Image } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import { Picker } from '@react-native-picker/picker';
@@ -8,26 +8,43 @@ import { API_URL } from '@env';
 import { FlatList } from 'react-native-gesture-handler';
 
 const RequestItem = ({ route }) => {
-  // const [name, setName] = useState('');
-  // const [contact, setContact] = useState('');
+
   const [farmerName, setFarmerName] = useState('');
   const [farmerContact, setFarmerContact] = useState('');
   const [farmerVillageName, setFarmerVilageName] = useState('');
   const [remarks, setRemarks] = useState(''); // State for remarks
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
-  const items = [
-    { itemName: 'Pump', quantity: 'Pump' },
-    { itemName: 'Motor', quantity: 'Motor' },
-    { itemName: 'Controller', quantity: 'Controller' },
-  ];
+  const [ items, setItems ] = useState([]);
   const [warehouse, setWarehouse] = useState('');
   const [status, setStatus] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [imageUri, setImageUri] = useState(null);
   const [serialNumber, setSerialNumber ] = useState('');
+
+
+  const fetchData = async () => {
+    // setLoading(true); 
+    try {
+      const response = await axios.get(
+        'http://88.222.214.93:8000/admin/viewItems',
+        { timeout: 2000 }
+      );
+      const result = response.data.data;
+      console.log(result);
+      setItems(result);
+    } catch (error) {
+      Alert.alert('Error', JSON.stringify(error.response));
+      console.log('Error fetching data:', error);
+    } 
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   
-  const warehouses = ['Bhiwani', 'Hisar', 'Sirsa'];
+  const warehouses = ['Bhiwani', 'Hisar', 'Sirsa','Jind', 'Fatehabad'];
 
   
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -66,23 +83,6 @@ const RequestItem = ({ route }) => {
     return true;
   };
 
-  // const selectImage = () => {
-  //   const options = {
-  //     mediaType: 'photo',
-  //     quality: 1,
-  //   };
-
-  //   launchImageLibrary(options, response => {
-  //     if (response.didCancel) {
-  //       console.log('User cancelled image picker');
-  //     } else if (response.error) {
-  //       console.log('ImagePicker Error: ', response.error);
-  //     } else {
-  //       const source = response.assets[0].uri;
-  //       setImageUri(source);
-  //     }
-  //   });
-  // };
 
   const handleSubmit = async () => {
     // const formData = new FormData();
@@ -98,22 +98,6 @@ const RequestItem = ({ route }) => {
 
     const data = { farmerName, farmerContact, farmerVillage: farmerVillageName, items: itemSelected, warehouse, remark: remarks, serialNumber, incoming: true }
     console.log(data);
-
-    // if (imageUri) {
-    //   const filename = imageUri.split('/').pop();
-    //   const imageType = `image/${filename.split('.').pop()}`;
-    //   // data.append('image', {
-    //   //   uri: imageUri,
-    //   //   name: fileName,
-    //   //   type: imageType,
-    //   // });
-    //   // data.image = {
-    //   //   uri: imageUri,
-    //   //   filename,
-    //   //   type: imageType
-    //   // }
-    //   data.image = filename;
-    // }
 
     console.log(data);
 
@@ -147,8 +131,7 @@ const RequestItem = ({ route }) => {
   };
 
   const resetForm = () => {
-    // setName('');
-    // setContact('');
+  
     setFarmerName('');
     setFarmerContact('');
     setFarmerVilageName('');
@@ -157,7 +140,7 @@ const RequestItem = ({ route }) => {
     setWarehouse('');
     setStatus('');
     setRemarks(''); 
-    // setImageUri(null);
+   
   };
 
 
@@ -215,20 +198,15 @@ const RequestItem = ({ route }) => {
 
             <Text>Serial Number</Text>
             <TextInput 
-                  value={remarks} 
-                  onChangeText={setRemarks} 
+                  value={serialNumber} 
+                  onChangeText={setSerialNumber} 
                   placeholder="Enter serial Number" 
                   style={styles.input} 
                   maxLength={100} 
                   multiline 
                   numberOfLines={4}
+                  required
                 />
-            {/* <Text>Upload Image:</Text>
-            <TouchableOpacity style={styles.button} onPress={selectImage}>
-              <Text style={styles.buttonText}>Upload Image</Text>
-            </TouchableOpacity> */}
-            {/* {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />} */}
-
             <Text>Warehouse:</Text>
             <Picker
               selectedValue={warehouse}
@@ -244,8 +222,8 @@ const RequestItem = ({ route }) => {
               <Text>Remarks:</Text>
               <ScrollView style={styles.scrollView}>
                 <TextInput 
-                  value={serialNumber} 
-                  onChangeText={setSerialNumber} 
+                  value={remarks}  
+                  onChangeText={setRemarks} 
                   placeholder="Enter Remarks" 
                   style={styles.input} 
                   maxLength={100} 
