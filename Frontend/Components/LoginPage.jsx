@@ -59,7 +59,6 @@ const LoginPage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={require('../assets/galologo.png')} style={styles.image} resizeMode="contain" />
       <Text style={styles.projectName}>Inventory System</Text>
       <Text style={styles.title}>Login</Text>
       <View style={styles.inputView}>

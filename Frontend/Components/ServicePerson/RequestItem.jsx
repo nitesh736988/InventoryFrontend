@@ -167,8 +167,10 @@ const RequestItem = ({ route }) => {
             searchInputPlaceholderText="Search Items..."
             displayKey="itemName"
             hideSubmitButton={true}
-            styleListContainer={{ backgroundColor: '#fbd33b' }}
+            // styleListContainer={{ backgroundColor: '#fbd33b' }}
             styleDropdownMenuSubsection={{ backgroundColor: '#fbd33b' }}
+            styleMainWrapper={styles.multiSelect}
+            styleListContainer={styles.listContainer}
           />
         </View>
         <ScrollView contentContainerStyle={{...styles.scrollContainer }}>
@@ -251,6 +253,11 @@ const styles = StyleSheet.create({
     height: 200,
     padding: 20,
   },
+  listContainer: {
+    backgroundColor: '#fbd33b',
+   maxHeight: 500, // Set the maximum height of the list
+   height: 300, // Set a specific height if you want to limit the list size
+ },
   scrollContainer: {
     flexGrow: 1,
   },

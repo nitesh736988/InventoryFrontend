@@ -83,7 +83,7 @@ const OrderDetails = () => {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={{...styles.cardTitle, width: 150}}>Arrival Date</Text>
             <MaterialCommunityIcons name='forward' size={30} color='white' />
-            <Text style={{...styles.cardTitle, width: 150, textAlign: 'right'}}>`{dateObject(item.arrivedDate).getDate()}/{dateObject(item.arrivedDate).getMonth()}/{dateObject(item.arrivedDate).getFullYear()}`</Text>
+            <Text style={{...styles.cardTitle, width: 150, textAlign: 'right'}}>`{dateObject(item.arrivedDate).getDate()}/{dateObject(item.arrivedDate).getMonth()+1}/{dateObject(item.arrivedDate).getFullYear()}`</Text>
           </View>
         </View>
       </View>

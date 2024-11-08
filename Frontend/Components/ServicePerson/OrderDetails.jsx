@@ -14,6 +14,7 @@ const OrderDetails = () => {
     try {
       const response = await axios.get(`${API_URL}/service-person/view-pickup-items`);
       if (response.status === 200) {
+        console.log("hello")
         console.log(response.data.pickupItemsDetail);
         setOrders(response.data.pickupItemsDetail); 
       }
@@ -68,6 +69,7 @@ const OrderDetails = () => {
           }
         </View>
         <Text style={{ color: '#000'}}>Serial Number: {item.serialNumber}</Text>
+        {item?.arrivedDate && <Text style={{ color: '#000'}}>Approved Date: {dateObject(item.arrivedDate).getDate()+'/' + ( dateObject(item.arrivedDate).getMonth()+1 ) + '/' + dateObject(item.arrivedDate).getFullYear()}</Text>}
       </View>
     </View>
   );

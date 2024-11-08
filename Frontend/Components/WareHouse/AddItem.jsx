@@ -55,7 +55,7 @@ const AddItem = () => {
             <Text style={styles.label}>Stock:</Text>
             <TextInput
                 style={styles.input}
-                value={stock}
+                value={stock}      
                 onChangeText={setStock}
                 keyboardType="numeric"
             />

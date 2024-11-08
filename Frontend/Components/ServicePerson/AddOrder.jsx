@@ -7,7 +7,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { API_URL } from '@env';
 import { FlatList } from 'react-native-gesture-handler';
 
-const RequestItem = ({ route }) => {
+const AddOrder = ({ route }) => {
 
   const [farmerName, setFarmerName] = useState('');
   const [farmerContact, setFarmerContact] = useState('');
@@ -30,7 +30,8 @@ const RequestItem = ({ route }) => {
         { timeout: 2000 }
       );
       const result = response.data.data;
-      console.log(result);
+      console.log(result.length);
+      console.log(result[result.length - 1]);
       setItems(result);
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response));
@@ -97,7 +98,7 @@ const RequestItem = ({ route }) => {
     selectedItems.forEach(item => {
       itemSelected.push({itemName: item, quantity: parseInt(quantities[item])});
     });
-    const sendingData = { farmerName, farmerContact, farmerVillage: farmerVillageName, items: itemSelected, warehouse, remark: remarks, serialNumber, incoming: false }
+    const sendingData = { farmerName, farmerContact, farmerVillage: farmerVillageName, items: itemSelected, warehouse, remark: remarks, serialNumber, incoming: false,  pickupDate: Date.now(), }
     console.log(sendingData);
     try {
       const response = await axios.post(`${API_URL}/service-person/create-pickup-items`, sendingData, 
@@ -139,7 +140,7 @@ const RequestItem = ({ route }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={{ paddingHorizontal: 20, backgroundColor: '#fbd33b', paddingTop: 30}}>
+        <View style={{ paddingHorizontal: 20, backgroundColor: '#fbd33b', paddingTop: 30,}}>
           <Text>Select Items:</Text>
           <MultiSelect
             items={items}
@@ -150,8 +151,10 @@ const RequestItem = ({ route }) => {
             searchInputPlaceholderText="Search Items..."
             displayKey="itemName"
             hideSubmitButton={true}
-            styleListContainer={{ backgroundColor: '#fbd33b' }}
+            // styleListContainer={{ }}
             styleDropdownMenuSubsection={{ backgroundColor: '#fbd33b' }}
+            styleMainWrapper={styles.multiSelect}
+            styleListContainer={styles.listContainer}
           />
         </View>
         <ScrollView contentContainerStyle={{...styles.scrollContainer }}>
@@ -190,11 +193,7 @@ const RequestItem = ({ route }) => {
                   numberOfLines={4}
                   required
                 />
-            {/* <Text>Upload Image:</Text>
-            <TouchableOpacity style={styles.button} onPress={selectImage}>
-              <Text style={styles.buttonText}>Upload Image</Text>
-            </TouchableOpacity> */}
-            {/* {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />} */}
+           
 
             <Text>Warehouse:</Text>
             <Picker
@@ -239,6 +238,11 @@ const styles = StyleSheet.create({
   container: {
     height: 200,
     padding: 20,
+  },
+  listContainer: {
+     backgroundColor: '#fbd33b',
+    maxHeight: 500, // Set the maximum height of the list
+    height: 300, // Set a specific height if you want to limit the list size
   },
   scrollContainer: {
     flexGrow: 1,
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RequestItem;
+export default AddOrder;
 
 
 // import React, { useState } from 'react';

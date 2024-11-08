@@ -63,6 +63,7 @@ const AddTransaction = ( { route } ) => {
       })),
       warehouse,
       status,
+     
     };
 
     // console.log(data);
