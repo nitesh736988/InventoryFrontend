@@ -18,7 +18,7 @@ const ReturnItem = () => {
       if (response.status === 200) {
         setOrders(response.data.pickupItems); 
       }
-    } catch (error) {
+    } catch (error) {        
       console.log(error);
       Alert.alert("Error", "Unable to fetch orders");
     } finally {
