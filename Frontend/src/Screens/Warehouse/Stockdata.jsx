@@ -16,7 +16,6 @@ const Stockdata = ({ route }) => {
     defectiveItem: '',
     arrivedDate: new Date(),
   });
-
   const fetchWarehouses = async () => {
     try {
       const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);

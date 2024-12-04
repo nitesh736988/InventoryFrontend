@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { API_URL } from '@env';
+import Icon from 'react-native-vector-icons/Feather'; // Importing Feather icons
 
 const ServicePersonRegistration = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const ServicePersonRegistration = ({ navigation }) => {
     createdAt: new Date(),
   });
   const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
 
   const handleChange = (key, value) => {
     setFormData((prevData) => ({
@@ -41,10 +43,7 @@ const ServicePersonRegistration = ({ navigation }) => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/warehouse-admin/service-person-signup`,{ name, email, contact, password, createdAt },
-      );
-
-      if (response.status === 200) {
+        `${API_URL}/warehouse-admin/service-person-signup`,{ name, email, contact, password, createdAt });
         Alert.alert('Registration Successful');
         setFormData({
           name: '',
@@ -53,7 +52,7 @@ const ServicePersonRegistration = ({ navigation }) => {
           password: '',
           createdAt: new Date(),
         });
-      }
+  
     } catch (error) {
       Alert.alert(
         'Registration Failed',
@@ -105,18 +104,28 @@ const ServicePersonRegistration = ({ navigation }) => {
         <Text style={styles.label}>
           Password <Text style={styles.required}>*</Text>
         </Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={formData.password}
-          onChangeText={(value) => handleChange('password', value)}
-          secureTextEntry
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { paddingRight: 40 }]} // Adding padding for the icon
+            placeholder="Password"
+            value={formData.password}
+            onChangeText={(value) => handleChange('password', value)}
+            secureTextEntry={!passwordVisible}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
+            <Icon
+              name={passwordVisible ? 'eye' : 'eye-off'}
+              size={24}
+              color="#070604"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
-          style={[
-            { backgroundColor: loading ? '#aaa' : 'black', padding: 16, borderRadius: 5 }
-          ]}
+          style={[{ backgroundColor: loading ? '#aaa' : 'black', padding: 16, borderRadius: 5 }]}
           onPress={handleSubmit}
           disabled={loading}
         >
@@ -162,6 +171,16 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 16,
     paddingVertical: 8,
+  },
+  passwordContainer: {
+    position: 'relative', 
+    marginBottom: 15,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 16, 
+    top: '50%',
+    transform: [{ translateY: -12 }],
   },
 });
 

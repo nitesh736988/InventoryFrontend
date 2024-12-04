@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, TextInput } from 'react-native';
-import axios from 'axios'; 
-import Icon from 'react-native-vector-icons/FontAwesome'; 
-import { API_URL } from '@env';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import axios from 'axios';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {API_URL} from '@env';
 
 const OrderDetails = () => {
   const [orders, setOrders] = useState([]);
@@ -14,19 +23,21 @@ const OrderDetails = () => {
   // Fetch orders from the API
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(`${API_URL}/service-person/pickedup-items`);
-        setOrders(response.data.pickupItemsDetail); 
-        setFilteredOrders(response.data.pickupItemsDetail); // Initially set filtered orders as all orders
-        setError('');  // Reset error on successful fetch
+      const response = await axios.get(
+        `${API_URL}/service-person/pickedup-items`,
+      );
+      setOrders(response.data.pickupItemsDetail);
+      setFilteredOrders(response.data.pickupItemsDetail); // Initially set filtered orders as all orders
+      setError(''); // Reset error on successful fetch
     } catch (error) {
       console.error(error);
-      setError("Unable to fetch orders. Please try again later.");
+      setError('Unable to fetch orders. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (newDate) => {
+  const formatDate = newDate => {
     const date = new Date(newDate);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -40,43 +51,63 @@ const OrderDetails = () => {
     fetchOrders();
   };
 
-  const handleSearch = (query) => {
+  const handleSearch = query => {
     setSearchQuery(query);
     if (query) {
-      const filtered = orders.filter(order =>
-        order.farmerName.toLowerCase().includes(query.toLowerCase()) || 
-        order.serialNumber.toLowerCase().includes(query.toLowerCase())
+      const filtered = orders.filter(
+        order =>
+          order.farmerName.toLowerCase().includes(query.toLowerCase()) ||
+          order.serialNumber.toLowerCase().includes(query.toLowerCase()),
       );
       setFilteredOrders(filtered);
     } else {
-      setFilteredOrders(orders); 
+      setFilteredOrders(orders);
     }
   };
 
   // Render order details
-  const renderOrder = ({ item }) => (
+  const renderOrder = ({item}) =>
     item.incoming && (
       <View key={item._id} style={styles.card}>
-        <Text style={[styles.statusText, item.incoming ? styles.incoming : styles.outgoing]}>
+        <Text
+          style={[
+            styles.statusText,
+            item.incoming ? styles.incoming : styles.outgoing,
+          ]}>
           {item.incoming ? 'Incoming' : 'Outgoing'}
         </Text>
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
-            <Text style={styles.detailText}>Farmer Name: {item.farmerName}</Text>
-            <Text style={{ color: item.status ? 'green' : 'red' }}>
+            <Text style={styles.detailText}>
+              Farmer Name: {item.farmerName}
+            </Text>
+            <Text style={{color: item.status ? 'green' : 'red'}}>
               {item.status ? 'Completed' : 'Pending'}
             </Text>
           </View>
-          <Text style={styles.detailText}>Farmer Contact: {item.farmerContact}</Text>
-          <Text style={styles.detailText}>Village Name: {item.farmerVillage}</Text>
+          <Text style={styles.detailText}>
+            Farmer Contact: {item.farmerContact}
+          </Text>
+          <Text style={styles.detailText}>
+            Village Name: {item.farmerVillage}
+          </Text>
           <View style={styles.itemList}>
-            {item.items.map(({ _id, itemName, quantity }) => (
-              <Text key={_id} style={styles.detailText}>{itemName}: {quantity}, </Text>
+            {item.items.map(({_id, itemName, quantity}) => (
+              <Text key={_id} style={styles.detailText}>
+                {itemName}: {quantity},{' '}
+              </Text>
             ))}
           </View>
-          <Text style={styles.detailText}>Serial Number: {item.serialNumber}</Text>
-          <Text style={styles.detailText}>RMU Present: {item.withoutRMU === null ? 'N/A' : !(item.withoutRMU) ? 'YES' : 'NO' }</Text>
-          <Text style={styles.detailText}>RMU Remark: { item.rmuRemark === '' ? 'N/A' : item.rmuRemark }</Text>
+          <Text style={styles.detailText}>
+            Serial Number: {item.serialNumber}
+          </Text>
+          <Text style={styles.detailText}>
+            RMU Present:{' '}
+            {item.withoutRMU === null ? 'N/A' : !item.withoutRMU ? 'YES' : 'NO'}
+          </Text>
+          <Text style={styles.detailText}>
+            RMU Remark: {item.rmuRemark === '' ? 'N/A' : item.rmuRemark}
+          </Text>
           {item.arrivedDate && (
             <Text style={styles.detailText}>
               Approved Date: {formatDate(item.arrivedDate)}
@@ -84,11 +115,16 @@ const OrderDetails = () => {
           )}
         </View>
       </View>
-    )
-  );
+    );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#0000ff"
+        style={styles.loadingIndicator}
+      />
+    );
   }
 
   return (
@@ -107,9 +143,9 @@ const OrderDetails = () => {
       <FlatList
         data={filteredOrders}
         renderItem={renderOrder}
-        keyExtractor={(item) => item._id} // Use unique ID as key
+        keyExtractor={item => item._id} // Use unique ID as key
       />
-      
+
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
         <Icon name="refresh" size={30} color="black" />
       </TouchableOpacity>
@@ -134,7 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

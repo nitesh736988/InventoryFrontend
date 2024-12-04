@@ -7,7 +7,6 @@ import InOrder from './InOrder';
 import OutStatus from './OutStatus';
 import ApprovedData from './ApprovedData';
 
-
 const headerColor = '#186cbf';
 
 const Tab = createBottomTabNavigator();
@@ -36,12 +35,9 @@ const TabNavigator = () => {
             iconName = 'truck-delivery';
           } else if (route.name === 'InOrder') {
             iconName = 'sort-ascending';
-          }
-          else if (route.name === 'OutStatus') {
+          } else if (route.name === 'OutStatus') {
             iconName = 'skip-next-circle-outline';
-          }
-
-          else if (route.name === 'ApprovedData') {
+          } else if (route.name === 'ApprovedData') {
             iconName = 'cube-outline';
           }
 
@@ -78,7 +74,6 @@ const TabNavigator = () => {
         component={ApprovedData}
         options={{title: 'Approved'}}
       />
-
     </Tab.Navigator>
   );
 };

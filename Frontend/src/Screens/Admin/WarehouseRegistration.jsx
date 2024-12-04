@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const WarehouseRegistration = () => {
   const [formData, setFormData] = useState({
@@ -45,16 +45,15 @@ const WarehouseRegistration = () => {
     fetchWarehouses();
   }, []);
 
-
   const handleChange = (key, value) => {
-    setFormData((prevData) => ({
+    setFormData(prevData => ({
       ...prevData,
       [key]: value,
     }));
   };
 
   const handleSubmit = async () => {
-    const { name, email, contact, password, warehouse } = formData;
+    const {name, email, contact, password, warehouse} = formData;
     const createdAt = new Date();
 
     if (!name || !email || !contact || !password || !warehouse) {
@@ -67,7 +66,8 @@ const WarehouseRegistration = () => {
     try {
       const response = await axios.post(
         `${API_URL}/admin/warehouse-person-signup`,
-        { name, email, contact, password, warehouse, createdAt });
+        {name, email, contact, password, warehouse, createdAt},
+      );
 
       if (response.status === 200) {
         Alert.alert('Registration Successful');
@@ -80,7 +80,9 @@ const WarehouseRegistration = () => {
           password: '',
           createdAt: new Date(),
         });
-        const warehouseResponse = await axios.get(`${API_URL}/admin/all-warehouses`);
+        const warehouseResponse = await axios.get(
+          `${API_URL}/admin/all-warehouses`,
+        );
         if (warehouseResponse.data.success) {
           setWarehouseOptions(warehouseResponse.data.allWarehouses);
         }
@@ -88,7 +90,7 @@ const WarehouseRegistration = () => {
     } catch (error) {
       Alert.alert(
         'Registration Failed',
-        error.response?.data?.message || 'An error occurred. Please try again.'
+        error.response?.data?.message || 'An error occurred. Please try again.',
       );
     } finally {
       setLoading(false);
@@ -97,7 +99,7 @@ const WarehouseRegistration = () => {
 
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1, justifyContent: 'center', marginTop: -64 }}>
+      <View style={{flex: 1, justifyContent: 'center', marginTop: -64}}>
         <Text style={styles.title}>Warehouse Person Registration</Text>
 
         <Text style={styles.label}>
@@ -107,7 +109,7 @@ const WarehouseRegistration = () => {
           style={styles.input}
           placeholder="Name"
           value={formData.name}
-          onChangeText={(value) => handleChange('name', value)}
+          onChangeText={value => handleChange('name', value)}
         />
 
         <Text style={styles.label}>
@@ -117,19 +119,17 @@ const WarehouseRegistration = () => {
           style={styles.input}
           placeholder="Contact"
           value={formData.contact}
-          onChangeText={(value) => handleChange('contact', value)}
+          onChangeText={value => handleChange('contact', value)}
           keyboardType="phone-pad"
           maxLength={10}
         />
-
         <Text style={styles.label}>
           Warehouse <Text style={styles.required}>*</Text>
         </Text>
         <Picker
           selectedValue={formData.warehouse}
-          onValueChange={(value) => handleChange('warehouse', value)}
-          style={styles.picker}
-        >
+          onValueChange={value => handleChange('warehouse', value)}
+          style={styles.picker}>
           <Picker.Item label="Select Warehouse" value="" />
           {warehouseOptions.length > 0 ? (
             warehouseOptions.map((warehouse, index) => (
@@ -151,7 +151,7 @@ const WarehouseRegistration = () => {
           style={styles.input}
           placeholder="Email"
           value={formData.email}
-          onChangeText={(value) => handleChange('email', value)}
+          onChangeText={value => handleChange('email', value)}
           keyboardType="email-address"
         />
 
@@ -162,18 +162,14 @@ const WarehouseRegistration = () => {
           style={styles.input}
           placeholder="Password"
           value={formData.password}
-          onChangeText={(value) => handleChange('password', value)}
+          onChangeText={value => handleChange('password', value)}
           secureTextEntry
         />
 
         <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: loading ? '#aaa' : 'black' },
-          ]}
+          style={[styles.button, {backgroundColor: loading ? '#aaa' : 'black'}]}
           onPress={handleSubmit}
-          disabled={loading}
-        >
+          disabled={loading}>
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (

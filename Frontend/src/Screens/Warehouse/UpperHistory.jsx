@@ -1,8 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const UpperHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -11,10 +19,12 @@ const UpperHistory = () => {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/incoming-items-data`);
+      const response = await axios.get(
+        `${API_URL}/warehouse-admin/incoming-items-data`,
+      );
       setOrders(response.data.incomingItemsData || []);
     } catch (error) {
-      Alert.alert("Error", error.message || "Unable to fetch orders");
+      Alert.alert('Error', error.message || 'Unable to fetch orders');
     } finally {
       setLoading(false);
     }
@@ -24,19 +34,21 @@ const UpperHistory = () => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     const newDate = new Date(date);
-    return `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
+    return `${newDate.getDate()}/${
+      newDate.getMonth() + 1
+    }/${newDate.getFullYear()}`;
   };
 
-  const OrderDetail = ({ label, value }) => (
+  const OrderDetail = ({label, value}) => (
     <View style={styles.detailRow}>
       <Text style={styles.cardTitle}>{label}:</Text>
       <Text style={styles.cardValue}>{value}</Text>
     </View>
   );
 
-  const renderOrder = ({ item }) => (
+  const renderOrder = ({item}) => (
     <View style={styles.card}>
       <View style={styles.itemContainer}>
         <OrderDetail label="Coming From" value={item.itemComingFrom} />
@@ -44,7 +56,10 @@ const UpperHistory = () => {
         <OrderDetail label="Item Name" value={item.itemName} />
         <OrderDetail label="Quantity" value={item.quantity} />
         <OrderDetail label="Defective" value={item.defectiveItem} />
-        <OrderDetail label="Arrival Date" value={formatDate(item.arrivedDate)} />
+        <OrderDetail
+          label="Arrival Date"
+          value={formatDate(item.arrivedDate)}
+        />
       </View>
     </View>
   );
@@ -69,8 +84,10 @@ const UpperHistory = () => {
         <FlatList
           data={orders}
           renderItem={renderOrder}
-          keyExtractor={(item) => item._id}
-          ListEmptyComponent={<Text style={styles.emptyMessage}>No orders found.</Text>}
+          keyExtractor={item => item._id}
+          ListEmptyComponent={
+            <Text style={styles.emptyMessage}>No orders found.</Text>
+          }
         />
       ) : (
         <Text>No orders found.</Text>
@@ -96,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

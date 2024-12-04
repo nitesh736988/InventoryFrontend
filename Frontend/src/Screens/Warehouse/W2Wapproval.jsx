@@ -1,28 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Dimensions, TextInput } from 'react-native';
-import axios from 'axios'; 
-import Icon from 'react-native-vector-icons/FontAwesome'; 
-import { API_URL } from '@env';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+  Dimensions,
+  TextInput,
+} from 'react-native';
+import axios from 'axios';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import {API_URL} from '@env';
 
 const W2Wapproval = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false); 
-  const [searchQuery, setSearchQuery] = useState(''); 
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [btnClickedStatus, setBtnClickedStatus] = useState({});
 
-  const { width } = Dimensions.get('window');
-  const cardWidth = width * 0.9;  
+  const {width} = Dimensions.get('window');
+  const cardWidth = width * 0.9;
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/view-defective-orders`);
-      console.log(response.data);  
+      const response = await axios.get(
+        `${API_URL}/warehouse-admin/view-defective-orders`,
+      );
+      console.log(response.data);
       setOrders(response.data.incomingDefectiveData);
     } catch (error) {
       console.log(error);
-      Alert.alert("Error", "Unable to fetch orders");
+      Alert.alert('Error', 'Unable to fetch orders');
     } finally {
       setRefreshing(false);
       setLoading(false);
@@ -33,15 +45,18 @@ const W2Wapproval = () => {
     fetchOrders();
   }, [refreshing]);
 
-  const handleApproveBtn = async (sendTransactionId) => {
+  const handleApproveBtn = async sendTransactionId => {
     try {
-      const sendRequest = await axios.put(`${API_URL}/warehouse-admin/update-defective-order-status`, { 
-        status: true, 
-        defectiveOrderId: sendTransactionId, 
-        arrivedDate: Date.now(),
-      });
+      const sendRequest = await axios.put(
+        `${API_URL}/warehouse-admin/update-defective-order-status`,
+        {
+          status: true,
+          defectiveOrderId: sendTransactionId,
+          arrivedDate: Date.now(),
+        },
+      );
       console.log(sendRequest);
-      setBtnClickedStatus(prev => ({ ...prev, [sendTransactionId]: true }));
+      setBtnClickedStatus(prev => ({...prev, [sendTransactionId]: true}));
       setRefreshing(true);
     } catch (error) {
       Alert.alert('Error', 'Unable to update status');
@@ -56,34 +71,56 @@ const W2Wapproval = () => {
     setBtnClickedStatus(updateClickedStatus);
   }, [orders]);
 
-
-  const dateObject = (newDate) => new Date(newDate);
+  const dateObject = newDate => new Date(newDate);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#0000ff"
+        style={styles.loadingIndicator}
+      />
+    );
   }
 
-  const renderOrderItem = ({ item }) => (
-    <View key={item._id} style={[styles.card, { width: cardWidth }]}>
-      <Text style={[styles.statusText, item.incoming ? styles.incoming : styles.outgoing]}>
+  const renderOrderItem = ({item}) => (
+    <View key={item._id} style={[styles.card, {width: cardWidth}]}>
+      <Text
+        style={[
+          styles.statusText,
+          item.incoming ? styles.incoming : styles.outgoing,
+        ]}>
         {item.incoming ? 'Incoming' : 'Outgoing'}
       </Text>
       <View style={styles.infoRow}>
-        <Text style={styles.infoText}>From Warehouse: {item.fromWarehouse}</Text>
-        {item.status && <Text style={styles.approvedText}>Approved Success</Text>}
+        <Text style={styles.infoText}>
+          From Warehouse: {item.fromWarehouse}
+        </Text>
+        {item.status && (
+          <Text style={styles.approvedText}>Approved Success</Text>
+        )}
       </View>
       <Text style={styles.infoText}>To Warehouse: {item.toWarehouse}</Text>
-      <Text style={styles.infoText}>Is Defective: {item.isDefective ? 'YES' : 'NO'}</Text>
+      <Text style={styles.infoText}>
+        Is Defective: {item.isDefective ? 'YES' : 'NO'}
+      </Text>
       <View style={styles.itemContainer}>
-        {item.items.map(({ _id, itemName, quantity }) => (
-          <Text key={_id} style={styles.infoText}>{itemName}: {quantity}</Text>
+        {item.items.map(({_id, itemName, quantity}) => (
+          <Text key={_id} style={styles.infoText}>
+            {itemName}: {quantity}
+          </Text>
         ))}
       </View>
       <Text style={styles.infoText}>Driver Name: {item.driverName}</Text>
       <Text style={styles.infoText}>Driver Contact: {item.driverContact}</Text>
       <Text style={styles.infoText}>Remark: {item.remarks}</Text>
       <Text style={styles.infoText}>
-        Pickup Date: {dateObject(item.pickupDate).getDate() + '/' + (dateObject(item.pickupDate).getMonth() + 1) + '/' + dateObject(item.pickupDate).getFullYear()}
+        Pickup Date:{' '}
+        {dateObject(item.pickupDate).getDate() +
+          '/' +
+          (dateObject(item.pickupDate).getMonth() + 1) +
+          '/' +
+          dateObject(item.pickupDate).getFullYear()}
       </Text>
       <View style={styles.actionContainer}>
         {!item.status && (
@@ -91,9 +128,11 @@ const W2Wapproval = () => {
             <TouchableOpacity style={styles.declineButton}>
               <Text style={styles.buttonText}>Decline</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.approveButton} onPress={() => handleApproveBtn(item._id, item.incoming)}>
+            <TouchableOpacity
+              style={styles.approveButton}
+              onPress={() => handleApproveBtn(item._id, item.incoming)}>
               <Text style={styles.buttonText}>Approve</Text>
-            </TouchableOpacity> 
+            </TouchableOpacity>
           </>
         )}
       </View>
@@ -115,7 +154,9 @@ const W2Wapproval = () => {
         keyExtractor={item => item._id}
         showsVerticalScrollIndicator={false}
       />
-      <TouchableOpacity style={styles.refreshIcon} onPress={() => setRefreshing(true)}>
+      <TouchableOpacity
+        style={styles.refreshIcon}
+        onPress={() => setRefreshing(true)}>
         <Icon name="refresh" size={30} color="black" />
       </TouchableOpacity>
     </View>
@@ -148,10 +189,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    alignSelf: 'center',  
+    alignSelf: 'center',
   },
   statusText: {
     fontSize: 16,

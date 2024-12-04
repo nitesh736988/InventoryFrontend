@@ -59,8 +59,6 @@
 
 //   const [btnClickedStatus, setBtnClickedStatus] = useState({});
 
- 
-
 //   useEffect(() => {
 //     const updateClickedStatus = {};
 //     for (let index = 0; index < orders.length; index++) {
@@ -85,7 +83,7 @@
 
 //   const renderOrderItem = ({item}) => (
 //     <>
-      
+
 //         <View key={item._id} style={styles.card}>
 //           <Text
 //             style={[
@@ -267,7 +265,7 @@
 
 // export default W2WData;
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -282,7 +280,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const W2WData = () => {
   const [orders, setOrders] = useState([]);
@@ -295,7 +293,7 @@ const W2WData = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${API_URL}/warehouse-admin/outgoing-defective-order`
+        `${API_URL}/warehouse-admin/outgoing-defective-order`,
       );
       setOrders(response.data.defectiveOrderData);
       setFilteredOrders(response.data.defectiveOrderData);
@@ -337,14 +335,13 @@ const W2WData = () => {
     );
   }
 
-  const renderOrderItem = ({ item }) => (
+  const renderOrderItem = ({item}) => (
     <View key={item._id} style={styles.card}>
       <Text
         style={[
           styles.statusText,
           item.incoming ? styles.incoming : styles.outgoing,
-        ]}
-      >
+        ]}>
         Outgoing
       </Text>
       <View style={styles.infoRow}>
@@ -354,7 +351,7 @@ const W2WData = () => {
         {item.status ? (
           <Text style={styles.approvedText}>Completed</Text>
         ) : (
-          <Text style={{ ...styles.approvedText, color: 'red' }}>Pending</Text>
+          <Text style={{...styles.approvedText, color: 'red'}}>Pending</Text>
         )}
       </View>
       <Text style={styles.infoText}>To Warehouse: {item.toWarehouse}</Text>
@@ -362,7 +359,7 @@ const W2WData = () => {
         Defective: {item.isDefective ? 'Yes' : 'No'}
       </Text>
       <View style={styles.itemContainer}>
-        {item.items.map(({ _id, itemName, quantity }) => (
+        {item.items.map(({_id, itemName, quantity}) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
@@ -402,8 +399,7 @@ const W2WData = () => {
         onPress={() => {
           setRefreshing(true);
           fetchOrders();
-        }}
-      >
+        }}>
         <Icon name="refresh" size={30} color="black" />
       </TouchableOpacity>
 
@@ -435,7 +431,7 @@ const W2WData = () => {
   );
 };
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -462,7 +458,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

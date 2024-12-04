@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {View, Text, FlatList, StyleSheet, Alert} from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const RepairRejectData = () => {
   const [repairRejectData, setRepairRejectData] = useState([]);
@@ -10,7 +10,8 @@ const RepairRejectData = () => {
   const fetchRepairRejectData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/repair-reject-itemData`);
+      const response = await axios.get(
+        `${API_URL}/warehouse-admin/repair-reject-itemData`);
       console.log(response.data.allRepairRejectData);
       setRepairRejectData(response.data.allRepairRejectData);
     } catch (error) {
@@ -25,16 +26,22 @@ const RepairRejectData = () => {
     fetchRepairRejectData();
   }, []);
 
-  const formatDateTime = useCallback((dateTime) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  const formatDateTime = useCallback(dateTime => {
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
     return new Date(dateTime).toLocaleDateString('en-US', options);
   }, []);
 
-  
-  const renderRepairRejectItem = ({ item }) => (
+  const renderRepairRejectItem = ({item}) => (
     <View style={styles.card}>
       <Text style={styles.label}>
-        Warehouse Person: <Text style={styles.value}>{item.warehousePerson}</Text>
+        Warehouse Person:{' '}
+        <Text style={styles.value}>{item.warehousePerson}</Text>
       </Text>
       <Text style={styles.label}>
         Warehouse Name: <Text style={styles.value}>{item.warehouseName}</Text>
@@ -49,7 +56,8 @@ const RepairRejectData = () => {
         Rejected: <Text style={styles.value}>{item.rejected}</Text>
       </Text>
       <Text style={styles.label}>
-        Created At: <Text style={styles.value}>{formatDateTime(item.createdAt)}</Text>
+        Created At:{' '}
+        <Text style={styles.value}>{formatDateTime(item.createdAt)}</Text>
       </Text>
     </View>
   );
@@ -62,12 +70,14 @@ const RepairRejectData = () => {
       ) : (
         <FlatList
           data={repairRejectData}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           renderItem={renderRepairRejectItem}
-          ListEmptyComponent={<Text style={styles.emptyText}>No Repair & Reject Data.</Text>}
-          initialNumToRender={10}  
-          maxToRenderPerBatch={10} 
-          windowSize={21} 
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No Repair & Reject Data.</Text>
+          }
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          windowSize={21}
         />
       )}
     </View>
@@ -95,7 +105,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,

@@ -78,7 +78,7 @@ const LoginPage = () => {
         >
           <Picker.Item label="Select Role" value="" />
           <Picker.Item label="Admin" value="admin" />
-          <Picker.Item label="WarehouseAdmin" value="warehouseAdmin" />
+          <Picker.Item label="Warehouse Admin" value="warehouseAdmin" />
           <Picker.Item label="ServicePerson" value="serviceperson" />
         </Picker>
         {role !== '' && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const ApprovedData = () => {
   const [orders, setOrders] = useState([]);
@@ -23,7 +23,9 @@ const ApprovedData = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/service-person/approved-order-history`);
+      const response = await axios.get(
+        `${API_URL}/service-person/approved-order-history`,
+      );
       console.log(response.data.orderHistory);
       setOrders(response.data.orderHistory || []);
     } catch (error) {
@@ -40,7 +42,7 @@ const ApprovedData = () => {
   }, []);
 
   // Helper function to format the date
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -53,29 +55,38 @@ const ApprovedData = () => {
 
   // Function to filter orders based on the search query
   const filterOrders = () => {
-    return orders.filter((order) => 
-      order.servicePersonName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    return orders.filter(
+      order =>
+        order.servicePersonName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
   // Render each order item in the FlatList
-  const renderOrderItem = ({ item }) => (
+  const renderOrderItem = ({item}) => (
     <View key={item._id} style={styles.card}>
-      <Text style={[styles.statusText, item.incoming ? styles.incoming : styles.outgoing]}>
+      <Text
+        style={[
+          styles.statusText,
+          item.incoming ? styles.incoming : styles.outgoing,
+        ]}>
         {item.incoming ? 'Incoming' : 'Outgoing'}
       </Text>
       <View style={styles.infoRow}>
         <Text style={styles.infoText}>Name: {item.servicePersonName}</Text>
-        {item.status && <Text style={styles.approvedText}>Approved Success</Text>}
+        {item.status && (
+          <Text style={styles.approvedText}>Approved Success</Text>
+        )}
       </View>
       <Text style={styles.infoText}>Contact: {item.servicePerContact}</Text>
       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
       <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
       <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
       <View style={styles.itemContainer}>
-        {item.items.map(({ _id, itemName, quantity }) => (
+        {item.items.map(({_id, itemName, quantity}) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
@@ -83,10 +94,16 @@ const ApprovedData = () => {
       </View>
       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
       <Text style={styles.infoText}>Remark: {item.remark}</Text>
-      <Text style={styles.infoText}>Pickup Date: {formatDate(item.pickupDate)}</Text>
-      {item.approvedBy && <Text style={styles.infoText}>Approved By: {item.approvedBy}</Text>}
+      <Text style={styles.infoText}>
+        Pickup Date: {formatDate(item.pickupDate)}
+      </Text>
+      {item.approvedBy && (
+        <Text style={styles.infoText}>Approved By: {item.approvedBy}</Text>
+      )}
       {item.arrivedDate && (
-        <Text style={styles.infoText}>Approved Date: {formatDate(item.arrivedDate)}</Text>
+        <Text style={styles.infoText}>
+          Approved Date: {formatDate(item.arrivedDate)}
+        </Text>
       )}
     </View>
   );
@@ -104,15 +121,21 @@ const ApprovedData = () => {
       />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
+        <ActivityIndicator
+          size="large"
+          color="#0000ff"
+          style={styles.loadingIndicator}
+        />
       ) : (
         <FlatList
-          data={filterOrders()}  // Filter orders based on the search query
+          data={filterOrders()} // Filter orders based on the search query
           renderItem={renderOrderItem}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           refreshing={refreshing}
           onRefresh={handleRefresh}
-          ListEmptyComponent={<Text style={styles.emptyText}>No transactions found.</Text>}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No transactions found.</Text>
+          }
         />
       )}
 
@@ -142,7 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

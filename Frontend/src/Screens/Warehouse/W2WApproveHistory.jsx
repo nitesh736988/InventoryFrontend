@@ -21,9 +21,10 @@ const W2WApprovalHistory = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${API_URL}/warehouse-admin/defective-order-history`);
-        console.log(response.data.defectiveOrderHistory)
-        setOrders(response.data.defectiveOrderHistory || []);
+        `${API_URL}/warehouse-admin/defective-order-history`,
+      );
+      console.log(response.data.defectiveOrderHistory);
+      setOrders(response.data.defectiveOrderHistory || []);
     } catch (error) {
       Alert.alert('Error', error.message || 'Unable to fetch orders');
     } finally {
@@ -41,12 +42,14 @@ const W2WApprovalHistory = () => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (!date) return 'N/A';
     const newDate = new Date(date);
-    return `${newDate.getDate().toString().padStart(2, '0')}/${
-      (newDate.getMonth() + 1).toString().padStart(2, '0')
-    }/${newDate.getFullYear()}`;
+    return `${newDate.getDate().toString().padStart(2, '0')}/${(
+      newDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, '0')}/${newDate.getFullYear()}`;
   };
 
   const renderOrder = ({item}) => (
@@ -54,9 +57,13 @@ const W2WApprovalHistory = () => {
       <OrderDetail label="From Warehouse" value={item.fromWarehouse} />
       <OrderDetail label="To Warehouse" value={item.toWarehouse} />
       {/* <View style={styles.itemContainer}> */}
-        {item.items.map(({_id, itemName, quantity}, index) => (
-          <OrderDetail key={_id} label={`Item${index+1}`} value={`${itemName} : ${quantity}`} />
-        ))}
+      {item.items.map(({_id, itemName, quantity}, index) => (
+        <OrderDetail
+          key={_id}
+          label={`Item${index + 1}`}
+          value={`${itemName} : ${quantity}`}
+        />
+      ))}
       {/* </View> */}
       <OrderDetail label="Defective" value={item.isDefective ? 'Yes' : 'No'} />
       <OrderDetail label="Driver Name" value={item.driverName} />
@@ -103,7 +110,7 @@ const W2WApprovalHistory = () => {
         <FlatList
           data={orders}
           renderItem={renderOrder}
-          keyExtractor={(item) => item._id || item.id || `${Math.random()}`}
+          keyExtractor={item => item._id || item.id || `${Math.random()}`}
         />
       )}
     </View>

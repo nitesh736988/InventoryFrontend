@@ -1,8 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; 
+import React, {useState, useEffect, useMemo} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const ServicePersonDashboard = () => {
   const [servicePersons, setServicePersons] = useState([]);
@@ -13,8 +20,12 @@ const ServicePersonDashboard = () => {
     try {
       const response = await axios.get(`${API_URL}/service-person/dashboard`);
       if (response.status === 200 && response.data.mergedData) {
-        const incoming = response.data.mergedData.filter(item => item.type === 'incoming');
-        const outgoing = response.data.mergedData.filter(item => item.type === 'outgoing');
+        const incoming = response.data.mergedData.filter(
+          item => item.type === 'incoming',
+        );
+        const outgoing = response.data.mergedData.filter(
+          item => item.type === 'outgoing',
+        );
         setServicePersons(incoming[0]?.items || []);
         setServicePersonOutgoing(outgoing[0]?.items || []);
       }
@@ -22,7 +33,7 @@ const ServicePersonDashboard = () => {
       Alert.alert('Error', 'Error fetching service persons');
       console.log('Error fetching service persons:', error);
     } finally {
-      setIsRefreshClicked(false);  // Set it back to false once fetching is done
+      setIsRefreshClicked(false); // Set it back to false once fetching is done
     }
   };
 
@@ -37,14 +48,20 @@ const ServicePersonDashboard = () => {
   }, [isRefreshClicked]);
 
   // Function to render the list of items
-  const renderItems = useMemo(() => (items) => (
-    items.length > 0 ? items.map(({ itemName, quantity }, index) => (
-      <View key={index} style={styles.card}>
-        <Text style={styles.cardTitle}>{itemName}</Text>
-        <Text style={styles.cardValue}>{quantity || 0}</Text>
-      </View>
-    )) : <Text>No Data Available</Text>
-  ), []);
+  const renderItems = useMemo(
+    () => items =>
+      items.length > 0 ? (
+        items.map(({itemName, quantity}, index) => (
+          <View key={index} style={styles.card}>
+            <Text style={styles.cardTitle}>{itemName}</Text>
+            <Text style={styles.cardValue}>{quantity || 0}</Text>
+          </View>
+        ))
+      ) : (
+        <Text>No Data Available</Text>
+      ),
+    [],
+  );
 
   return (
     <View style={styles.container}>
@@ -85,7 +102,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
     flexDirection: 'row',

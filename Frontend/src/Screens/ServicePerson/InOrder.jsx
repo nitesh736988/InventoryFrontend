@@ -382,7 +382,9 @@ const InOrder = () => {
     // Fetch all warehouses
     const fetchAllWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/service-person/all-warehouses`);
+        const response = await axios.get(
+          `${API_URL}/service-person/all-warehouses`,
+        );
         setWarehouses(response.data.allWarehouses); // Set the fetched data to warehouses
       } catch (error) {
         console.log('Failed to fetch warehouses:', error);
@@ -629,7 +631,10 @@ const InOrder = () => {
               selectedValue={selectedWarehouse}
               style={styles.picker}
               onValueChange={value =>
-                setFormData(prevState => ({...prevState, selectedWarehouse: value}))
+                setFormData(prevState => ({
+                  ...prevState,
+                  selectedWarehouse: value,
+                }))
               }>
               {warehouses.map(warehouse => (
                 <Picker.Item
@@ -674,7 +679,10 @@ const InOrder = () => {
                     <TextInput
                       value={rmuRemark}
                       onChangeText={text =>
-                        setFormData(prevState => ({...prevState, rmuRemark: text}))
+                        setFormData(prevState => ({
+                          ...prevState,
+                          rmuRemark: text,
+                        }))
                       }
                       placeholder="Enter Reason"
                       style={styles.input}
@@ -694,9 +702,7 @@ const InOrder = () => {
               style={styles.input}
             />
 
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleSubmit}>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
 
@@ -715,7 +721,7 @@ const InOrder = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
+  container: {
     height: 200,
     padding: 20,
   },

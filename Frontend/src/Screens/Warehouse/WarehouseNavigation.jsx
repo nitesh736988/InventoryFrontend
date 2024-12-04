@@ -6,7 +6,6 @@ import Sidebar from './Sidebar';
 import WarehouseDashboard from './WarehouseDashboard';
 import ApprovalData from './ApprovalData';
 
-
 const headerColor = '#186cbf';
 
 const Tab = createBottomTabNavigator();
@@ -35,8 +34,7 @@ const TabNavigator = () => {
             iconName = 'arrow-right-bold-circle-outline';
           } else if (route.name === 'ApprovalData') {
             iconName = 'cube-outline';
-          }
-           else if (route.name === 'Sidebar') {
+          } else if (route.name === 'Sidebar') {
             iconName = 'cube-outline';
           }
 
