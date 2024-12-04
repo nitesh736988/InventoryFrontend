@@ -1,217 +1,7 @@
-// import React, { useState } from 'react';
-// import { useEffect } from 'react';
-// import { Alert, ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
-// import { Picker } from '@react-native-picker/picker'; 
-// import axios from 'axios';
-// import { useNavigation } from '@react-navigation/native';
-// import { API_URL } from '@env';
-
-
-// axios.defaults.withCredentials = true;
-// const LoginPage = () => {
-//   const navigation = useNavigation();
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [role, setRole] = useState(""); 
-//   const [loading, setLoading] = useState(false);
-//   const [showPassword, setShowPassword ] = useState(true);
-
-//   const handleSubmit = async () => {
-//   if (!email || !password || !role) {
-//     Alert.alert("Error", "Please fill out all fields including selecting a role");
-//     return;
-//   }
-
-//   setLoading(true); 
-//   console.log(email + " " + password + " " + role);
-//   console.log(API_URL);
-    
-//   try {
-//     const response = await axios.post(`${API_URL}/user/login`,{email,password,role});
-//     console.log(response.data)
-//     if (response.status === 200) {
-//       if (role.toLowerCase() === 'serviceperson') {
-//           navigation.navigate('ServicePersonNavigation');
-//       } else if (role.toLowerCase() === 'warehouseAdmin') {
-//           navigation.navigate('WarehouseNavigation');
-//       } else {
-//           navigation.navigate('Navigation'); 
-//       }
-//   }
-  
-//   } catch (error) {
-//     console.log(error);
-//     if (error.response) {
-//       switch (error.response.status) {
-//         case 401:
-//           Alert.alert("Login Failed", "Incorrect credentials. Please try again.");
-//           break;
-//         case 500:
-//           Alert.alert("Server Error", "There is an issue with the server. Please try again later.");
-//           break;
-//         default:
-//           Alert.alert("Login Failed", error.response.data?.message || "An error occurred.");
-//       }
-//     } else if (error.request) {
-//       Alert.alert("Network Error", "Please check your internet connection.");
-//     } else {
-//       Alert.alert("Error", "An unexpected error occurred.");
-//     }
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <Text style={styles.projectName}>Inventory System</Text>
-//       <Text style={styles.title}>Login</Text>
-//       <View style={styles.inputView}>
-//         <Picker
-//           selectedValue={role}
-//           style={styles.picker}
-//           onValueChange={(itemValue) => setUserType(itemValue)}
-//         >
-//           <Picker.Item label="Select Role" value="" />
-//           <Picker.Item label="Admin" value="Admin" />
-//           <Picker.Item label="Warehouse" value="Warehouse" />
-//           <Picker.Item label="Service Person" value="ServicePerson" />
-//         </Picker>
-//         {role !== "" && (
-//           <>
-//             <TextInput
-//               style={styles.input}
-//               placeholder="EMAIL"
-//               value={email}
-//               onChangeText={setEmail}
-//               autoCorrect={false}
-//               autoCapitalize="none"
-//             />
-//             <View style={{ width: '100%', borderRadius: 5, backgroundColor: '#fbd33b', borderColor: '#070604', borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12 }}> 
-//               <TextInput
-//                 style={{ color: 'black', width: '90%'}}
-//                 placeholder="PASSWORD"
-//                 secureTextEntry={showPassword}
-//                 value={password}
-//                 onChangeText={setPassword}
-//                 autoCorrect={false}
-//                 autoCapitalize="none"
-//               />
-//               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-//                 <Text style={{ color: 'black' }}>{showPassword?'Show':'Hide'}</Text>
-//               </TouchableOpacity>
-//             </View>
-//           </>
-//         )}
-//       </View>
-//       <View style={styles.buttonView}>
-//         <Pressable style={styles.button} onPress={handleSubmit} disabled={loading}>
-//           {loading ? (
-//             <ActivityIndicator size="small" color="white" />
-//           ) : (
-//             <Text style={styles.buttonText}>LOGIN</Text>
-//           )}
-//         </Pressable>
-//       </View>
-     
-//     </SafeAreaView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     alignItems: 'center',
-//     paddingTop: 50,
-//     backgroundColor: '#fbd33b',
-//     borderColorn: 'red',
-//     // borderWidth: 1
-//   },
-//   projectName: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: -10,
-//     color: '#070604',
-//   },
-//   image: {
-//     height: 160,
-//     width: 170,
-//   },
-//   title: {
-//     fontSize: 30,
-//     fontWeight: 'bold',
-//     textTransform: 'uppercase',
-//     textAlign: 'center',
-//     paddingVertical: 40,
-//     color: '#070604',
-//   },
-//   inputView: {
-//     gap: 15,
-//     width: '100%',
-//     paddingHorizontal: 40,
-//     marginBottom: 5,
-//   },
-//   input: {
-  
-//     height: 50,
-//     paddingHorizontal: 20,
-//     borderColor: '#000',
-//     borderWidth: 1,
-//     borderRadius: 7,
-//     color: 'black'
-//   },
-//   picker: {
-//     height: 50,
-//     borderColor: '#070604',
-//     borderWidth: 1,
-//     borderRadius: 7, 
-//     color: 'black',
-//   },
-//   buttonView: {
-//     width: '100%',
-//     paddingHorizontal: 40,
-//   },
-//   button: {
-//     backgroundColor: '#070604',
-//     height: 45,
-//     borderRadius: 5,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     marginTop: 15,
-//   },
-//   registrationButton: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginTop: 10,
-//     gap: 2,
-//   },
-//   buttonText: {
-//     color: 'white',
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-//   registerBtnContainer: {
-//     flex: 1,
-//     justifyContent: 'flex-end',
-//     paddingBottom: 16,
-//   },
-//   buttonclick: {
-//     color: '#070604',
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     textDecorationLine: 'underline',
-//     textDecorationStyle: 'solid',
-//     textDecorationColor: 'black',
-//   },
-// });
-
-// export default LoginPage;
-
-
 import React, { useState } from 'react';
-import { useEffect } from 'react';
-import { Alert, ActivityIndicator, Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
+import { Alert, ActivityIndicator, Text, TextInput, View, SafeAreaView, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import Icon from 'react-native-vector-icons/MaterialIcons'; 
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { API_URL } from '@env';
@@ -220,51 +10,55 @@ axios.defaults.withCredentials = true;
 
 const LoginPage = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState(""); 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword ] = useState(true);
+  const [showPassword, setShowPassword] = useState(true);
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = async () => {
     if (!email || !password || !role) {
-      Alert.alert("Error", "Please fill out all fields including selecting a role");
+      Alert.alert('Error', 'Please fill out all fields, including selecting a role.');
       return;
     }
 
-    setLoading(true); 
-    console.log(email + " " + password + " " + role);
-    console.log(API_URL);
-    
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address.');
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const response = await axios.post(`${API_URL}/user/login`, {email, password, role});
-      console.log(response.data)
-      if (response.status === 200) {
-        if (role.toLowerCase() === 'serviceperson') {
-            navigation.navigate('ServicePersonNavigation');
-        } else if (role.toLowerCase() === 'warehouseadmin') {
-            navigation.navigate('WarehouseNavigation');
-        } else {
-            navigation.navigate('Navigation'); 
+      console.log(API_URL);
+      console.log(email,password,role)
+      const response = await axios.post(`${API_URL}/user/login`,{ email, password, role});
+        Alert.alert('Success', 'Login successful!');
+        if (role === 'serviceperson') {
+          navigation.navigate('ServicePersonNavigation');
+        } else if (role === 'warehouseAdmin') {
+          navigation.navigate('WarehouseNavigation');
+        } else if (role === 'admin') {
+          navigation.navigate('Navigation');
         }
-      }
     } catch (error) {
-      console.log(error);
       if (error.response) {
         switch (error.response.status) {
           case 401:
-            Alert.alert("Login Failed", "Incorrect credentials. Please try again.");
+            Alert.alert('Login Failed', 'Incorrect credentials. Please try again.');
             break;
           case 500:
-            Alert.alert("Server Error", "There is an issue with the server. Please try again later.");
+            Alert.alert('Server Error', 'There is an issue with the server. Please try again later.');
             break;
           default:
-            Alert.alert("Login Failed", error.response.data?.message || "An error occurred.");
+            Alert.alert('Login Failed', error.response.data?.message || 'An error occurred.');
         }
       } else if (error.request) {
-        Alert.alert("Network Error", "Please check your internet connection.");
+        Alert.alert('Network Error', 'Please check your internet connection.');
       } else {
-        Alert.alert("Error", "An unexpected error occurred.");
+        Alert.alert('Error', 'An unexpected error occurred.');
       }
     } finally {
       setLoading(false);
@@ -279,14 +73,15 @@ const LoginPage = () => {
         <Picker
           selectedValue={role}
           style={styles.picker}
-          onValueChange={(itemValue) => setRole(itemValue)} // Fixed here to setRole
+          onValueChange={(itemValue) => setRole(itemValue)}
+          enabled={!loading}
         >
           <Picker.Item label="Select Role" value="" />
-          <Picker.Item label="Admin" value="Admin" />
-          <Picker.Item label="Warehouse" value="Warehouse" />
-          <Picker.Item label="Service Person" value="ServicePerson" />
+          <Picker.Item label="Admin" value="admin" />
+          <Picker.Item label="WarehouseAdmin" value="warehouseAdmin" />
+          <Picker.Item label="ServicePerson" value="serviceperson" />
         </Picker>
-        {role !== "" && (
+        {role !== '' && (
           <>
             <TextInput
               style={styles.input}
@@ -295,19 +90,21 @@ const LoginPage = () => {
               onChangeText={setEmail}
               autoCorrect={false}
               autoCapitalize="none"
+              editable={!loading}
             />
-            <View style={{ width: '100%', borderRadius: 5, backgroundColor: '#fbd33b', borderColor: '#070604', borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12 }}> 
+            <View style={styles.passwordContainer}>
               <TextInput
-                style={{ color: 'black', width: '90%' }}
+                style={styles.passwordInput}
                 placeholder="PASSWORD"
                 secureTextEntry={showPassword}
                 value={password}
                 onChangeText={setPassword}
                 autoCorrect={false}
                 autoCapitalize="none"
+                editable={!loading}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Text style={{ color: 'black' }}>{showPassword ? 'Show' : 'Hide'}</Text>
+                <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="black" />
               </TouchableOpacity>
             </View>
           </>
@@ -332,7 +129,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 50,
     backgroundColor: '#fbd33b',
-    borderColorn: 'red',
   },
   projectName: {
     fontSize: 24,
@@ -366,8 +162,21 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: '#070604',
     borderWidth: 1,
-    borderRadius: 7, 
+    borderRadius: 7,
     color: 'black',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fbd33b',
+    borderColor: '#070604',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 12,
+  },
+  passwordInput: {
+    color: 'black',
+    width: '90%',
   },
   buttonView: {
     width: '100%',
@@ -389,3 +198,7 @@ const styles = StyleSheet.create({
 });
 
 export default LoginPage;
+
+
+
+

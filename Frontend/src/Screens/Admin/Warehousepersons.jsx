@@ -21,7 +21,6 @@ const Warehousepersons = () => {
       setLoading(false);
     }
   };
-
   const deleteWarehousePerson = async (id) => {
     try {
       await axios.delete(`${API_URL}/admin/remove-warehouse-person?id=${id}`);
@@ -32,7 +31,6 @@ const Warehousepersons = () => {
       console.log('Error deleting data:', error);
     }
   };
-
   useEffect(() => {
     fetchWarehousePersons();
   }, []);

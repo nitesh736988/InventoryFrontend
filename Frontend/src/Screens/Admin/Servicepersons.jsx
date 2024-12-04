@@ -15,7 +15,7 @@ const Servicepersons = () => {
       setServicepersons(response.data.allServicePersons);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch service persons');
-      console.error('Error fetching data:', error);
+      console.log('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -28,7 +28,7 @@ const Servicepersons = () => {
       setServicepersons((prev) => prev.filter((person) => person._id !== id));
     } catch (error) {
       Alert.alert('Error', error.response?.data?.message || 'Failed to delete service person');
-      console.error('Error deleting data:', error);
+      console.log('Error deleting data:', error);
     }
   };
 

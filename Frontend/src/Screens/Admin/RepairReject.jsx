@@ -14,12 +14,11 @@ const RepairReject = () => {
       setRepairRejectData(response.data.allRepairRejectData);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch repair & reject data.');
-      console.error('Error fetching data:', error);
+      console.log('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchRepairRejectData();
   }, []);

@@ -3,7 +3,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Dashboard from './Admin/Dashboard';
 import AddWarehouse from './Admin/AddWareHouse';
-import OrderTracker from './Admin/OrderTracker';
 import History from './Admin/History';
 import SidebarModal from './Admin/SidebarModal';
 

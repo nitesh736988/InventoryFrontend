@@ -23,7 +23,7 @@ const OrderTracker = () => {
       console.log('API Response:', response.data);
         setOrders(response.data.itemDetails || []); 
     } catch (error) {
-      console.error('API Error:', error);
+      console.log('API Error:', error);
       Alert.alert('Error', error?.response?.data?.message || 'Unable to fetch orders.');
     } finally {
       setLoading(false);
