@@ -2,9 +2,10 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Outgoing from './Outgoing';
-import Sidebar from './Sidebar';
 import WarehouseDashboard from './WarehouseDashboard';
 import ApprovalData from './ApprovalData';
+import AddTransaction from './AddTransaction';
+
 
 const headerColor = '#186cbf';
 
@@ -35,9 +36,9 @@ const TabNavigator = () => {
           } else if (route.name === 'ApprovalData') {
             iconName = 'cube-outline';
           }
-          //  else if (route.name === 'Sidebar') {
-          //   iconName = 'cube-outline';
-          // }
+           else if (route.name === 'AddTransaction') {
+            iconName = 'cube-outline';
+          }
 
           return (
             <MaterialCommunityIcons name={iconName} color={color} size={size} />
@@ -52,19 +53,19 @@ const TabNavigator = () => {
       <Tab.Screen
         name="Outgoing"
         component={Outgoing}
-        options={{title: 'Outgoing'}}
+        options={{title: 'OutData'}}
       />
 
       <Tab.Screen
         name="ApprovalData"
         component={ApprovalData}
-        options={{title: 'Incoming'}}
+        options={{title: 'InData'}}
       />
-      {/* <Tab.Screen
-        name="Sidebar"
-        component={Sidebar}
-        options={{title: 'More'}}
-      /> */}
+      <Tab.Screen
+        name="AddTransaction"
+        component={AddTransaction}
+        options={{title: 'Outgoing'}}
+      />
     </Tab.Navigator>
   );
 };
