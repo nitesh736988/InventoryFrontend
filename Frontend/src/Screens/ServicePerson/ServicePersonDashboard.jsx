@@ -6,12 +6,16 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {API_URL} from '@env';
 
-const ServicePersonDashboard = () => {
+const {width} = Dimensions.get('window');
+
+const ServicePersonDashboard = ({navigation}) => {
   const [servicePersons, setServicePersons] = useState([]);
   const [servicePersonOutgoing, setServicePersonOutgoing] = useState([]);
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
@@ -33,21 +37,43 @@ const ServicePersonDashboard = () => {
       Alert.alert('Error', 'Error fetching service persons');
       console.log('Error fetching service persons:', error);
     } finally {
-      setIsRefreshClicked(false); // Set it back to false once fetching is done
+      setIsRefreshClicked(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/user/logout`);
+      if (response.data.success) {
+        Alert.alert('Logout', 'You have logged out successfully');
+        await AsyncStorage.clear(); 
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'LoginPage'}], 
+        });
+      } else {
+        Alert.alert('Logout Failed', response.data.message || 'Unknown error');
+      }
+    } catch (error) {
+      console.log(
+        'Error logging out:',
+        error.message,
+        error.response?.data || error,
+      );
+      Alert.alert('Error', 'Failed to logout. Please try again.');
     }
   };
 
   useEffect(() => {
-    fetchServicePersons(); // Initial fetch when component mounts
+    fetchServicePersons();
   }, []);
 
   useEffect(() => {
     if (isRefreshClicked) {
-      fetchServicePersons(); // Refetch when refresh is triggered
+      fetchServicePersons();
     }
   }, [isRefreshClicked]);
 
-  // Function to render the list of items
   const renderItems = useMemo(
     () => items =>
       items.length > 0 ? (
@@ -65,11 +91,12 @@ const ServicePersonDashboard = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.refreshButton}
-        onPress={() => setIsRefreshClicked(true)}>
-        <Icon name="refresh" size={30} color="black" />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Icon name="sign-out" size={20} color="white" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <Text style={styles.sectionTitle}>Incoming Items</Text>
@@ -86,6 +113,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'black',
+    paddingVertical: width * 0.02,
+    paddingHorizontal: width * 0.04,
+    borderRadius: width * 0.02,
+    marginLeft: 'auto', 
+  },
+  logoutText: {
+    marginLeft: 8,
+    color: 'white',
+    fontSize: 16,
   },
   scrollViewContent: {
     paddingBottom: 20,
@@ -117,12 +163,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     color: '#000',
-  },
-  refreshButton: {
-    position: 'absolute',
-    top: 24,
-    right: 40,
-    zIndex: 999,
   },
 });
 

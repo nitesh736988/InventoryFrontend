@@ -1,7 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Warehousepersons = () => {
@@ -11,23 +19,31 @@ const Warehousepersons = () => {
   const fetchWarehousePersons = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/admin/all-warehouse-persons`);
-      console.log('Response:', response); 
+      const response = await axios.get(
+        `${API_URL}/admin/all-warehouse-persons`,
+      );
+      console.log('Response:', response);
       setWarehousePersons(response.data.allWarehousePersons || []);
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Failed to fetch warehouse persons');
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to fetch warehouse persons',
+      );
       console.log('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
-  const deleteWarehousePerson = async (id) => {
+  const deleteWarehousePerson = async id => {
     try {
       await axios.delete(`${API_URL}/admin/remove-warehouse-person?id=${id}`);
       Alert.alert('Success', 'Warehouse person deleted successfully');
-      setWarehousePersons((prev) => prev.filter((person) => person._id !== id));
+      setWarehousePersons(prev => prev.filter(person => person._id !== id));
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Failed to delete warehouse person');
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to delete warehouse person',
+      );
       console.log('Error deleting data:', error);
     }
   };
@@ -36,7 +52,7 @@ const Warehousepersons = () => {
   }, []);
 
   const renderWarehousePerson = useCallback(
-    ({ item }) => (
+    ({item}) => (
       <View style={styles.personContainer}>
         <Text style={styles.label}>
           Name: <Text style={styles.value}>{item.name || 'N/A'}</Text>
@@ -45,7 +61,10 @@ const Warehousepersons = () => {
           Email: <Text style={styles.value}>{item.email || 'N/A'}</Text>
         </Text>
         <Text style={styles.label}>
-          Warehouse: <Text style={styles.value}>{item.warehouse?.warehouseName || 'N/A'}</Text>
+          Warehouse:{' '}
+          <Text style={styles.value}>
+            {item.warehouse?.warehouseName || 'N/A'}
+          </Text>
         </Text>
         <Text style={styles.label}>
           Contact: <Text style={styles.value}>{item.contact || 'N/A'}</Text>
@@ -58,17 +77,20 @@ const Warehousepersons = () => {
               'Confirm Deletion',
               `Are you sure you want to delete ${item.name}?`,
               [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive', onPress: () => deleteWarehousePerson(item._id) },
-              ]
+                {text: 'Cancel', style: 'cancel'},
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: () => deleteWarehousePerson(item._id),
+                },
+              ],
             )
-          }
-        >
+          }>
           <Icon name="trash" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
     ),
-    []
+    [],
   );
 
   return (
@@ -77,12 +99,18 @@ const Warehousepersons = () => {
         <ActivityIndicator size="large" color="#fbd33b" />
       ) : (
         <>
-          <Text style={styles.label}>Total Warehouse Persons: {warehousePersons.length}</Text>
+          <Text style={styles.label}>
+            Total Warehouse Persons: {warehousePersons.length}
+          </Text>
           <FlatList
             data={warehousePersons}
-            keyExtractor={(item, index) => item._id?.toString() || index.toString()} // Ensure the key is valid
+            keyExtractor={(item, index) =>
+              item._id?.toString() || index.toString()
+            } // Ensure the key is valid
             renderItem={renderWarehousePerson}
-            ListEmptyComponent={<Text style={styles.emptyText}>No warehouse persons found.</Text>}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No warehouse persons found.</Text>
+            }
           />
         </>
       )}

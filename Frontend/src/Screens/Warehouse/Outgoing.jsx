@@ -298,12 +298,11 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  TouchableOpacity,
   TextInput,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env';
 
 const Outgoing = () => {
@@ -314,17 +313,15 @@ const Outgoing = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchOrders = async () => {
-    setLoading(true);
     try {
       const response = await axios.get(
         `${API_URL}/warehouse-admin/warehouse-in-out-orders`
       );
-      console.log(response.data.pickupItems);
       setOrders(response.data.pickupItems);
       setFilteredOrders(response.data.pickupItems);
     } catch (error) {
-      console.log(error);
-      // Alert.alert('Error', JSON.stringify(error.response.data));
+      console.error(error);
+      Alert.alert('Error', 'Failed to fetch data');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -350,52 +347,10 @@ const Outgoing = () => {
     setFilteredOrders(filtered);
   }, [searchQuery, orders]);
 
-  const [btnClickedStatus, setBtnClickedStatus] = useState({});
-
-  const handleApproveBtn = async (sendTransactionId, incoming) => {
-    try {
-      const sendRequest = await axios.put(
-        `${API_URL}/warehouse-admin/update-incoming-status`,
-        {
-          status: true,
-          pickupItemId: sendTransactionId,
-          incoming,
-          arrivedDate: Date.now(),
-        }
-      );
-      console.log(sendRequest.data);
-      if (sendRequest.status === 200) {
-        setBtnClickedStatus((previousData) => ({
-          ...previousData,
-          [sendTransactionId]: true,
-        }));
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Unable to approve status');
-    }
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchOrders();
   };
-
-  useEffect(() => {
-    const updateClickedStatus = {};
-    for (let index = 0; index < orders.length; index++) {
-      updateClickedStatus[orders[index]._id] = orders[index].status || false;
-    }
-    setBtnClickedStatus(updateClickedStatus);
-  }, [orders]);
-
-  const dateObject = (newDate) => {
-    return new Date(newDate);
-  };
-
-  if (loading) {
-    return (
-      <ActivityIndicator
-        size="large"
-        color="#0000ff"
-        style={styles.loadingIndicator}
-      />
-    );
-  }
 
   const renderOrderItem = ({ item }) => (
     <>
@@ -413,20 +368,25 @@ const Outgoing = () => {
             <Text style={styles.infoText}>
               Name: {item.servicePerson ? item.servicePerson.name : 'N/A'}
             </Text>
-            {item.status ? (
-              <Text style={styles.approvedText}>Completed</Text>
-            ) : (
-              <Text style={{ ...styles.approvedText, color: 'red' }}>
-                Pending
-              </Text>
-            )}
+            <Text
+              style={[
+                styles.approvedText,
+                { color: item.status ? 'green' : 'red' },
+              ]}
+            >
+              {item.status ? 'Completed' : 'Pending'}
+            </Text>
           </View>
           <Text style={styles.infoText}>
             Contact: {item.servicePerson ? item.servicePerson.contact : 'N/A'}
           </Text>
           <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
-          <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
-          <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
+          <Text style={styles.infoText}>
+            Farmer Contact: {item.farmerContact}
+          </Text>
+          <Text style={styles.infoText}>
+            Village Name: {item.farmerVillage}
+          </Text>
           <View style={styles.itemContainer}>
             {item.items.map(({ _id, itemName, quantity }) => (
               <Text key={_id} style={styles.infoText}>
@@ -434,41 +394,28 @@ const Outgoing = () => {
               </Text>
             ))}
           </View>
-          <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
-          <Text style={styles.infoText}>Remark: {item.remark}</Text>
           <Text style={styles.infoText}>
-            Pickup Date:{' '}
-            {dateObject(item.pickupDate).getDate() +
-              '/' +
-              (dateObject(item.pickupDate).getMonth() + 1) +
-              '/' +
-              dateObject(item.pickupDate).getFullYear()}
+            Serial Number: {item.serialNumber}
           </Text>
-          {item?.arrivedDate && (
-            <Text style={styles.infoText}>
-              Approved Date:{' '}
-              {dateObject(item.arrivedDate).getDate() +
-                '/' +
-                (dateObject(item.arrivedDate).getMonth() + 1) +
-                '/' +
-                dateObject(item.arrivedDate).getFullYear()}
-            </Text>
-          )}
+          <Text style={styles.infoText}>Remark: {item.remark}</Text>
         </View>
       )}
     </>
   );
 
+  if (loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#0000ff"
+        style={styles.loadingIndicator}
+      />
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.refreshIcon}
-        onPress={() => setRefreshing(true)}
-      >
-        <Icon name="refresh" size={30} color="black" />
-      </TouchableOpacity>
-
-      <Text style={styles.header}>Outgoing Item</Text>
+      <Text style={styles.header}>Outgoing Items</Text>
 
       <TextInput
         style={styles.searchBar}
@@ -482,6 +429,9 @@ const Outgoing = () => {
         renderItem={renderOrderItem}
         keyExtractor={(item) => item._id}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       />
     </View>
   );
@@ -544,38 +494,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 8,
   },
-  actionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-  },
-  declineButton: {
-    width: '49%',
-    borderRadius: 5,
-    backgroundColor: 'red',
-    padding: 8,
-  },
-  approveButton: {
-    width: '49%',
-    borderRadius: 5,
-    backgroundColor: 'green',
-    padding: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-  },
   loadingIndicator: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fbd33b',
   },
-  refreshIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 32,
-  },
 });
 
 export default Outgoing;
+
+

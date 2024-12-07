@@ -1,17 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {testApi} from '../../utils/testAPI';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import {API_URL} from '@env';
-import {useNavigation} from '@react-navigation/native';
+import { API_URL } from '@env';
+import { useNavigation } from '@react-navigation/native';
+import Sidebar from './Sidebar';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Assuming AsyncStorage is being used
 
 const WarehouseDashboard = () => {
   const [data, setData] = useState([]);
@@ -23,10 +17,7 @@ const WarehouseDashboard = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `${API_URL}/warehouse-admin/dashboard`,
-        );
-
+        const response = await axios.get(`${API_URL}/warehouse-admin/dashboard`);
         console.log('Response data:', response.data);
         if (response.data?.warehouseData?.items) {
           setData(response.data.warehouseData.items);
@@ -35,7 +26,7 @@ const WarehouseDashboard = () => {
           setData([]);
         }
       } catch (error) {
-        console.log('Error fetching data:', error.response.data);
+        console.log('Error fetching data:', error.response?.data || error);
       } finally {
         setLoading(false);
         setIsRefreshClicked(false);
@@ -45,6 +36,29 @@ const WarehouseDashboard = () => {
     fetchData();
   }, [isRefreshClicked]);
 
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/user/logout`);
+      if (response.data.success) {
+        Alert.alert('Logout', 'You have logged out successfully');
+        await AsyncStorage.clear();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'LoginPage' }],
+        });
+      } else {
+        Alert.alert('Logout Failed', response.data.message || 'Unknown error');
+      }
+    } catch (error) {
+      console.log(
+        'Error logging out:',
+        error.message,
+        error.response?.data || error
+      );
+      Alert.alert('Error', 'Failed to logout. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -52,16 +66,18 @@ const WarehouseDashboard = () => {
       </View>
     );
   }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={true}>
-      <TouchableOpacity
-        style={styles.refreshIcon}
-        onPress={() => setIsRefreshClicked(true)}>
-        <Icon name="refresh" size={30} color="black" />
-      </TouchableOpacity>
+      <Sidebar />
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Icon name="sign-out" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
 
       {data.length > 0 ? (
-        data.map(({_id, itemName, quantity, defective, repaired, rejected}) => (
+        data.map(({ _id, itemName, quantity, defective, repaired, rejected }) => (
           <View key={_id} style={styles.card}>
             <TouchableOpacity
               onPress={() =>
@@ -81,11 +97,7 @@ const WarehouseDashboard = () => {
                 })
               }>
               <Text
-                style={[
-                  styles.cardDetails,
-                  styles.link,
-                  styles.defectiveHighlight,
-                ]}>
+                style={[styles.cardDetails, styles.link, styles.defectiveHighlight]}>
                 Defective: {defective}
               </Text>
             </TouchableOpacity>
@@ -106,9 +118,16 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fbd33b',
   },
-  refreshIcon: {
-    alignSelf: 'flex-end',
-    marginBottom: 10,
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingVertical: 10,
+  },
+  logoutButton: {
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 20,
   },
   card: {
     backgroundColor: '#fff',
@@ -116,7 +135,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
   },

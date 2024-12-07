@@ -25,6 +25,9 @@ import OrderTracker from './Screens/Admin/OrderTracker';
 import W2WApproveHistory from './Screens/Warehouse/W2WApproveHistory';
 import W2Wapproval from './Screens/Warehouse/W2Wapproval';
 import W2WData from './Screens/Warehouse/W2WData';
+import ServicePersonData from './Screens/Admin/ServicePersonData';
+import ServicePersonOutgoing from './Screens/Admin/ServicePersonOutgoing';
+import W2WApproveData from './Screens/Admin/W2WApproveData';
 
 const Stack = createStackNavigator();
 
@@ -168,6 +171,24 @@ const AppNavigator = () => {
           name="W2WData"
           component={W2WData}
           options={{title: 'W2WData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ServicePersonData"
+          component={ServicePersonData}
+          options={{title: 'ServicePersonData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ServicePersonOutgoing"
+          component={ServicePersonOutgoing}
+          options={{title: 'ServicePersonOutgoing', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="W2WApproveData"
+          component={W2WApproveData}
+          options={{title: 'W2WApproveData', headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

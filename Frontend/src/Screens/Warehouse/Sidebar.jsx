@@ -99,11 +99,8 @@ const Sidebar = ({ userType }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={openModal} style={styles.openButton}>
-      <View style={styles.buttonContent}>
-        <Icon name="bars" size={30} color="#fff" style={styles.icon} />
-
-      </View>
+      <TouchableOpacity onPress={openModal} style={styles.menuIcon}>
+        <Icon name="bars" size={28} color="#000" />
       </TouchableOpacity>
 
       <Modal transparent visible={visible} animationType="none" onRequestClose={closeModal}>
@@ -173,12 +170,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fbd33b'
   },
-  openButton: {
-    backgroundColor: 'black',
-    padding: 10,
-    borderRadius: 5,
-    alignSelf: 'center',
-    marginVertical: 20,
+  menuIcon: {
+    position: 'absolute',
+    top: 20, 
+    left: 15,
+    zIndex: 10,
   },
   buttonContent: {
     flexDirection: 'row',

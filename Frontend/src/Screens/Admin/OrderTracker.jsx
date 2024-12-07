@@ -6,27 +6,30 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env';
 
 const OrderTracker = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchOrders = async () => {
-    setLoading(true);
+  const fetchOrders = async (isRefreshing = false) => {
+    if (loading && !isRefreshing) return;
+
     try {
+      if (isRefreshing) setIsRefreshing(true);
+      else setLoading(true);
+
       const response = await axios.get(`${API_URL}/admin/upper-order-details`);
-      console.log('API Response:', response.data);
-        setOrders(response.data.itemDetails || []); 
+      setOrders(response.data.itemDetails || []);
     } catch (error) {
       console.log('API Error:', error);
       Alert.alert('Error', error?.response?.data?.message || 'Unable to fetch orders.');
     } finally {
-      setLoading(false);
+      if (isRefreshing) setIsRefreshing(false);
+      else setLoading(false);
     }
   };
 
@@ -72,24 +75,24 @@ const OrderTracker = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>Upper Order History</Text>
-        <TouchableOpacity onPress={fetchOrders}>
-          <Icon name="refresh" size={30} color="black" />
-        </TouchableOpacity>
-      </View>
-      {loading ? (
+      <Text style={styles.header}>Upper Order Data</Text>
+      {loading && orders.length === 0 ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
-      ) : orders.length > 0 ? (
+      ) : (
         <FlatList
           data={orders}
           renderItem={renderOrder}
           keyExtractor={(item, index) => item._id || index.toString()}
+          onRefresh={() => fetchOrders(true)}
+          refreshing={isRefreshing}
+          ListEmptyComponent={
+            !loading && orders.length === 0 ? (
+              <Text style={styles.noOrdersText}>No orders found.</Text>
+            ) : null
+          }
         />
-      ) : (
-        <Text style={styles.noOrdersText}>No orders found.</Text>
       )}
     </View>
   );
@@ -101,15 +104,10 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fbd33b',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 16,
   },
   card: {
     padding: 16,

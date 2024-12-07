@@ -1,11 +1,11 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Dashboard from './Admin/Dashboard';
 import AddWarehouse from './Admin/AddWareHouse';
 import History from './Admin/History';
-import SidebarModal from './Admin/SidebarModal';
-
+import OrderTracker from './Admin/OrderTracker';
 
 const headerColor = '#186cbf';
 
@@ -30,22 +30,26 @@ const TabNavigator = () => {
           let iconName;
 
           if (route.name === 'Dashboard') {
-            iconName = 'home';
+            return (
+              <MaterialCommunityIcons name="home" color={color} size={size} />
+            );
           } else if (route.name === 'AddWarehouse') {
-            iconName = 'warehouse';
-          } 
-
-           else if (route.name === 'History') {
-            iconName = 'history';
+            return (
+              <MaterialCommunityIcons
+                name="storefront-outline"
+                color={color}
+                size={size}
+              />
+            );
+          } else if (route.name === 'History') {
+            return (
+              <MaterialCommunityIcons name="history" color={color} size={size} />
+            );
+          } else if (route.name === 'OrderTracker') {
+            return (
+              <MaterialIcons name="event" color={color} size={size} />
+            );
           }
-
-          else if (route.name === 'SidebarModal') {
-            iconName = 'history';
-          }
-
-          return (
-            <MaterialCommunityIcons name={iconName} color={color} size={size} />
-          );
         },
       })}>
       <Tab.Screen
@@ -63,13 +67,11 @@ const TabNavigator = () => {
         component={History}
         options={{title: 'History'}}
       />
-
       <Tab.Screen
-        name="SidebarModal"
-        component={SidebarModal}
-        options={{title: 'More'}}
+        name="OrderTracker"
+        component={OrderTracker}
+        options={{title: 'Track'}}
       />
-
     </Tab.Navigator>
   );
 };

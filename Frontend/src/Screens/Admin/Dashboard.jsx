@@ -7,20 +7,27 @@ import {
   Alert,
   TouchableOpacity,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { API_URL } from '@env';
+import SidebarModal from './SidebarModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+
+const { width } = Dimensions.get('window');
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
   const [selectedWarehouse, setSelectedWarehouse] = useState('Total Items');
   const [allWarehouses, setAllWarehouses] = useState([]);
   const [responseData, setResponseData] = useState([]);
+  const navigation = useNavigation();
 
-  // Fetch Dashboard Data
   const fetchDashboardData = async (retries = 3) => {
     setLoading(true);
     try {
@@ -50,11 +57,11 @@ const Dashboard = () => {
       );
     } finally {
       setLoading(false);
+      setRefreshing(false); 
       setIsRefreshClicked(false);
     }
   };
 
-  // Fetch Warehouses Data
   const fetchWarehouses = async () => {
     try {
       const response = await axios.get(`${API_URL}/admin/all-warehouses`);
@@ -81,9 +88,36 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [selectedWarehouse, isRefreshClicked]);
 
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/user/logout`);
+      if (response.data.success) {
+        Alert.alert('Logout', 'You have logged out successfully');
+        await AsyncStorage.clear();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'LoginPage' }],
+        });
+      } else {
+        Alert.alert('Logout Failed', response.data.message || 'Unknown error');
+      }
+    } catch (error) {
+      console.log(
+        'Error logging out:',
+        error.message,
+        error.response?.data || error
+      );
+      Alert.alert('Error', 'Failed to logout. Please try again.');
+    }
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchDashboardData();
+  };
+
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
@@ -91,18 +125,13 @@ const Dashboard = () => {
 
   return (
     <View style={styles.container}>
-      {/* Refresh Button */}
+      <SidebarModal />
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.refreshButton}
-          onPress={() => setIsRefreshClicked(true)}
-        >
-          <Icon name="refresh" size={20} color="#fff" />
-          <Text style={styles.refreshButtonText}>Refresh</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Icon name="sign-out" size={20} color="white" />
         </TouchableOpacity>
       </View>
 
-      {/* Warehouse Picker */}
       <Picker
         selectedValue={selectedWarehouse}
         style={styles.picker}
@@ -117,8 +146,6 @@ const Dashboard = () => {
           />
         ))}
       </Picker>
-
-      {/* Data Display */}
       {responseData.length > 0 ? (
         <FlatList
           data={responseData}
@@ -140,6 +167,8 @@ const Dashboard = () => {
             </View>
           )}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={onRefresh} 
         />
       ) : (
         <Text style={styles.noDataText}>
@@ -150,35 +179,45 @@ const Dashboard = () => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: width * 0.05,
     backgroundColor: '#fbd33b',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'flex-end',
-    marginBottom: 10,
+    marginBottom: width * 0.03,
   },
-  refreshButton: {
+  logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    backgroundColor: 'black',
+    paddingVertical: width * 0.02,
+    paddingHorizontal: width * 0.04,
+    borderRadius: width * 0.02,
+    marginTop: width * 0.02,
   },
-  refreshButtonText: {
+  logoutButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: width * 0.04,
     marginLeft: 5,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    marginBottom: 10,
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 20,
-    marginVertical: 10,
+    padding: width * 0.04,
+    marginVertical: width * 0.03,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -189,25 +228,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: width * 0.045,
     fontWeight: 'bold',
     color: '#070604',
   },
   cardDetails: {
-    fontSize: 14,
+    fontSize: width * 0.04,
     color: '#333',
     marginTop: 5,
   },
   noDataText: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: width * 0.045,
     color: '#555',
     marginVertical: 20,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 10,
   },
 });
 

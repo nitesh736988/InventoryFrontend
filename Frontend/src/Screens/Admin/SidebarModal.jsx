@@ -8,6 +8,7 @@ import {
   Animated,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SidebarModal = () => {
   const [visible, setVisible] = useState(false);
@@ -68,6 +69,11 @@ const SidebarModal = () => {
     navigation.navigate('RepairReject');
   };
 
+  const openW2WApproveData = () => {
+    closeModal();
+    navigation.navigate('W2WApproveData');
+  };
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -76,8 +82,8 @@ const SidebarModal = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={openModal} style={styles.openButton}>
-        <Text style={styles.buttonText}>Open Sidebar</Text>
+      <TouchableOpacity onPress={openModal} style={styles.menuIcon}>
+        <Icon name="bars" size={28} color="#000" />
       </TouchableOpacity>
 
       <Modal
@@ -134,6 +140,13 @@ const SidebarModal = () => {
             style={styles.optionButton}>
             <Text style={styles.optionText}>Repair & Reject</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openW2WApproveData}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>W2W Approve Data</Text>
+          </TouchableOpacity>
+
         </Animated.View>
       </Modal>
     </View>
@@ -144,11 +157,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fbd33b'
   },
-  openButton: {
-    padding: 10,
-    backgroundColor: '#4CAF50',
-    borderRadius: 5,
+  menuIcon: {
+    position: 'absolute',
+    top: 20, 
+    left: 15,
+    zIndex: 10,
   },
   buttonText: {
     color: '#FFFFFF',

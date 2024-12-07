@@ -34,9 +34,10 @@ const TabNavigator = () => {
             iconName = 'arrow-right-bold-circle-outline';
           } else if (route.name === 'ApprovalData') {
             iconName = 'cube-outline';
-          } else if (route.name === 'Sidebar') {
-            iconName = 'cube-outline';
           }
+          //  else if (route.name === 'Sidebar') {
+          //   iconName = 'cube-outline';
+          // }
 
           return (
             <MaterialCommunityIcons name={iconName} color={color} size={size} />
@@ -59,11 +60,11 @@ const TabNavigator = () => {
         component={ApprovalData}
         options={{title: 'Incoming'}}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Sidebar"
         component={Sidebar}
         options={{title: 'More'}}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

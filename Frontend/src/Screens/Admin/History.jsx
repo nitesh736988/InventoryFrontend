@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,11 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  TouchableOpacity,
   TextInput,
   Dimensions,
 } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {API_URL} from '@env';
+import { API_URL } from '@env';
 
 const History = () => {
   const [orders, setOrders] = useState([]);
@@ -26,7 +24,7 @@ const History = () => {
 
     try {
       const response = await axios.get(
-        `${API_URL}/admin/all-transactions-data`,
+        `${API_URL}/admin/all-transactions-data`
       );
       setOrders(response.data.pickupItems);
       setFilteredOrders(response.data.pickupItems);
@@ -43,7 +41,7 @@ const History = () => {
     fetchOrders();
   }, []);
 
-  const formatDate = dateString => {
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -53,58 +51,62 @@ const History = () => {
     fetchOrders();
   };
 
-  const handleSearch = query => {
+  const handleSearch = (query) => {
     setSearchQuery(query);
     if (query.trim() === '') {
       setFilteredOrders(orders);
     } else {
       const lowerCaseQuery = query.toLowerCase();
       const filtered = orders.filter(
-        order =>
-          order.servicePerson.name.toLowerCase().includes(lowerCaseQuery) ||
+        (order) =>
+          order.servicePerson?.name.toLowerCase().includes(lowerCaseQuery) ||
           order.farmerName.toLowerCase().includes(lowerCaseQuery) ||
-          order.serialNumber.toLowerCase().includes(lowerCaseQuery),
+          order.serialNumber.toLowerCase().includes(lowerCaseQuery)
       );
       setFilteredOrders(filtered);
     }
   };
-  const renderOrderItem = ({item}) => (
+
+  const renderOrderItem = ({ item }) => (
     <View key={item._id} style={styles.card}>
       <Text
         style={[
           styles.statusText,
           item.incoming ? styles.incoming : styles.outgoing,
-        ]}>
+        ]}
+      >
         {item.incoming ? 'Incoming' : 'Outgoing'}
       </Text>
       <View style={styles.infoRow}>
         <Text style={styles.infoText}>
-          Service Name: {item?.servicePersonName || item?.servicePerson.name}
+          Service Name: {item?.servicePerson?.name || 'N/A'}
         </Text>
         {item.status && (
           <Text style={styles.approvedText}>Approved Success</Text>
         )}
       </View>
       <Text style={styles.infoText}>
-        Service Contact:{' '}
-        {item?.servicePerContact || item?.servicePerson.contact}
+        Service Contact: {item?.servicePerson?.contact || 'N/A'}
       </Text>
-      <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
-      <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
-      <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
+      <Text style={styles.infoText}>Farmer Name: {item.farmerName || 'N/A'}</Text>
+      <Text style={styles.infoText}>
+        Farmer Contact: {item.farmerContact || 'N/A'}
+      </Text>
+      <Text style={styles.infoText}>Village Name: {item.farmerVillage || 'N/A'}</Text>
       <View style={styles.itemContainer}>
-        {item.items.map(({_id, itemName, quantity}) => (
+        {item.items.map(({ _id, itemName, quantity }) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
         ))}
       </View>
-      <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
-      <Text style={styles.infoText}>Remark: {item.remark}</Text>
+      <Text style={styles.infoText}>
+        Serial Number: {item.serialNumber || 'N/A'}
+      </Text>
+      <Text style={styles.infoText}>Remark: {item.remark || 'N/A'}</Text>
       {item.incoming && (
         <Text style={styles.infoText}>
-          RMU Present:{' '}
-          {item?.withoutRMU ? (!item.withoutRMU ? 'YES' : 'NO') : 'N/A'}
+          RMU Present: {item?.withoutRMU ? (!item.withoutRMU ? 'YES' : 'NO') : 'N/A'}
         </Text>
       )}
       {item.incoming && (
@@ -145,7 +147,7 @@ const History = () => {
         <FlatList
           data={filteredOrders}
           renderItem={renderOrderItem}
-          keyExtractor={item => item._id}
+          keyExtractor={(item) => item._id}
           refreshing={refreshing}
           onRefresh={handleRefresh}
           ListEmptyComponent={
@@ -154,14 +156,11 @@ const History = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
-      <TouchableOpacity style={styles.refreshIcon} onPress={handleRefresh}>
-        <Icon name="refresh" size={30} color="black" />
-      </TouchableOpacity>
     </View>
   );
 };
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -189,7 +188,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
@@ -226,15 +225,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  refreshIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    backgroundColor: '#fff',
-    padding: 8,
-    borderRadius: 16,
-    elevation: 4,
   },
   emptyText: {
     textAlign: 'center',

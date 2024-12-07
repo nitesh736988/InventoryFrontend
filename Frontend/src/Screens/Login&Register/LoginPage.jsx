@@ -34,6 +34,7 @@ const LoginPage = () => {
     try {
       console.log(API_URL);
       console.log(email,password,role)
+      
       const response = await axios.post(`${API_URL}/user/login`,{ email, password, role});
         Alert.alert('Success', 'Login successful!');
         if (role === 'serviceperson') {
