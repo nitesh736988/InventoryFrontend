@@ -5,7 +5,6 @@ import ServicePersonDashboard from './ServicePersonDashboard';
 import OrderDetails from './OrderDetails';
 import InOrder from './InOrder';
 import OutStatus from './OutStatus';
-import ApprovedData from './ApprovedData';
 
 const headerColor = '#186cbf';
 
@@ -67,12 +66,6 @@ const TabNavigator = () => {
         name="OutStatus"
         component={OutStatus}
         options={{title: 'OutStatus'}}
-      />
-
-      <Tab.Screen
-        name="ApprovedData"
-        component={ApprovedData}
-        options={{title: 'Approved'}}
       />
     </Tab.Navigator>
   );

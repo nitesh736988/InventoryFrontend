@@ -12,7 +12,7 @@ import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 
-const W2WApprovalHistory = () => {
+const W2WApproveData = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingRefresh, setLoadingRefresh] = useState(false);
@@ -175,4 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default W2WApprovalHistory;
+export default W2WApproveData;

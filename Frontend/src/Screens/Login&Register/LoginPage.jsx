@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, ActivityIndicator, Text, TextInput, View, SafeAreaView, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { API_URL } from '@env';
@@ -33,17 +33,17 @@ const LoginPage = () => {
 
     try {
       console.log(API_URL);
-      console.log(email,password,role)
-      
-      const response = await axios.post(`${API_URL}/user/login`,{ email, password, role});
-        Alert.alert('Success', 'Login successful!');
-        if (role === 'serviceperson') {
-          navigation.navigate('ServicePersonNavigation');
-        } else if (role === 'warehouseAdmin') {
-          navigation.navigate('WarehouseNavigation');
-        } else if (role === 'admin') {
-          navigation.navigate('Navigation');
-        }
+      console.log(email, password, role);
+
+      const response = await axios.post(`${API_URL}/user/login`, { email, password, role });
+      Alert.alert('Success', 'Login successful!');
+      if (role === 'serviceperson') {
+        navigation.navigate('ServicePersonNavigation');
+      } else if (role === 'warehouseAdmin') {
+        navigation.navigate('WarehouseNavigation');
+      } else if (role === 'admin') {
+        navigation.navigate('Navigation');
+      }
     } catch (error) {
       if (error.response) {
         switch (error.response.status) {
@@ -84,18 +84,22 @@ const LoginPage = () => {
         </Picker>
         {role !== '' && (
           <>
-            <TextInput
-              style={styles.input}
-              placeholder="EMAIL"
-              value={email}
-              onChangeText={setEmail}
-              autoCorrect={false}
-              autoCapitalize="none"
-              editable={!loading}
-            />
-            <View style={styles.passwordContainer}>
+            <View style={styles.inputWithIcon}>
+              <Icon name="email" size={20} color="black" style={styles.icon} />
               <TextInput
-                style={styles.passwordInput}
+                style={styles.input}
+                placeholder="EMAIL"
+                value={email}
+                onChangeText={setEmail}
+                autoCorrect={false}
+                autoCapitalize="none"
+                editable={!loading}
+              />
+            </View>
+            <View style={styles.inputWithIcon}>
+              <Icon name="lock" size={20} color="black" style={styles.icon} />
+              <TextInput
+                style={styles.passwordInputWithIcon}
                 placeholder="PASSWORD"
                 secureTextEntry={showPassword}
                 value={password}
@@ -151,12 +155,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     marginBottom: 5,
   },
-  input: {
-    height: 50,
-    paddingHorizontal: 20,
+  inputWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderColor: '#000',
     borderWidth: 1,
     borderRadius: 7,
+    paddingHorizontal: 12,
+    height: 50,
+    backgroundColor: 'white',
+  },
+  icon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    color: 'black',
+  },
+  passwordInputWithIcon: {
+    flex: 1,
     color: 'black',
   },
   picker: {
@@ -165,19 +182,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 7,
     color: 'black',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fbd33b',
-    borderColor: '#070604',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 12,
-  },
-  passwordInput: {
-    color: 'black',
-    width: '90%',
   },
   buttonView: {
     width: '100%',
@@ -199,7 +203,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginPage;
-
-
-
-

@@ -28,6 +28,8 @@ import W2WData from './Screens/Warehouse/W2WData';
 import ServicePersonData from './Screens/Admin/ServicePersonData';
 import ServicePersonOutgoing from './Screens/Admin/ServicePersonOutgoing';
 import W2WApproveData from './Screens/Admin/W2WApproveData';
+import Sidebarmodal from './Screens/ServicePerson/Sidebarmodal';
+import InstallationPart from './Screens/ServicePerson/InstallationPart';
 
 const Stack = createStackNavigator();
 
@@ -189,6 +191,18 @@ const AppNavigator = () => {
           name="W2WApproveData"
           component={W2WApproveData}
           options={{title: 'W2WApproveData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Sidebarmodal"
+          component={Sidebarmodal}
+          options={{title: 'Sidebarmodal', headerShown: false}}
+        />
+
+       <Stack.Screen
+          name="InstallationPart"
+          component={InstallationPart}
+          options={{title: 'InstallationPart', headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

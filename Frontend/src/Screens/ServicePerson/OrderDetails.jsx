@@ -20,15 +20,14 @@ const OrderDetails = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState('');
 
-  // Fetch orders from the API
   const fetchOrders = async () => {
     try {
       const response = await axios.get(
         `${API_URL}/service-person/pickedup-items`,
       );
       setOrders(response.data.pickupItemsDetail);
-      setFilteredOrders(response.data.pickupItemsDetail); // Initially set filtered orders as all orders
-      setError(''); // Reset error on successful fetch
+      setFilteredOrders(response.data.pickupItemsDetail); 
+      setError(''); 
     } catch (error) {
       console.error(error);
       setError('Unable to fetch orders. Please try again later.');
