@@ -99,12 +99,12 @@ const InstallationPart = () => {
       <Text style={styles.infoText}>
         Pickup Date: {formatDate(item.pickupDate)}
       </Text>
-      {item.approvedBy && (
-        <Text style={styles.infoText}>Approved By: {item.approvedBy}</Text>
+      {item.installedBy && (
+        <Text style={styles.infoText}>Install By: {item.installedBy}</Text>
       )}
-      {item.arrivedDate && (
+      {item.installationDate && (
         <Text style={styles.infoText}>
-          Approved Date: {formatDate(item.arrivedDate)}
+          installation Date: {formatDate(item.installationDate)}
         </Text>
       )}
     </View>
@@ -112,18 +112,11 @@ const InstallationPart = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Installation Part</Text>
+      <Text style={styles.header}>Installation Data</Text>
 
       <Text style={styles.infoText}>
         Current Location: {location.latitude}, {location.longitude}
       </Text>
-
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Farmer Name"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
 
       {loading ? (
         <ActivityIndicator
