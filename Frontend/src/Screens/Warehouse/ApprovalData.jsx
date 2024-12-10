@@ -33,7 +33,7 @@ const ApprovalData = () => {
 
       setOrders(response.data.pickupItems);
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Alert.alert('Error', 'Unable to fetch orders');
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ const ApprovalData = () => {
         fetchOrders();
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       Alert.alert('Error', 'Unable to update status');
     }
   };

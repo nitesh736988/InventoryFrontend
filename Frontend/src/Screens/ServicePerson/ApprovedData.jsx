@@ -11,21 +11,21 @@ import {
   TextInput,
 } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
+
 
 const ApprovedData = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigation = useNavigation();
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${API_URL}/service-person/approved-order-history`,
-      );
+      const response = await axios.get(`${API_URL}/service-person/approved-order-history`);
       console.log(response.data.orderHistory);
       setOrders(response.data.orderHistory || []);
     } catch (error) {
@@ -36,24 +36,17 @@ const ApprovedData = () => {
       setRefreshing(false);
     }
   };
-
   useEffect(() => {
     fetchOrders();
   }, []);
-
-  // Helper function to format the date
   const formatDate = dateString => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
-
-  // Function to handle refresh event
   const handleRefresh = () => {
     setRefreshing(true);
     fetchOrders();
   };
-
-  // Function to filter orders based on the search query
   const filterOrders = () => {
     return orders.filter(
       order =>
@@ -64,8 +57,6 @@ const ApprovedData = () => {
         order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
-
-  // Render each order item in the FlatList
   const renderOrderItem = ({item}) => (
     <View key={item._id} style={styles.card}>
       <Text
@@ -77,9 +68,11 @@ const ApprovedData = () => {
       </Text>
       <View style={styles.infoRow}>
         <Text style={styles.infoText}>Name: {item.servicePersonName}</Text>
-        {item.status && (
-          <Text style={styles.approvedText}>Approved Success</Text>
-        )}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('InstallationPart', { pickupItemId: item._id })}>
+          <Text style={styles.approvedText}>Fill Form</Text>
+        </TouchableOpacity>
+
       </View>
       <Text style={styles.infoText}>Contact: {item.servicePerContact}</Text>
       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
@@ -97,22 +90,12 @@ const ApprovedData = () => {
       <Text style={styles.infoText}>
         Pickup Date: {formatDate(item.pickupDate)}
       </Text>
-      {item.approvedBy && (
-        <Text style={styles.infoText}>Approved By: {item.approvedBy}</Text>
-      )}
-      {item.arrivedDate && (
-        <Text style={styles.infoText}>
-          Approved Date: {formatDate(item.arrivedDate)}
-        </Text>
-      )}
     </View>
   );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Approved Data</Text>
-
-      {/* Search Bar */}
       <TextInput
         style={styles.searchBar}
         placeholder="Search by Name, Serial Number, or Farmer Name"
@@ -128,7 +111,7 @@ const ApprovedData = () => {
         />
       ) : (
         <FlatList
-          data={filterOrders()} // Filter orders based on the search query
+          data={filterOrders()}
           renderItem={renderOrderItem}
           keyExtractor={item => item._id}
           refreshing={refreshing}
@@ -138,15 +121,9 @@ const ApprovedData = () => {
           }
         />
       )}
-
-      <TouchableOpacity style={styles.refreshIcon} onPress={handleRefresh}>
-        <Icon name="refresh" size={30} color="black" />
-      </TouchableOpacity>
     </View>
   );
 };
-
-// Styling the components
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -231,3 +208,4 @@ const styles = StyleSheet.create({
 });
 
 export default ApprovedData;
+

@@ -16,7 +16,7 @@ const AddWareHouse = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const trimmedName = warehouseName.trim(); // Trim the input
+    const trimmedName = warehouseName.trim();
     if (!trimmedName) {
       Alert.alert('Error', 'Please enter a valid warehouse name.');
       return;
@@ -26,7 +26,7 @@ const AddWareHouse = () => {
   
     try {
       const response = await axios.post(`${API_URL}/admin/add-warehouse`, {
-        warehouseName: trimmedName, // Use the trimmed name here
+        warehouseName: trimmedName,
       });
       console.log('Response:', response.data);
       Alert.alert('Success', 'Warehouse added successfully!');

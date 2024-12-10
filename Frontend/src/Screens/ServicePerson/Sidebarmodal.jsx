@@ -119,11 +119,11 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>Approved Data</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={openInstallationPart}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Installation Data</Text>
-          </TouchableOpacity>
+            <Text style={styles.optionText}>Installation Pending</Text>
+          </TouchableOpacity> */}
 
 
         </Animated.View>

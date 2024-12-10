@@ -30,7 +30,7 @@ const History = () => {
       setFilteredOrders(response.data.pickupItems);
     } catch (error) {
       Alert.alert('Error', 'Unable to fetch orders');
-      console.error('Error fetching orders:', error);
+      console.log('Error fetching orders:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
