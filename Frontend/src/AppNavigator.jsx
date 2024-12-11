@@ -29,8 +29,10 @@ import ServicePersonData from './Screens/Admin/ServicePersonData';
 import ServicePersonOutgoing from './Screens/Admin/ServicePersonOutgoing';
 import W2WApproveData from './Screens/Admin/W2WApproveData';
 import Sidebarmodal from './Screens/ServicePerson/Sidebarmodal';
-import InstallationPart from './Screens/ServicePerson/InstallationPart';
 import ApprovedData from './Screens/ServicePerson/ApprovedData';
+import ShowComplaints from './Screens/ServicePerson/ShowComplaints';
+import InstallationPart from './Screens/ServicePerson/InstallationPart';
+
 
 const Stack = createStackNavigator();
 
@@ -210,6 +212,12 @@ const AppNavigator = () => {
           name="ApprovedData"
           component={ApprovedData}
           options={{title: 'ApprovedData', headerShown: false}}
+        />
+
+       <Stack.Screen
+          name="ShowComplaints"
+          component={ShowComplaints}
+          options={{title: 'ShowComplaints', headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

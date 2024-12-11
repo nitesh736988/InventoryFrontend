@@ -59,9 +59,9 @@ const Sidebarmodal = () => {
     navigation.navigate('ApprovedData');
   };
 
-  const openInstallationPart = () => {
+  const openShowComplaints = () => {
     closeModal();
-    navigation.navigate('InstallationPart');
+    navigation.navigate('ShowComplaints');
   };
 
   useEffect(() => {
@@ -119,11 +119,11 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>Approved Data</Text>
           </TouchableOpacity>
 
-          {/* <TouchableOpacity
-            onPress={openInstallationPart}
+          <TouchableOpacity
+            onPress={openShowComplaints}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Installation Pending</Text>
-          </TouchableOpacity> */}
+            <Text style={styles.optionText}>Show Complaint</Text>
+          </TouchableOpacity>
 
 
         </Animated.View>
