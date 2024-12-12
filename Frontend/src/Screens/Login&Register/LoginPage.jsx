@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
 
 axios.defaults.withCredentials = true;
@@ -34,10 +35,13 @@ const LoginPage = () => {
     try {
       console.log(API_URL);
       console.log(email, password, role);
-
       const response = await axios.post(`${API_URL}/user/login`, { email, password, role });
       Alert.alert('Success', 'Login successful!');
       if (role === 'serviceperson') {
+        console.log(response.data);
+        const { id } = response.data;
+        console.log("Login Person id", id);
+        await AsyncStorage.setItem("_id", id);
         navigation.navigate('ServicePersonNavigation');
       } else if (role === 'warehouseAdmin') {
         navigation.navigate('WarehouseNavigation');
