@@ -11,16 +11,13 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {API_URL} from '@env';
 
 const ShowComplaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchComplaints = async () => {
-    setLoading(true);
     try {
       const serviceId = await AsyncStorage.getItem('_id');
       console.log(serviceId);
@@ -34,44 +31,7 @@ const ShowComplaints = () => {
       console.log('Error fetching complaints:', error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  };
-
-  useEffect(() => {
-    fetchComplaints();
-  }, []);
-
-
-  const [btnClickedStatus, setBtnClickedStatus] = useState();
-
-  const handleApproveBtn = async (sendTransactionId, incoming) => {
-    try {
-      const sendRequest = await axios.post(
-        `${API_URL}/service-person/update-outgoing-status`,
-        {
-          status: true,
-          pickupItemId: sendTransactionId,
-          incoming,
-          arrivedDate: Date.now(),
-        },
-      );
-      console.log(sendRequest.data);
-      if (sendRequest.status === 200) {
-        setBtnClickedStatus(prevData => ({
-          ...prevData,
-          [sendTransactionId]: true,
-        }));
-        setRefreshing(true);
-      }
-    } catch (error) {
-      Alert.alert(JSON.stringify(error));
-    }
-  };
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchComplaints();
   };
 
   const filterComplaints = () => {
@@ -79,84 +39,98 @@ const ShowComplaints = () => {
       complaint =>
         complaint.complainantName
           .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
+          .includes(searchQuery.toLowerCase()) ||   
         complaint.trackingId.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
-  const renderComplaintItem = ({item}) => (
-    <View key={item._id} style={styles.card}>
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Complainant Name:</Text>{' '}
-        {item.complainantName}
-      </Text>
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
-      </Text>
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Contact:</Text> {item.contact}
-      </Text>
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Company:</Text> {item.company}
-      </Text>
+  useEffect(() => {
+    fetchComplaints();
+  }, [loading]);
 
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>ComplaintDetails:</Text>{' '}
-        {item.complaintDetails}
-      </Text>
+  const handleApproveBtn = async (sendTransactionId,status) => {
+    setLoading(true);
+    try {
+      const fieldEmpId = await AsyncStorage.getItem('_id');
+      console.log({
+        complaintAccept: status,
+        complaintId: sendTransactionId,
+        fieldEmpId: fieldEmpId
+      })
+      const sendRequest = await axios.post(
+        `http://88.222.214.93:8001/filedService/complaintAccept`,
+        {
+          complaintAccept: true,
+          complaintId: sendTransactionId,
+          fieldEmpId: fieldEmpId
+        },
+      );
+      console.log(sendRequest.data); 
+        setBtnClickedStatus(prevData => ({
+          ...prevData,
+          [sendTransactionId]: true,
+        }));  
+    } catch (error) {
+      // Alert.alert(JSON.stringify(error));0-
+    }
+  };
 
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Created At:</Text>{' '}
-        {new Date(item.created_At).toLocaleDateString()}
-      </Text>
 
-      <View style={styles.actionContainer}>
-        {!item.status && (
-          <>
-            <TouchableOpacity style={styles.declineButton}>
-              <Text style={styles.buttonText}>Decline</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.approveButton}
-              onPress={() =>
-                handleApproveBtn(item._id, item.incoming ? true : false)
-              }>
-              <Text style={styles.buttonText}>Approve</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+ const renderComplaintItem = ({item}) => (
+  <View key={item._id} style={styles.card}>
+    <Text style={styles.infoText}>
+      <Text style={styles.label}>Complainant Name:</Text>{' '}
+      {item.complainantName}
+    </Text>
+    <Text style={styles.infoText}>
+      <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
+    </Text>
+    <Text style={styles.infoText}>
+      <Text style={styles.label}>Contact:</Text> {item.contact}
+    </Text>
+    <Text style={styles.infoText}>
+      <Text style={styles.label}>Company:</Text> {item.company}
+    </Text>
+    <Text style={styles.infoText}>
+      <Text style={styles.label}>ComplaintDetails:</Text>{' '}
+      {item.complaintDetails}
+    </Text>
+    <Text style={styles.infoText}>
+      <Text style={styles.label}>Created At:</Text>{' '}
+      {new Date(item.created_At).toLocaleDateString()}
+    </Text>
+
+    <View style={styles.actionContainer}>
+      {item?.ComplaintAccept?.length === 0 &&  (
+        <>
+          <TouchableOpacity
+            onPress={() => handleApproveBtn(item._id, false)}
+            style={styles.declineButton}>
+            <Text style={styles.buttonText}>Decline</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.approveButton}
+            onPress={() => handleApproveBtn(item._id, true)}>
+            <Text style={styles.buttonText}>Approve</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
-  );
+  </View>
+);
 
-  return (
+
+  return (     
     <View style={styles.container}>
       <Text style={styles.header}>Complaints</Text>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search by Name or Tracking ID"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-
-      {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#0000ff"
-          style={styles.loadingIndicator}
-        />
-      ) : (
         <FlatList
-          data={filterComplaints()}
+          data={complaints}
           renderItem={renderComplaintItem}
           keyExtractor={item => item._id}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
           ListEmptyComponent={
             <Text style={styles.emptyText}>No complaints found.</Text>
           }
         />
-      )}
     </View>
   );
 };

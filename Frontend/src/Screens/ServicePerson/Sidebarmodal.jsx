@@ -64,6 +64,11 @@ const Sidebarmodal = () => {
     navigation.navigate('ShowComplaints');
   };
 
+  const openShowFarmerComplaint = () => {
+    closeModal();
+    navigation.navigate('ShowFarmerComplaint');
+  };
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -121,6 +126,12 @@ const Sidebarmodal = () => {
 
           <TouchableOpacity
             onPress={openShowComplaints}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Show Complaint</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openShowFarmerComplaint}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Show Complaint</Text>
           </TouchableOpacity>

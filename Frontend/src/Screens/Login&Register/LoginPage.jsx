@@ -113,7 +113,7 @@ const LoginPage = () => {
                 editable={!loading}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Icon name={showPassword ? 'visibility' : 'visibility-off'} size={20} color="black" />
+                <Icon name={showPassword ? 'visibility-off' : 'visibility'} size={20} color="black" />
               </TouchableOpacity>
             </View>
           </>

@@ -10,18 +10,18 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { API_URL } from '@env';
-import Icon from 'react-native-vector-icons/Feather'; // Importing Feather icons
+import Icon from 'react-native-vector-icons/Feather'; 
 
 const ServicePersonRegistration = ({ navigation }) => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: '', 
     contact: '',
     password: '',
     createdAt: new Date(),
   });
   const [loading, setLoading] = useState(false);
-  const [passwordVisible, setPasswordVisible] = useState(false); // State to toggle password visibility
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleChange = (key, value) => {
     setFormData((prevData) => ({

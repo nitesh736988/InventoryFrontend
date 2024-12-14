@@ -110,52 +110,108 @@ const ApprovalData = () => {
             {item.incoming ? 'Incoming' : 'Outgoing'}
           </Text>
           <View style={styles.infoRow}>
-            <Text style={styles.infoText}>Name: {item.servicePerson.name}</Text>
+            <Text style={styles.titleText}>
+              ServicePerson Name:{' '}
+              <Text style={styles.dataText}>{item.servicePerson.name}</Text>
+            </Text>
             {item.status && (
               <Text style={styles.approvedText}>Approved Success</Text>
             )}
           </View>
           <Text style={styles.infoText}>
-            Contact: {item.servicePerson.contact}
+            <Text style={styles.titleText}>
+              ServicePerson Contact:{' '}
+              <Text style={styles.dataText}>{item.servicePerson.contact}</Text>
+            </Text>
           </Text>
-          <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
+
           <Text style={styles.infoText}>
-            Farmer Contact: {item.farmerContact}
+            <Text style={styles.titleText}>
+              Farmer Name:{' '}
+              <Text style={styles.dataText}>{item.farmerName}</Text>
+            </Text>
+          </Text>
+
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>
+              Farmer Contact:{' '}
+              <Text style={styles.dataText}>{item.farmerContact}</Text>
+            </Text>
+          </Text>
+
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>
+              Village Name:{' '}
+              <Text style={styles.dataText}>{item.farmerVillage}</Text>
+            </Text>
           </Text>
           <Text style={styles.infoText}>
-            Village Name: {item.farmerVillage}
+            <Text style={styles.titleText}>
+              Selected Warehouse:{' '}
+              <Text style={styles.dataText}>{item.warehouse}</Text>
+            </Text>
           </Text>
           <View style={styles.itemContainer}>
+            <Text style={styles.infoText}>
+              <Text style={styles.titleText}>Product: </Text>
+            </Text>
             {item.items.map(({_id, itemName, quantity}) => (
-              <Text key={_id} style={styles.infoText}>
-                {itemName}: {quantity}
+              <Text key={_id} style={styles.dataText}>
+                {itemName}: {quantity + ' '}
               </Text>
             ))}
           </View>
+
           <Text style={styles.infoText}>
-            Serial Number: {item.serialNumber}
+            <Text style={styles.titleText}>
+              Serial Number:{' '}
+              <Text style={styles.dataText}>{item.serialNumber}</Text>
+            </Text>
           </Text>
-          <Text style={styles.infoText}>Remark: {item.remark}</Text>
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>
+              Remark: <Text style={styles.dataText}>{item.remark}</Text>
+            </Text>
+          </Text>
+
           {item.incoming && (
             <Text style={styles.infoText}>
-              RMU Present:{' '}
-              {item?.withoutRMU ? (!item.withoutRMU ? 'YES' : 'NO') : 'N/A'}
+              <Text style={styles.titleText}>
+                RMU Present:{' '}
+                <Text style={styles.dataText}>
+                  {item?.withoutRMU === true
+                    ? 'NO'
+                    : item?.withoutRMU === false
+                    ? 'YES'
+                    : 'N/A'}
+                </Text>
+              </Text>
             </Text>
           )}
-          {item.incoming && (
+
+          {item?.incoming && (
             <Text style={styles.infoText}>
-              RMU Remark: {item?.rmuRemark || 'N/A'}
+              <Text style={styles.titleText}>RMU Remark: </Text>
+              <Text style={styles.dataText}>{item?.rmuRemark || 'N/A'}</Text>
             </Text>
           )}
+
           <Text style={styles.infoText}>
-            Pickup Date:{' '}
-            {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+            <Text style={styles.titleText}>Pickup Date: </Text>
+            <Text style={styles.dataText}>
+              {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+            </Text>
           </Text>
+
           {item?.arrivedDate && (
             <Text style={styles.infoText}>
-              Approved Date: {formatDate(item.arrivedDate)}
+              <Text style={styles.titleText}>Approved Date: </Text>
+              <Text style={styles.dataText}>
+                {formatDate(item.arrivedDate)}
+              </Text>
             </Text>
           )}
+
           <View style={styles.actionContainer}>
             {!item.status && (
               <>
@@ -243,7 +299,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  infoText: {
+  titleText: {
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  dataText: {
+    fontWeight: 'normal',
     color: '#000',
   },
   approvedText: {
@@ -252,7 +313,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 8,
   },
   actionContainer: {
     flexDirection: 'row',

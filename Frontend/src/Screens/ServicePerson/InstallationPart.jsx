@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,14 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { launchCamera } from 'react-native-image-picker';
-import { API_URL } from '@env';
+import {launchCamera} from 'react-native-image-picker';
+import {API_URL} from '@env';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const InstallationPart = ({ route }) => {
-  const { pickupItemId } = route.params;
+const InstallationPart = ({route}) => {
+  const {pickupItemId} = route.params;
   const [installationData, setInstallationData] = useState(null);
   const [images, setImages] = useState([]);
   const [longitude, setLongitude] = useState('');
@@ -29,11 +29,14 @@ const InstallationPart = ({ route }) => {
     const fetchInstallationData = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/service-person/get-pickupItem-data?pickupItemId=${pickupItemId}`
+          `${API_URL}/service-person/get-pickupItem-data?pickupItemId=${pickupItemId}`,
         );
         setInstallationData(response.data.data);
       } catch (error) {
-        console.log('Error fetching installation data:', error.response?.data || error.message);
+        console.log(
+          'Error fetching installation data:',
+          error.response?.data || error.message,
+        );
         Alert.alert('Error', 'Unable to fetch installation data.');
       } finally {
         setLoading(false);
@@ -56,7 +59,7 @@ const InstallationPart = ({ route }) => {
         } else if (response.assets && response.assets.length > 0) {
           setImages(prevImages => [...prevImages, response.assets[0].uri]);
         }
-      }
+      },
     );
   };
 
@@ -67,7 +70,10 @@ const InstallationPart = ({ route }) => {
 
   const handleSubmit = async () => {
     if (!validateCoordinates(latitude, longitude)) {
-      Alert.alert('Validation Error', 'Please enter valid latitude and longitude.');
+      Alert.alert(
+        'Validation Error',
+        'Please enter valid latitude and longitude.',
+      );
       return;
     }
     if (images.length === 0) {
@@ -78,33 +84,39 @@ const InstallationPart = ({ route }) => {
     const formData = new FormData();
     formData.append('latitude', latitude);
     formData.append('longitude', longitude);
-    formData.append('status', false); // Assuming status is a boolean
+    formData.append('status', false);
     formData.append('pickupItemId', pickupItemId);
 
     images.forEach((imageUri, index) => {
       const fileName = imageUri.split('/').pop();
       formData.append('image', {
         uri: imageUri,
-        type: 'image/jpeg', // Update based on your image type
+        type: 'image/jpeg',
         name: fileName || `image_${index}.jpg`,
       });
     });
 
     try {
-      const response = await axios.post(`${API_URL}/service-person/new-installation-data`, formData, {
-        headers: { 
-          'Content-Type': 'multipart/form-data' 
+      const response = await axios.post(
+        `${API_URL}/service-person/new-installation-data`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         },
-      });
+      );
 
       if (response.data.success) {
         Alert.alert('Success', 'Installation data submitted successfully.');
-        navigation.goBack();
       } else {
         Alert.alert('Error', 'Failed to submit installation data.');
       }
     } catch (error) {
-      console.log('Error submitting installation data:', error.response?.data || error.message);
+      console.log(
+        'Error submitting installation data:',
+        error.response?.data || error.message,
+      );
       Alert.alert('Error', 'An error occurred while submitting the data.');
     }
   };
@@ -126,25 +138,45 @@ const InstallationPart = ({ route }) => {
     );
   }
 
-  const { farmerName, farmerContact, farmerVillage, items, serialNumber, installedBy, installationDate } = installationData;
+  const {
+    farmerName,
+    farmerContact,
+    farmerVillage,
+    items,
+    serialNumber,
+    installedBy,
+    installationDate,
+  } = installationData;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.header}>Installation Pending</Text>
 
       <Text style={styles.label}>Farmer Name:</Text>
-      <TextInput style={[styles.input, styles.nonEditable]} value={farmerName} editable={false} />
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={farmerName}
+        editable={false}
+      />
 
       <Text style={styles.label}>Farmer Contact:</Text>
-      <TextInput style={[styles.input, styles.nonEditable]} value={farmerContact.toString()} editable={false} />
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={farmerContact.toString()}
+        editable={false}
+      />
 
       <Text style={styles.label}>Farmer Village:</Text>
-      <TextInput style={[styles.input, styles.nonEditable]} value={farmerVillage} editable={false} />
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={farmerVillage}
+        editable={false}
+      />
 
       <Text style={styles.subHeader}>Items:</Text>
       <View style={styles.itemContainer}>
         {items.length > 0 ? (
-          items.map(({ _id, itemName, quantity }) => (
+          items.map(({_id, itemName, quantity}) => (
             <Text key={_id} style={styles.infoText}>
               {itemName}: {quantity}
             </Text>
@@ -155,10 +187,20 @@ const InstallationPart = ({ route }) => {
       </View>
 
       <Text style={styles.label}>Serial Number:</Text>
-      <TextInput style={[styles.input, styles.nonEditable]} value={serialNumber} editable={false} />
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={serialNumber}
+        editable={false}
+      />
 
-      {installedBy && <Text style={styles.infoText}>Installed By: {installedBy}</Text>}
-      {installationDate && <Text style={styles.infoText}>Installation Date: {new Date(installationDate).toLocaleDateString()}</Text>}
+      {installedBy && (
+        <Text style={styles.infoText}>Installed By: {installedBy}</Text>
+      )}
+      {installationDate && (
+        <Text style={styles.infoText}>
+          Installation Date: {new Date(installationDate).toLocaleDateString()}
+        </Text>
+      )}
 
       <Text style={styles.label}>Longitude:</Text>
       <TextInput
@@ -185,7 +227,11 @@ const InstallationPart = ({ route }) => {
 
       <ScrollView horizontal style={styles.imagePreviewContainer}>
         {images.map((imageUri, index) => (
-          <Image key={index} source={{ uri: imageUri }} style={styles.imagePreview} />
+          <Image
+            key={index}
+            source={{uri: imageUri}}
+            style={styles.imagePreview}
+          />
         ))}
       </ScrollView>
 
@@ -193,7 +239,9 @@ const InstallationPart = ({ route }) => {
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.submitButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Close</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -201,9 +249,14 @@ const InstallationPart = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fbd33b' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
-  label: { fontSize: 16, marginBottom: 4, color: '#555' },
+  container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  label: {fontSize: 16, marginBottom: 4, color: '#555'},
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -222,18 +275,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 10,
   },
-  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
-  nonEditable: { backgroundColor: '#e9ecef', color: '#6c757d' },
-  subHeader: { fontSize: 20, fontWeight: '600', marginTop: 16, marginBottom: 8 },
-  itemContainer: { marginBottom: 16 },
-  infoText: { fontSize: 16, color: '#333', marginBottom: 4 },
+  buttonText: {color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'},
+  nonEditable: {backgroundColor: '#e9ecef', color: '#6c757d'},
+  subHeader: {fontSize: 20, fontWeight: '600', marginTop: 16, marginBottom: 8},
+  itemContainer: {marginBottom: 16},
+  infoText: {fontSize: 16, color: '#333', marginBottom: 4},
   imageButton: {
     padding: 10,
     marginBottom: 12,
     borderRadius: 8,
     alignItems: 'start',
   },
-  imagePreviewContainer: { marginTop: 16 },
+  imagePreviewContainer: {marginTop: 16},
   imagePreview: {
     width: 100,
     height: 100,
@@ -242,8 +295,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  errorText: { fontSize: 16, color: 'red', textAlign: 'center' },
+  loaderContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  errorText: {fontSize: 16, color: 'red', textAlign: 'center'},
 });
 
 export default InstallationPart;

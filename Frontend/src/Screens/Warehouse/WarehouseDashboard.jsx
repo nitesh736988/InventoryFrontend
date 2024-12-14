@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { API_URL } from '@env';
-import { useNavigation } from '@react-navigation/native';
+import {API_URL} from '@env';
+import {useNavigation} from '@react-navigation/native';
 import Sidebar from './Sidebar';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Assuming AsyncStorage is being used
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WarehouseDashboard = () => {
   const [data, setData] = useState([]);
@@ -17,7 +25,9 @@ const WarehouseDashboard = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/dashboard`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/dashboard`,
+        );
         console.log('Response data:', response.data);
         if (response.data?.warehouseData?.items) {
           setData(response.data.warehouseData.items);
@@ -44,7 +54,7 @@ const WarehouseDashboard = () => {
         await AsyncStorage.clear();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'LoginPage' }],
+          routes: [{name: 'LoginPage'}],
         });
       } else {
         Alert.alert('Logout Failed', response.data.message || 'Unknown error');
@@ -53,7 +63,7 @@ const WarehouseDashboard = () => {
       console.log(
         'Error logging out:',
         error.message,
-        error.response?.data || error
+        error.response?.data || error,
       );
       Alert.alert('Error', 'Failed to logout. Please try again.');
     }
@@ -77,17 +87,9 @@ const WarehouseDashboard = () => {
       </View>
 
       {data.length > 0 ? (
-        data.map(({ _id, itemName, quantity, defective, repaired, rejected }) => (
+        data.map(({_id, itemName, quantity, defective, repaired, rejected}) => (
           <View key={_id} style={styles.card}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('Stockdata', {
-                  itemId: _id,
-                  itemName,
-                })
-              }>
               <Text style={styles.cardTitle}>{itemName}</Text>
-            </TouchableOpacity>
             <Text style={styles.cardDetails}>Stock: {quantity}</Text>
             <TouchableOpacity
               onPress={() =>
@@ -97,12 +99,27 @@ const WarehouseDashboard = () => {
                 })
               }>
               <Text
-                style={[styles.cardDetails, styles.link, styles.defectiveHighlight]}>
+                style={[
+                  styles.cardDetails,
+                  styles.link,
+                  styles.defectiveHighlight,
+                ]}>
                 Defective: {defective}
               </Text>
             </TouchableOpacity>
             <Text style={styles.cardDetails}>Repaired: {repaired}</Text>
             <Text style={styles.cardDetails}>Rejected: {rejected}</Text>
+
+            <TouchableOpacity
+              style={styles.externalLinkIcon}
+              onPress={() =>
+                navigation.navigate('Stockdata', {
+                  itemId: _id,
+                  itemName,
+                })
+              }>
+              <Icon name="external-link" size={20} color="blue"/>
+            </TouchableOpacity>
           </View>
         ))
       ) : (
@@ -135,7 +152,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
     shadowRadius: 2,
   },
@@ -155,6 +172,12 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
   },
+
+  externalLinkIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
   noDataText: {
     fontSize: 16,
     color: 'gray',
@@ -163,3 +186,5 @@ const styles = StyleSheet.create({
 });
 
 export default WarehouseDashboard;
+
+

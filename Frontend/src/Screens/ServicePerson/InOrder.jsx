@@ -345,7 +345,7 @@ import {RadioButton} from 'react-native-paper';
 
 const InOrder = () => {
   const [items, setItems] = useState([{}]);
-  const [warehouses, setWarehouses] = useState([]); // Track warehouses as an array
+  const [warehouses, setWarehouses] = useState([]);
   const [formData, setFormData] = useState({
     farmerName: '',
     farmerContact: '',
