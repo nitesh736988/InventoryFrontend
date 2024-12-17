@@ -74,6 +74,11 @@ const SidebarModal = () => {
     navigation.navigate('W2WApproveData');
   };
 
+  const openW2WApproved = () => {
+    closeModal();
+    navigation.navigate('W2WApproved');
+  };
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -146,6 +151,7 @@ const SidebarModal = () => {
             style={styles.optionButton}>
             <Text style={styles.optionText}>W2W Approve Data</Text>
           </TouchableOpacity>
+
 
         </Animated.View>
       </Modal>

@@ -264,10 +264,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    color: 'black'
   },
   searchInput: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: 'black',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 16,

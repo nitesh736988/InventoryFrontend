@@ -78,6 +78,7 @@ const Outgoing = () => {
                 </Text>
               </Text>
             </Text>
+            
             <Text
               style={[styles.approvedText, { color: item.status ? 'green' : 'red' }]}>
               {item.status ? 'Completed' : 'Pending'}
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: 'black',
     borderWidth: 1,
     borderRadius: 8,
     paddingLeft: 8,
@@ -237,8 +238,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    // marginBottom: 8,
+    flexWrap: 'wrap',  
   },
   loadingIndicator: {
     flex: 1,

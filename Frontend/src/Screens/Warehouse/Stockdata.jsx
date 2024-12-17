@@ -1,12 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, TextInput, Button} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  TextInput,
+  Button,
+  TouchableOpacity
+} from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
-import { Picker } from '@react-native-picker/picker';
+import {API_URL} from '@env';
+import {Picker} from '@react-native-picker/picker';
 
-
-const Stockdata = ({ route }) => {
-  const { itemId, itemName } = route.params;
+const Stockdata = ({route}) => {
+  const {itemId, itemName} = route.params;
   const [loading, setLoading] = useState(true);
   const [allWarehouses, setAllWarehouses] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
@@ -18,7 +26,9 @@ const Stockdata = ({ route }) => {
   });
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+      const response = await axios.get(
+        `${API_URL}/warehouse-admin/get-warehouse`,
+      );
       if (response.data.success) {
         setAllWarehouses(response.data.warehouseName);
       } else {
@@ -45,8 +55,10 @@ const Stockdata = ({ route }) => {
 
   const validateForm = () => {
     if (!formData.itemComingFrom) return 'Item coming from is required.';
-    if (!formData.quantity || isNaN(formData.quantity)) return 'Quantity must be a valid number.';
-    if (!formData.defectiveItem || isNaN(formData.defectiveItem)) return 'Defective item count must be a valid number.';
+    if (!formData.quantity || isNaN(formData.quantity))
+      return 'Quantity must be a valid number.';
+    if (!formData.defectiveItem || isNaN(formData.defectiveItem))
+      return 'Defective item count must be a valid number.';
     return null;
   };
 
@@ -60,8 +72,9 @@ const Stockdata = ({ route }) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${API_URL}/warehouse-admin/add-incoming-item`, 
-        {itemName, ...formData,warehouse: allWarehouses});
+        `${API_URL}/warehouse-admin/add-incoming-item`,
+        {itemName, ...formData, warehouse: allWarehouses},
+      );
       setFormData({
         itemComingFrom: '',
         quantity: '',
@@ -70,7 +83,10 @@ const Stockdata = ({ route }) => {
       });
       Alert.alert('Success', 'Item added successfully!');
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Failed to add item.');
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to add item.',
+      );
     } finally {
       setLoading(false);
     }
@@ -87,29 +103,20 @@ const Stockdata = ({ route }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Item: {itemName}</Text>
-      <Text>Warehouse:</Text>
+      
       <Picker
         selectedValue={selectedWarehouse}
         style={styles.picker}
-        onValueChange={(itemValue) => setSelectedWarehouse(itemValue)}
-      >
-          <Picker.Item  label={allWarehouses} value={allWarehouses} />
+        onValueChange={itemValue => setSelectedWarehouse(itemValue)}>
+        <Picker.Item label={allWarehouses} value={allWarehouses} />
       </Picker>
 
       <TextInput
         style={styles.input}
-        placeholder="Item Coming From"
+        placeholder="Product Coming From"
         value={formData.itemComingFrom}
         onChangeText={value => handleChange('itemComingFrom', value)}
         keyboardType="text"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Defective Items"
-        value={formData.defectiveItem}
-        onChangeText={value => handleChange('defectiveItem', value)}
-        keyboardType="numeric"
       />
 
       <TextInput
@@ -120,9 +127,21 @@ const Stockdata = ({ route }) => {
         keyboardType="numeric"
       />
 
-      <View style={{ marginTop: 20 }}>
+      <TextInput
+        style={styles.input}
+        placeholder="Defective Quantity"
+        value={formData.defectiveItem}
+        onChangeText={value => handleChange('defectiveItem', value)}
+        keyboardType="numeric"
+      />
+
+      {/* <View style={{ marginTop: 20}}>
         <Button title="Submit" onPress={handleSubmit} />
-      </View>
+      </View> */}
+
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Submit</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -137,6 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: 'black'
   },
   input: {
     height: 40,
@@ -147,6 +167,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#fff',
   },
+
+  submitButton: {
+    backgroundColor: '#070604',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  buttonText: {color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'},
 });
 
 export default Stockdata;

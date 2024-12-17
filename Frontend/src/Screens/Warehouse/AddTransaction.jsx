@@ -339,6 +339,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fbd33b',
   },
+  heading: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: 'black',
+  },
   input: {
     backgroundColor: '#fbd33b',
     borderWidth: 1,

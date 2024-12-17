@@ -140,6 +140,7 @@ dependencies {
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
+        implementation 'com.google.android.gms:play-services-location:18.0.0'
     } else {
         implementation jscFlavor
     }

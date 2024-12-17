@@ -226,6 +226,8 @@ const AppNavigator = () => {
           component={ShowFarmerComplaint}
           options={{title: 'ShowFarmerComplaint', headerShown: false}}
         />
+
+      
       </Stack.Navigator>
     </NavigationContainer>
   );

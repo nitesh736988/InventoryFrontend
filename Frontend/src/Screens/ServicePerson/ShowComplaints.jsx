@@ -22,8 +22,7 @@ const ShowComplaints = () => {
       const serviceId = await AsyncStorage.getItem('_id');
       console.log(serviceId);
       const response = await axios.get(
-        `http://88.222.214.93:8001/farmer/showComplaint?assignEmployee=${serviceId}`,
-      );
+        `http://88.222.214.93:8001/farmer/showComplaint?assignEmployee=${serviceId}`);
       console.log(response.data.data);
       setComplaints(response.data.data || []);
     } catch (error) {
@@ -32,7 +31,7 @@ const ShowComplaints = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };    
 
   const filterComplaints = () => {
     return complaints.filter(
@@ -71,7 +70,7 @@ const ShowComplaints = () => {
           [sendTransactionId]: true,
         }));  
     } catch (error) {
-      // Alert.alert(JSON.stringify(error));0-
+      // Alert.alert(JSON.stringify(error));
     }
   };
 

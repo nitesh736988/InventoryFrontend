@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import {launchCamera} from 'react-native-image-picker';
 import {API_URL} from '@env';
@@ -16,16 +17,41 @@ import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+
+const requestCameraPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: 'Camera Permission',
+        message: 'We need access to your camera to take pictures',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('Camera permission granted');
+    } else {
+      console.log('Camera permission denied');
+    }
+  } catch (err) {
+    console.warn (err);
+  }
+};
+
 const InstallationPart = ({route}) => {
   const {pickupItemId} = route.params;
   const [installationData, setInstallationData] = useState(null);
   const [images, setImages] = useState([]);
-  const [longitude, setLongitude] = useState('');
-  const [latitude, setLatitude] = useState('');
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (Platform.OS === 'android') {
+      requestCameraPermission();
+    }
+
     const fetchInstallationData = async () => {
       try {
         const response = await axios.get(
@@ -54,8 +80,11 @@ const InstallationPart = ({route}) => {
         quality: 1,
       },
       response => {
+        console.log('Camera response:', response);
         if (response.didCancel) {
           console.log('User cancelled camera picker');
+        } else if (response.errorCode) {
+          console.error('Camera Error:', response.errorMessage);
         } else if (response.assets && response.assets.length > 0) {
           setImages(prevImages => [...prevImages, response.assets[0].uri]);
         }
@@ -63,27 +92,13 @@ const InstallationPart = ({route}) => {
     );
   };
 
-  const validateCoordinates = (lat, long) => {
-    const coordRegex = /^-?\d+(\.\d+)?$/;
-    return coordRegex.test(lat) && coordRegex.test(long);
-  };
-
   const handleSubmit = async () => {
-    if (!validateCoordinates(latitude, longitude)) {
-      Alert.alert(
-        'Validation Error',
-        'Please enter valid latitude and longitude.',
-      );
-      return;
-    }
     if (images.length === 0) {
       Alert.alert('Validation Error', 'Please add at least one image.');
       return;
     }
 
     const formData = new FormData();
-    formData.append('latitude', latitude);
-    formData.append('longitude', longitude);
     formData.append('status', false);
     formData.append('pickupItemId', pickupItemId);
 
@@ -202,24 +217,6 @@ const InstallationPart = ({route}) => {
         </Text>
       )}
 
-      <Text style={styles.label}>Longitude:</Text>
-      <TextInput
-        style={styles.input}
-        value={longitude}
-        onChangeText={setLongitude}
-        placeholder="Enter Longitude"
-        placeholderTextColor="#aaa"
-      />
-
-      <Text style={styles.label}>Latitude:</Text>
-      <TextInput
-        style={styles.input}
-        value={latitude}
-        onChangeText={setLatitude}
-        placeholder="Enter Latitude"
-        placeholderTextColor="#aaa"
-      />
-
       <Text style={styles.label}>Installation Images:</Text>
       <TouchableOpacity onPress={openCamera} style={styles.imageButton}>
         <Icon name="camera-plus" size={28} color="#000" />
@@ -255,8 +252,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    color: 'black'
   },
-  label: {fontSize: 16, marginBottom: 4, color: '#555'},
+  label: {fontSize: 16, marginBottom: 4, color: 'black'},
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -277,7 +275,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'},
   nonEditable: {backgroundColor: '#e9ecef', color: '#6c757d'},
-  subHeader: {fontSize: 20, fontWeight: '600', marginTop: 16, marginBottom: 8},
+  subHeader: {fontSize: 20, fontWeight: '600', marginTop: 16, marginBottom: 8, color: 'black'},
   itemContainer: {marginBottom: 16},
   infoText: {fontSize: 16, color: '#333', marginBottom: 4},
   imageButton: {
