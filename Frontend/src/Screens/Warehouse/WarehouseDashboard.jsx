@@ -89,8 +89,8 @@ const WarehouseDashboard = () => {
       {data.length > 0 ? (
         data.map(({_id, itemName, quantity, defective, repaired, rejected}) => (
           <View key={_id} style={styles.card}>
-              <Text style={styles.cardTitle}>{itemName}</Text>
-            <Text style={styles.cardDetails}>Stock: {quantity}</Text>
+              <Text style={{...styles.cardTitle, color:'#000'}}>{itemName}</Text>
+            <Text style={{...styles.cardDetails, color:'#000'}}>Stock: {quantity}</Text>
             <TouchableOpacity
               onPress={() =>
                 navigation.navigate('DefectiveItem', {
@@ -107,8 +107,8 @@ const WarehouseDashboard = () => {
                 Defective: {defective}
               </Text>
             </TouchableOpacity>
-            <Text style={styles.cardDetails}>Repaired: {repaired}</Text>
-            <Text style={styles.cardDetails}>Rejected: {rejected}</Text>
+            <Text style={{...styles.cardDetails, color: '#000'}}>Repaired: {repaired}</Text>
+            <Text style={{...styles.cardDetails, color: '#000'}}>Rejected: {rejected}</Text>
 
             <TouchableOpacity
               style={styles.externalLinkIcon}

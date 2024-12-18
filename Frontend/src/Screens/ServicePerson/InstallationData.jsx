@@ -6,28 +6,25 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  TouchableOpacity,
-  Dimensions,
   TextInput,
+  Image,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
 
-
-const ApprovedData = () => {
+const InstallationData = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const navigation = useNavigation();
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/service-person/approved-order-history`);
-      console.log(response.data.orderHistory);
-      setOrders(response.data.orderHistory || []);
+      const response = await axios.get(`${API_URL}/service-person/service-installation-data`);
+      setOrders(response.data.data || []);
     } catch (error) {
       Alert.alert('Error', 'Unable to fetch orders');
       console.log('Error fetching orders:', error);
@@ -36,60 +33,55 @@ const ApprovedData = () => {
       setRefreshing(false);
     }
   };
+
   useEffect(() => {
     fetchOrders();
   }, []);
+
   const formatDate = dateString => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
+
   const handleRefresh = () => {
     setRefreshing(true);
     fetchOrders();
   };
+
   const filterOrders = () => {
     return orders.filter(
       order =>
-        order.servicePersonName
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
         order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()),
+        order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
+
   const renderOrderItem = ({item}) => (
     <View key={item._id} style={styles.card}>
-      <Text
-        style={[
-          styles.statusText,
-          item.incoming ? styles.incoming : styles.outgoing,
-        ]}>
-        {item.incoming ? 'Incoming' : 'Outgoing'}
-      </Text>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoText}>Name: {item.servicePersonName}</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('InstallationPart', { pickupItemId: item._id })}>
-          <Text style={styles.approvedText}>Fill Form</Text>
-        </TouchableOpacity>
-
-      </View>
-      <Text style={styles.infoText}>Contact: {item.servicePerContact}</Text>
       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
       <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
       <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
+
       <View style={styles.itemContainer}>
+      <Text style={styles.infoText}>
+        Product: {' '}</Text>
         {item.items.map(({_id, itemName, quantity}) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
+          
         ))}
       </View>
       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
-      <Text style={styles.infoText}>Remark: {item.remark}</Text>
-      <Text style={styles.infoText}>
-        Pickup Date: {formatDate(item.pickupDate)}
-      </Text>
+      <Text style={styles.infoText}>Longitude: {item.longitude}</Text>
+      <Text style={styles.infoText}>Latitude: {item.latitude}</Text>
+        <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
+            <Image source={{ uri: item?.photos[0]}} style={{ width:  100, height: 100 }}/>
+            {item?.photos[1] && <Image source={{ uri: item?.photos[1]}} style={{ width:  100, height: 100 }}/>}
+            {item?.photos[2] && <Image source={{ uri: item?.photos[2]}} style={{ width:  100, height: 100 }}/>}
+            {item?.photos[3] && <Image source={{ uri: item?.photos[3]}} style={{ width:  100, height: 100 }}/>}
+        </View>
+      <Text style={styles.infoText}>Installation Date: {formatDate(item.installationDate)}</Text>
     </View>
   );
 
@@ -98,7 +90,7 @@ const ApprovedData = () => {
       <Text style={styles.header}>Approved Data</Text>
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by Name, Serial Number, or Farmer Name"
+        placeholder="Search by Farmer Name or Serial Number"
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}
@@ -125,6 +117,7 @@ const ApprovedData = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -148,29 +141,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  statusText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  incoming: {
-    color: 'purple',
-  },
-  outgoing: {
-    color: 'orange',
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
   infoText: {
     color: '#000',
     marginBottom: 4,
-  },
-  approvedText: {
-    color: 'green',
-    fontWeight: 'bold',
   },
   itemContainer: {
     flexDirection: 'row',
@@ -181,15 +154,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  refreshIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    backgroundColor: '#fff',
-    padding: 8,
-    borderRadius: 16,
-    elevation: 4,
   },
   emptyText: {
     textAlign: 'center',
@@ -209,5 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ApprovedData;
-
+export default InstallationData;

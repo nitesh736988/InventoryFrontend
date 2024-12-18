@@ -455,6 +455,7 @@ const ApprovalHistoryData = () => {
         placeholder="Search by name, farmer, or serial number"
         value={searchQuery}
         onChangeText={handleSearch}
+        placeholderTextColor={'#000'}
       />
        
         <FlatList
@@ -490,6 +491,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: 16,
     fontSize: 16,
+    
   },
   header: {
     fontSize: 24,

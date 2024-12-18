@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    color: '#000'
   },
   searchBar: {
     height: 40,

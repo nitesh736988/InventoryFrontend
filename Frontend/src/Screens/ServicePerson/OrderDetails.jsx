@@ -135,6 +135,7 @@ const OrderDetails = () => {
         placeholder="Search by Farmer Name or Serial Number"
         value={searchQuery}
         onChangeText={handleSearch}
+        placeholderTextColor={'#000'}
       />
       {/* Error Alert */}
       {error ? <Alert>{error}</Alert> : null}
@@ -142,12 +143,14 @@ const OrderDetails = () => {
       <FlatList
         data={filteredOrders}
         renderItem={renderOrder}
-        keyExtractor={item => item._id} // Use unique ID as key
+        keyExtractor={item => item._id}
       />
 
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
         <Icon name="refresh" size={30} color="black" />
       </TouchableOpacity>
+
+      
     </View>
   );
 };
@@ -162,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: 'black'
   },
   card: {
     padding: 16,

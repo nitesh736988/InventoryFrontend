@@ -219,7 +219,7 @@ const W2W = () => {
           }}>
 
          <Text style={styles.heading}>Warehouse to Warehouse Transfer</Text>
-          <Text>Select Items:</Text>
+          <Text style={styles.label}>Select Items:</Text>
           <MultiSelect
             items={items}
             uniqueKey="itemName"
@@ -230,40 +230,44 @@ const W2W = () => {
             displayKey="itemName"
             hideSubmitButton
             textColor="black"
+            placeholderTextColor={'#000'}
           />
         </View>
 
         {formData.selectedItems.map(item => (
           <View key={item} style={styles.itemQuantityContainer}>
-            <Text>Quantity for {item}:</Text>
+            <Text style={styles.label}>Quantity for {item}:</Text>
             <TextInput
               value={formData.quantities[item]}
               onChangeText={value => handleQuantityChange(item, value)}
               placeholder={`Enter quantity for ${item}`}
               style={styles.input}
               keyboardType="numeric"
+              placeholderTextColor={'#000'}
             />
           </View>
         ))}
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.modalContainer}>
-            <Text>Driver Name:</Text>
+            <Text style={styles.label}>Driver Name:</Text>
             <TextInput
               value={formData.driverName}
               onChangeText={value => handleInputChange('driverName', value)}
               placeholder="Enter Driver Name"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
-            <Text>Driver Contact:</Text>
+            <Text style={styles.label}>Driver Contact:</Text>
             <TextInput
               value={formData.driverContact}
               onChangeText={value => handleInputChange('driverContact', value)}
               placeholder="Enter Driver Contact"
               style={styles.input}
               keyboardType="phone-pad"
+              placeholderTextColor={'#000'}
             />
 
-            <Text>From Warehouse:</Text>
+            <Text style={styles.label}>From Warehouse:</Text>
             <Picker
               selectedValue={formData.fromWarehouse}
               style={styles.picker}
@@ -276,7 +280,7 @@ const W2W = () => {
                 value={formData.fromWarehouse}
               />
             </Picker>
-            <Text>To Warehouse:</Text>
+            <Text style={styles.label}>To Warehouse:</Text>
             <Picker
               selectedValue={formData.toWarehouse}
               style={styles.picker}
@@ -289,7 +293,7 @@ const W2W = () => {
                 />
               ))}
             </Picker>
-            <Text>Is Defective:</Text>
+            <Text style={styles.label}>Is Defective:</Text>
             <Picker
               selectedValue={formData.isDefective}
               style={styles.picker}
@@ -301,7 +305,7 @@ const W2W = () => {
                 <Picker.Item key={_id} label={name} value={name} />
               ))}
             </Picker>
-            <Text>Remarks:</Text>
+            <Text style={styles.label}>Remarks:</Text>
             <TextInput
               value={formData.remarks}
               onChangeText={value => handleInputChange('remarks', value)}
@@ -310,6 +314,7 @@ const W2W = () => {
               maxLength={100}
               multiline
               numberOfLines={4}
+              placeholderTextColor={'#000'}
             />
             <TouchableOpacity
               style={styles.button}
@@ -343,6 +348,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 10,
     alignItems: 'center',
+  },
+  label: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#333',
   },
 
   heading: {

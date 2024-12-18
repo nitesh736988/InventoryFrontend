@@ -18,8 +18,8 @@ const OutStatus = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // state for search query
-  const [filteredOrders, setFilteredOrders] = useState([]); // state for filtered orders
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredOrders, setFilteredOrders] = useState([]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -196,6 +196,7 @@ const OutStatus = () => {
         placeholder="Search by Farmer Name or Serial Number"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor={'#000'}
       />
       <FlatList
         data={filteredOrders}
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    color: 'black'
   },
   searchBar: {
     height: 40,

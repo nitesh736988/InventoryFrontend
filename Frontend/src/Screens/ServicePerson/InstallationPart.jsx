@@ -10,13 +10,14 @@ import {
   ActivityIndicator,
   Alert,
   PermissionsAndroid,
+  Platform,
 } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 import {launchCamera} from 'react-native-image-picker';
 import {API_URL} from '@env';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 
 const requestCameraPermission = async () => {
   try {
@@ -30,46 +31,81 @@ const requestCameraPermission = async () => {
         buttonPositive: 'OK',
       },
     );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      console.log('Camera permission granted');
-    } else {
-      console.log('Camera permission denied');
-    }
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
-    console.warn (err);
+    console.warn(err);
+    return false;
+  }
+};
+
+const requestLocationPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location Permission',
+        message: 'We need access to your location to fetch coordinates',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
   }
 };
 
 const InstallationPart = ({route}) => {
   const {pickupItemId} = route.params;
-  const [installationData, setInstallationData] = useState(null);
+  const [installationData, setInstallationData] = useState('');
   const [images, setImages] = useState([]);
+  const [longitude, setLongitude] = useState(null);
+  const [latitude, setLatitude] = useState(null);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      requestCameraPermission();
-    }
-
-    const fetchInstallationData = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/service-person/get-pickupItem-data?pickupItemId=${pickupItemId}`,
-        );
-        setInstallationData(response.data.data);
-      } catch (error) {
-        console.log(
-          'Error fetching installation data:',
-          error.response?.data || error.message,
-        );
-        Alert.alert('Error', 'Unable to fetch installation data.');
-      } finally {
-        setLoading(false);
+    const initialize = async () => {
+      if (Platform.OS === 'android') {
+        await requestCameraPermission();
+        const locationGranted = await requestLocationPermission();
+        if (locationGranted) {
+          Geolocation.getCurrentPosition(
+            position => {
+              setLongitude(position.coords.longitude);
+              setLatitude(position.coords.latitude);
+            },
+            error => {
+              console.log('Error getting location:', error.message);
+              Alert.alert('Error', 'Unable to fetch location.');
+            },
+          );
+        }
       }
+
+      const fetchInstallationData = async () => {
+        try {
+          const response = await axios.get(
+            `${API_URL}/service-person/get-pickupItem-data?pickupItemId=${pickupItemId}`,
+          );
+          setInstallationData(response.data.data);
+        } catch (error) {
+          console.log(
+            'Error fetching installation data:',
+            error.response?.data || error.message,
+          );
+          Alert.alert('Error', 'Unable to fetch installation data.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchInstallationData();
     };
 
-    fetchInstallationData();
+    initialize();
   }, [pickupItemId]);
 
   const openCamera = () => {
@@ -78,15 +114,15 @@ const InstallationPart = ({route}) => {
         mediaType: 'photo',
         cameraType: 'back',
         quality: 1,
+        includeBase64: true
       },
       response => {
-        console.log('Camera response:', response);
         if (response.didCancel) {
           console.log('User cancelled camera picker');
         } else if (response.errorCode) {
-          console.error('Camera Error:', response.errorMessage);
+          console.log('Camera Error:', response.errorMessage);
         } else if (response.assets && response.assets.length > 0) {
-          setImages(prevImages => [...prevImages, response.assets[0].uri]);
+          setImages(prevImages => [ ...prevImages, response.assets[0]]);
         }
       },
     );
@@ -98,32 +134,83 @@ const InstallationPart = ({route}) => {
       return;
     }
 
+    if (longitude === null || latitude === null) {
+      Alert.alert('Validation Error', 'Unable to fetch location coordinates.');
+      return;
+    }
+
+    const {
+      farmerName,
+      farmerContact,
+      farmerVillage,
+      items,
+      serialNumber,
+    } = installationData;
+
     const formData = new FormData();
+    formData.append('farmerName', farmerName);
+    formData.append('farmerContact', farmerContact);
+    formData.append('farmerVillage', farmerVillage);
+    formData.append('items', items);
+    formData.append('serialNumber', serialNumber)
     formData.append('status', false);
     formData.append('pickupItemId', pickupItemId);
+    formData.append('longitude', longitude);
+    formData.append('latitude', latitude);
 
-    images.forEach((imageUri, index) => {
-      const fileName = imageUri.split('/').pop();
-      formData.append('image', {
-        uri: imageUri,
-        type: 'image/jpeg',
-        name: fileName || `image_${index}.jpg`,
-      });
-    });
+    // console.log(JSON.stringifyformData);
+
+    // images.forEach((imageUri, index) => {
+    //   const fileName = imageUri.split('/').pop();
+    //   formData.append('photos', {
+    //     uri: imageUri,
+    //     type: 'image/jpeg',
+    //     name: fileName || `image_${index}.jpg`,
+    //   });
+    // });
+
+    // console.log(JSON.stringify(formData));
+
+    const photos = []; // Array to hold base64 images
+
+    console.log(images);
+
+    for (let index = 0; index < images.length; index++) {
+      const photo = images[index];
+
+      if (!photo.base64) {
+        console.error('Base64 not found in photo object. Ensure includeBase64 is enabled.');
+        continue; // Skip this photo if base64 is not available
+      }
+    
+      const photoBase64 = `data:${photo.type};base64,${photo.base64}`;
+      console.log('Photo in Base64:', photoBase64);
+      photos.push(photoBase64); // Add to the photos array
+    }
+
+    const dataToSend = { 
+      photos,
+      pickupItemId, farmerName, farmerContact, farmerVillage,
+      items, serialNumber, latitude, longitude, status: false,
+      installationDate: new Date()
+    }
+    
+    console.log(dataToSend);
 
     try {
       const response = await axios.post(
         `${API_URL}/service-person/new-installation-data`,
-        formData,
+        dataToSend,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
           },
         },
       );
 
       if (response.data.success) {
         Alert.alert('Success', 'Installation data submitted successfully.');
+        navigation.goBack();
       } else {
         Alert.alert('Error', 'Failed to submit installation data.');
       }
@@ -159,7 +246,6 @@ const InstallationPart = ({route}) => {
     farmerVillage,
     items,
     serialNumber,
-    installedBy,
     installationDate,
   } = installationData;
 
@@ -180,6 +266,8 @@ const InstallationPart = ({route}) => {
         value={farmerContact.toString()}
         editable={false}
       />
+
+      
 
       <Text style={styles.label}>Farmer Village:</Text>
       <TextInput
@@ -208,14 +296,25 @@ const InstallationPart = ({route}) => {
         editable={false}
       />
 
-      {installedBy && (
-        <Text style={styles.infoText}>Installed By: {installedBy}</Text>
-      )}
       {installationDate && (
         <Text style={styles.infoText}>
           Installation Date: {new Date(installationDate).toLocaleDateString()}
         </Text>
       )}
+
+      <Text style={styles.label}>Longitude:</Text>
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={longitude?.toString()}
+        editable={false}
+      />
+
+      <Text style={styles.label}>Latitude:</Text>
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={latitude?.toString()}
+        editable={false}
+      />
 
       <Text style={styles.label}>Installation Images:</Text>
       <TouchableOpacity onPress={openCamera} style={styles.imageButton}>
@@ -223,10 +322,10 @@ const InstallationPart = ({route}) => {
       </TouchableOpacity>
 
       <ScrollView horizontal style={styles.imagePreviewContainer}>
-        {images.map((imageUri, index) => (
+        {images.map(({ uri }, index) => (
           <Image
             key={index}
-            source={{uri: imageUri}}
+            source={{uri}}
             style={styles.imagePreview}
           />
         ))}
@@ -244,7 +343,6 @@ const InstallationPart = ({route}) => {
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
   header: {
@@ -252,7 +350,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
   },
   label: {fontSize: 16, marginBottom: 4, color: 'black'},
   input: {
@@ -275,7 +373,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {color: '#FFFFFF', fontSize: 16, fontWeight: 'bold'},
   nonEditable: {backgroundColor: '#e9ecef', color: '#6c757d'},
-  subHeader: {fontSize: 20, fontWeight: '600', marginTop: 16, marginBottom: 8, color: 'black'},
+  subHeader: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+    color: 'black',
+  },
   itemContainer: {marginBottom: 16},
   infoText: {fontSize: 16, color: '#333', marginBottom: 4},
   imageButton: {

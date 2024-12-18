@@ -14,11 +14,12 @@ import {API_URL} from '@env';
 const AddItem = () => {
   const [itemName, setItemName] = useState('');
   const [stock, setStock] = useState('');
+  const [defective, setDefective] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!itemName || !stock) {
-      Alert.alert('Error', 'Please fill in both fields.');
+    if (!itemName || !stock || !defective) {
+      Alert.alert('Error', 'Please fill All fields.');
       return;
     }
     const stockValue = parseInt(stock);
@@ -26,9 +27,16 @@ const AddItem = () => {
       Alert.alert('Error', 'Stock must be a positive integer.');
       return;
     }
+
+    const defectiveValue = parseInt(defective);
+    if (isNaN(defectiveValue) || defectiveValue < 0) {
+      Alert.alert('Error', 'defective must be a positive integer.');
+      return;
+    }
     const itemData = {
       itemName,
       quantity: stockValue,
+      defective: defectiveValue,
     };
     setLoading(true);
 
@@ -42,6 +50,7 @@ const AddItem = () => {
 
       setItemName('');
       setStock('');
+      setDefective('');
     } catch (error) {
       console.log('Error adding item:', error);
       if (error.response && error.response.data) {
@@ -72,6 +81,14 @@ const AddItem = () => {
         onChangeText={setStock}
         keyboardType="numeric"
       />
+
+      <Text style={styles.label}>Defective Quantity:</Text>
+      <TextInput
+        style={styles.input}
+        value={defective}
+        onChangeText={setDefective}
+        keyboardType="numeric"
+      />
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         {loading ? (
           <ActivityIndicator color="#ffffff" />
@@ -93,6 +110,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 16,
     fontWeight: '600',
+    color: 'black'
   },
   input: {
     color: 'black',

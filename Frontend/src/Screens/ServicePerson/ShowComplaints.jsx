@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import OpenMap from '../../Component/OpenMap/index';
 
 const ShowComplaints = () => {
   const [complaints, setComplaints] = useState([]);
@@ -22,7 +23,7 @@ const ShowComplaints = () => {
       const serviceId = await AsyncStorage.getItem('_id');
       console.log(serviceId);
       const response = await axios.get(
-        `http://88.222.214.93:8001/farmer/showComplaint?assignEmployee=${serviceId}`);
+        `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`);
       console.log(response.data.data);
       setComplaints(response.data.data || []);
     } catch (error) {
@@ -77,10 +78,17 @@ const ShowComplaints = () => {
 
  const renderComplaintItem = ({item}) => (
   <View key={item._id} style={styles.card}>
-    <Text style={styles.infoText}>
-      <Text style={styles.label}>Complainant Name:</Text>{' '}
-      {item.complainantName}
-    </Text>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Complainant Name:</Text>{' '}
+        {item.complainantName}
+      </Text>
+      <OpenMap 
+        longitude={item?.farmerId?.longitude}
+        latitude={item?.farmerId?.latitude}
+      />
+    </View>
+
     <Text style={styles.infoText}>
       <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
     </Text>

@@ -98,6 +98,7 @@ const LoginPage = () => {
                 autoCorrect={false}
                 autoCapitalize="none"
                 editable={!loading}
+                placeholderTextColor={'#000'}
               />
             </View>
             <View style={styles.inputWithIcon}>
@@ -111,6 +112,7 @@ const LoginPage = () => {
                 autoCorrect={false}
                 autoCapitalize="none"
                 editable={!loading}
+                placeholderTextColor={'#000'}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Icon name={showPassword ? 'visibility-off' : 'visibility'} size={20} color="black" />

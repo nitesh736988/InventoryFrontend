@@ -500,6 +500,23 @@ const Sidebar = ({userType}) => {
                 W2W Data
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateAndHighlight('InstallationHistoryData')}
+              style={[
+                styles.optionButton,
+                activeSection === 'InstallationHisoryData' &&
+                  styles.activeOptionButton,
+              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  activeSection === 'InstallationHisoryData' &&
+                    styles.activeOptionText,
+                ]}>
+                Installation Data
+              </Text>
+            </TouchableOpacity>
           </>
         </Animated.View>
       </Modal>

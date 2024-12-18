@@ -379,7 +379,7 @@ const InOrder = () => {
   } = formData;
 
   useEffect(() => {
-    // Fetch all warehouses
+   
     const fetchAllWarehouses = async () => {
       try {
         const response = await axios.get(
@@ -549,7 +549,7 @@ const InOrder = () => {
             backgroundColor: '#fbd33b',
             paddingTop: 30,
           }}>
-          <Text>Select Items:</Text>
+          <Text style= {{color: 'black'}}>Select Items:</Text>
           <MultiSelect
             items={items}
             uniqueKey="itemName"
@@ -562,12 +562,13 @@ const InOrder = () => {
             styleDropdownMenuSubsection={{backgroundColor: '#fbd33b'}}
             styleMainWrapper={styles.multiSelect}
             styleListContainer={styles.listContainer}
+            placeholderTextColor={'#000'}
           />
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.modalContainer}>
-            <Text>Farmer Name:</Text>
+            <Text style= {{color: 'black'}}>Farmer Name:</Text>
             <TextInput
               value={farmerName}
               onChangeText={text =>
@@ -575,9 +576,10 @@ const InOrder = () => {
               }
               placeholder="Enter Name"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Farmer Contact Number:</Text>
+            <Text style= {{color: 'black'}}>Farmer Contact Number:</Text>
             <TextInput
               value={farmerContact}
               onChangeText={text =>
@@ -586,9 +588,10 @@ const InOrder = () => {
               placeholder="Enter Contact"
               style={styles.input}
               maxLength={10}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Farmer Village Name:</Text>
+            <Text style= {{color: 'black'}}>Farmer Village Name:</Text>
             <TextInput
               value={farmerVillageName}
               onChangeText={text =>
@@ -599,11 +602,12 @@ const InOrder = () => {
               }
               placeholder="Enter Village"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
             {selectedItems.map((item, index) => (
               <View key={index}>
-                <Text>
+                <Text style= {{color: 'black'}}>
                   Quantity for <Text style={styles.itemText}>{item}</Text>:
                 </Text>
                 <TextInput
@@ -612,11 +616,12 @@ const InOrder = () => {
                   keyboardType="numeric"
                   placeholder="Enter Quantity"
                   style={styles.input}
+                  placeholderTextColor={'#000'}
                 />
               </View>
             ))}
 
-            <Text>Serial Number:</Text>
+            <Text style= {{color: 'black'}}>Serial Number:</Text>
             <TextInput
               value={serialNumber}
               onChangeText={text =>
@@ -624,9 +629,10 @@ const InOrder = () => {
               }
               placeholder="Enter Serial Number"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Warehouse:</Text>
+            <Text style= {{color: 'black'}}>Warehouse:</Text>
             <Picker
               selectedValue={selectedWarehouse}
               style={styles.picker}
@@ -686,13 +692,14 @@ const InOrder = () => {
                       }
                       placeholder="Enter Reason"
                       style={styles.input}
+                      placeholderTextColor={'#000'}
                     />
                   </View>
                 )}
               </View>
             )}
 
-            <Text>Remarks:</Text>
+            <Text style= {{color: 'black'}}>Remarks:</Text>
             <TextInput
               value={remarks}
               onChangeText={text =>
@@ -700,6 +707,7 @@ const InOrder = () => {
               }
               placeholder="Enter Remarks"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>

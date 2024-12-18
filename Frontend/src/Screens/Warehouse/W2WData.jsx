@@ -644,6 +644,7 @@ const W2WData = () => {
         placeholder="Search by name or contact"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor={'#000'}
       />
       <FlatList
         data={filteredOrders}

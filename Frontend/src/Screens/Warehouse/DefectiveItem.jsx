@@ -60,7 +60,7 @@ const DefectiveItem = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Item: {itemName}</Text>
+      <Text style={{...styles.title, color:'#000'}}>Item: {itemName}</Text>
 
       <TextInput
         style={styles.input}
@@ -68,6 +68,7 @@ const DefectiveItem = ({route}) => {
         value={formData.repaired}
         onChangeText={value => handleChange('repaired', value)}
         keyboardType="numeric"
+        placeholderTextColor={'#000'}
       />
 
       <TextInput
@@ -76,6 +77,7 @@ const DefectiveItem = ({route}) => {
         value={formData.rejected}
         onChangeText={value => handleChange('rejected', value)}
         keyboardType="numeric"
+        placeholderTextColor={'#000'}
       />
 
       <View style={{marginTop: 20}}>

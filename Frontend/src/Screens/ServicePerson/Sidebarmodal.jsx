@@ -63,11 +63,11 @@ const Sidebarmodal = () => {
     closeModal();
     navigation.navigate('ShowComplaints');
   };
-
-  const openShowFarmerComplaint = () => {
+  const openShowInstallationData = () => {
     closeModal();
-    navigation.navigate('ShowFarmerComplaint');
+    navigation.navigate('InstallationData');
   };
+
 
   useEffect(() => {
     if (!visible) {
@@ -131,9 +131,9 @@ const Sidebarmodal = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={openShowFarmerComplaint}
+            onPress={openShowInstallationData}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Show Complaint</Text>
+            <Text style={styles.optionText}>Installation Data</Text>
           </TouchableOpacity>
 
 

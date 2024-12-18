@@ -160,6 +160,7 @@ const Outgoing = () => {
         placeholder="Search by name, serial number, or farmer"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor={'#000'}
       />
 
       <FlatList
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
+    color: 'black'
   },
   searchBar: {
     height: 40,

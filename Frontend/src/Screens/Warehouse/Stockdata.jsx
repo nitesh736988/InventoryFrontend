@@ -106,7 +106,7 @@ const Stockdata = ({route}) => {
       
       <Picker
         selectedValue={selectedWarehouse}
-        style={styles.picker}
+        style={{...styles.picker, color:'#000'}}
         onValueChange={itemValue => setSelectedWarehouse(itemValue)}>
         <Picker.Item label={allWarehouses} value={allWarehouses} />
       </Picker>
@@ -117,6 +117,7 @@ const Stockdata = ({route}) => {
         value={formData.itemComingFrom}
         onChangeText={value => handleChange('itemComingFrom', value)}
         keyboardType="text"
+        placeholderTextColor={'#000'}
       />
 
       <TextInput
@@ -125,6 +126,7 @@ const Stockdata = ({route}) => {
         value={formData.quantity}
         onChangeText={value => handleChange('quantity', value)}
         keyboardType="numeric"
+        placeholderTextColor={'#000'}
       />
 
       <TextInput
@@ -133,6 +135,7 @@ const Stockdata = ({route}) => {
         value={formData.defectiveItem}
         onChangeText={value => handleChange('defectiveItem', value)}
         keyboardType="numeric"
+        placeholderTextColor={'#000'}
       />
 
       {/* <View style={{ marginTop: 20}}>

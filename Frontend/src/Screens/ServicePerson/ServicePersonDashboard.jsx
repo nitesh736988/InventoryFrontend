@@ -86,7 +86,7 @@ const ServicePersonDashboard = ({navigation}) => {
           </View>
         ))
       ) : (
-        <Text>No Data Available</Text>
+        <Text style= {{color: 'black'}}>No Data Available</Text>
       ),
     [],
   );

@@ -43,7 +43,7 @@ const UpperHistory = () => {
 
   const OrderDetail = ({label, value}) => (
     <View style={styles.detailRow}>
-      <Text style={styles.cardTitle}>{label}:</Text>
+      <Text style={{...styles.cardTitle, color: '#000'}}>{label}:</Text>
       <Text style={styles.cardValue}>{value}</Text>
     </View>
   );
@@ -75,7 +75,7 @@ const UpperHistory = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Order History</Text>
+        <Text style={styles.header}>Upper Order History</Text>
         <TouchableOpacity onPress={fetchOrders}>
           <Icon name="refresh" size={30} color="black" />
         </TouchableOpacity>
@@ -106,17 +106,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: 'black'
   },
+
   card: {
     padding: 16,
     marginVertical: 8,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: 'white',
     borderRadius: 8,
-    shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  
   itemContainer: {
     padding: 8,
     backgroundColor: '#e0e0e0',

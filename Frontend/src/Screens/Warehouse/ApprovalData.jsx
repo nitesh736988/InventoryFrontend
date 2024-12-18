@@ -239,6 +239,7 @@ const ApprovalData = () => {
         placeholder="Search by Farmer or Serviceperson Name"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor={'#000'}
       />
       <FlatList
         data={filteredOrders}

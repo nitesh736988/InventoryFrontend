@@ -268,6 +268,7 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholder="Name"
             value={formData.name}
             onChangeText={(value) => handleChange('name', value)}
+            placeholderTextColor={'#000'}
           />
 
           <Text style={styles.label}>
@@ -280,6 +281,7 @@ const ServicePersonRegistration = ({ navigation }) => {
             onChangeText={(value) => handleChange('contact', value)}
             keyboardType="phone-pad"
             maxLength={10}
+            placeholderTextColor={'#000'}
           />
 
           <Text style={styles.label}>
@@ -291,6 +293,7 @@ const ServicePersonRegistration = ({ navigation }) => {
             value={formData.email}
             onChangeText={(value) => handleChange('email', value)}
             keyboardType="email-address"
+            placeholderTextColor={'#000'}
           />
 
           <Text style={styles.label}>
@@ -303,6 +306,7 @@ const ServicePersonRegistration = ({ navigation }) => {
               value={formData.password}
               onChangeText={(value) => handleChange('password', value)}
               secureTextEntry={!passwordVisible}
+              placeholderTextColor={'#000'}
             />
             <TouchableOpacity
               style={styles.eyeIcon}

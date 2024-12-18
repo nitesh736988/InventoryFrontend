@@ -194,7 +194,7 @@ const AddTransaction = ({route}) => {
             backgroundColor: '#fbd33b',
             paddingTop: 30,
           }}>
-          <Text>Select Items:</Text>
+          <Text style={{color:'#000'}}>Select Items:</Text>
           <MultiSelect
             items={allItems}
             uniqueKey="itemName"
@@ -205,56 +205,62 @@ const AddTransaction = ({route}) => {
             displayKey="itemName"
             hideSubmitButton
             textColor="#000"
+            styleListContainer={{ minHeight: 300, maxHeight: 300 }}
             // styleDropdownMenuSubsection={{ backgroundColor: '#fbd33b' }}
             //  styleListContainer={{ backgroundColor: '#fbd33b' }}
           />
         </View>
         <ScrollView contentContainerStyle={{...styles.scrollContainer}}>
           <View style={styles.modalContainer}>
-            <Text>Service Person Name:</Text>
+            <Text style={{color:'#000'}}>Service Person Name:</Text>
             <TextInput
               value={servicePersonName}
               onChangeText={setServicePersonName}
               placeholder="Enter ServicePerson Name"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Service Person Contact:</Text>
+            <Text style={{color:'#000'}}>Service Person Contact:</Text>
             <TextInput
               value={servicePerContact}
               onChangeText={setServicePerContact}
               placeholder="Enter ServicePerson Contact"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Farmer Name:</Text>
+            <Text style={{color:'#000'}}>Farmer Name:</Text>
             <TextInput
               value={farmerName}
               onChangeText={setFarmerName}
               placeholder="Enter Contact"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Farmer Contact Number:</Text>
+            <Text style={{color:'#000'}}>Farmer Contact Number:</Text>
             <TextInput
               value={farmerContact}
               onChangeText={setFarmerContact}
               placeholder="Enter Contact"
               style={styles.input}
               maxLength={10}
+              placeholderTextColor={'#000'}
             />
 
-            <Text>Farmer Village Name:</Text>
+            <Text style={{color:'#000'}}>Farmer Village Name:</Text>
             <TextInput
               value={farmerVillageName}
               onChangeText={setFarmerVilageName}
               placeholder="Enter Contact"
               style={styles.input}
+              placeholderTextColor={'#000'}
             />
 
             {selectedItems.map((item, index) => (
               <View key={index}>
-                <Text>
+                <Text style={{color:'#000'}}>
                   Quantity for <Text style={styles.itemText}>{item}</Text>:
                 </Text>
                 <TextInput
@@ -263,11 +269,12 @@ const AddTransaction = ({route}) => {
                   keyboardType="numeric"
                   placeholder="Enter Quantity"
                   style={styles.input}
+                  placeholderTextColor={'#000'}
                 />
               </View>
             ))}
 
-            <Text>Serial Number</Text>
+            <Text style={{color:'#000'}}>Serial Number</Text>
             <TextInput
               value={serialNumber}
               onChangeText={setSerialNumber}
@@ -277,8 +284,9 @@ const AddTransaction = ({route}) => {
               multiline
               numberOfLines={4}
               required
+              placeholderTextColor={'#000'}
             />
-            <Text>Warehouse:</Text>
+            <Text style={{color:'#000'}}>Warehouse:</Text>
             <Picker
               selectedValue={selectedWarehouse}
               style={styles.picker}
@@ -287,11 +295,12 @@ const AddTransaction = ({route}) => {
                 key={allWarehouses}
                 label={allWarehouses}
                 value={allWarehouses}
+                placeholderTextColor={'#000'}
               />
             </Picker>
 
             <View style={styles.remark}>
-              <Text>Remarks:</Text>
+              <Text style={{color:'#000'}}>Remarks:</Text>
               <ScrollView style={styles.scrollView}>
                 <TextInput
                   value={remarks}
@@ -301,6 +310,7 @@ const AddTransaction = ({route}) => {
                   maxLength={100}
                   multiline
                   numberOfLines={4}
+                  placeholderTextColor={'#000'}
                 />
               </ScrollView>
             </View>

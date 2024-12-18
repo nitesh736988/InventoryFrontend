@@ -32,7 +32,8 @@ import Sidebarmodal from './Screens/ServicePerson/Sidebarmodal';
 import ApprovedData from './Screens/ServicePerson/ApprovedData';
 import ShowComplaints from './Screens/ServicePerson/ShowComplaints';
 import InstallationPart from './Screens/ServicePerson/InstallationPart';
-import ShowFarmerComplaint from './Screens/ServicePerson/ShowFarmerComplaint';
+import InstallationData from './Screens/ServicePerson/InstallationData';
+import InstallationHistoryData from './Screens/Warehouse/InstallationHistoryData';
 
 
 const Stack = createStackNavigator();
@@ -221,10 +222,16 @@ const AppNavigator = () => {
           options={{title: 'ShowComplaints', headerShown: false}}
         />
 
-      <Stack.Screen
-          name="ShowFarmerComplaint"
-          component={ShowFarmerComplaint}
-          options={{title: 'ShowFarmerComplaint', headerShown: false}}
+        <Stack.Screen
+          name="InstallationData"
+          component={InstallationData}
+          options={{title: 'InstallationData', headerShown: false}}
+        />
+
+       <Stack.Screen
+          name="InstallationHistoryData"
+          component={InstallationHistoryData}
+          options={{title: 'InstallationHistoryData', headerShown: false}}
         />
 
       

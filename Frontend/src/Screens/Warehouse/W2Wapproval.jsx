@@ -429,6 +429,7 @@ const W2Wapproval = () => {
         placeholder="Search by Driver Name or Warehouse"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor={'#000'}
       />
       <FlatList
         data={filteredOrders}

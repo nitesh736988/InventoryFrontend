@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: 'black',
     textAlign: 'center',
-    textTransform: 'uppercase', // Makes text uppercase
+    textTransform: 'uppercase', 
   },
   
   card: {

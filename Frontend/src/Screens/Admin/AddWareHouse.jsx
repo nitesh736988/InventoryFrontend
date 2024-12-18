@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#000'
   },
   input: {
     color: 'black',
