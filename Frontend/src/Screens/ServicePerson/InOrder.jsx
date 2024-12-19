@@ -326,7 +326,7 @@
 
 // export default InOrder;
 
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -338,14 +338,15 @@ import {
   ScrollView,
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
-import {API_URL} from '@env';
-import {RadioButton} from 'react-native-paper';
+import { API_URL } from '@env';
+import { RadioButton } from 'react-native-paper';
 
 const InOrder = () => {
   const [items, setItems] = useState([{}]);
   const [warehouses, setWarehouses] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [formData, setFormData] = useState({
     farmerName: '',
     farmerContact: '',
@@ -379,13 +380,10 @@ const InOrder = () => {
   } = formData;
 
   useEffect(() => {
-   
     const fetchAllWarehouses = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/service-person/all-warehouses`,
-        );
-        setWarehouses(response.data.allWarehouses); // Set the fetched data to warehouses
+        const response = await axios.get(`${API_URL}/service-person/all-warehouses`);
+        setWarehouses(response.data.allWarehouses);
       } catch (error) {
         console.log('Failed to fetch warehouses:', error);
       }
@@ -395,7 +393,6 @@ const InOrder = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch items based on the selected warehouse
     const selectedItemList = async () => {
       const response = await axios.get(
         `${API_URL}/service-person/warehouse-items?option=${selectedWarehouse}`,
@@ -408,34 +405,26 @@ const InOrder = () => {
         });
       }
       setItems(updateItemsData);
+      setFilteredItems(updateItemsData);
     };
     selectedItemList();
   }, [selectedWarehouse]);
 
-  const handleItemSelect = selected => {
-    const isControllerSelected = selected.some(item =>
-      item.toLowerCase().includes('controller'),
+  const handleItemSelect = (selected) => {
+    const validItems = selected.filter(item =>
+      filteredItems.some(filteredItem => filteredItem.itemName === item)
     );
-
-    const newQuantities = {};
-    selected.forEach(item => {
-      newQuantities[item] = quantities[item] || '';
-    });
-
     setFormData(prevState => ({
       ...prevState,
-      selectedItems: selected,
-      quantities: newQuantities,
-      controllerSelected: isControllerSelected,
-      withoutRMU: isControllerSelected ? prevState.withoutRMU : null,
-      rmuRemark: isControllerSelected ? prevState.rmuRemark : '',
+      selectedItems: validItems,
+      quantities: validItems.reduce((acc, item) => ({ ...acc, [item]: '' }), {}),
     }));
   };
 
   const handleQuantityChange = (itemName, quantity) => {
     setFormData(prevState => ({
       ...prevState,
-      quantities: {...prevState.quantities, [itemName]: quantity},
+      quantities: { ...prevState.quantities, [itemName]: quantity },
     }));
   };
 
@@ -453,10 +442,7 @@ const InOrder = () => {
     }
 
     if (withoutRMU === true && !rmuRemark) {
-      Alert.alert(
-        'Error',
-        'Please provide a reason for selecting "Without RMU".',
-      );
+      Alert.alert('Error', 'Please provide a reason for selecting "Without RMU".');
       return false;
     }
 
@@ -466,10 +452,10 @@ const InOrder = () => {
   const handleSubmit = async () => {
     if (!validateInput()) return;
 
-    let itemSelected = [];
-    selectedItems.forEach(item => {
-      itemSelected.push({itemName: item, quantity: parseInt(quantities[item])});
-    });
+    const itemSelected = selectedItems.map(item => ({
+      itemName: item,
+      quantity: parseInt(quantities[item]),
+    }));
 
     const data = {
       farmerName,
@@ -501,10 +487,7 @@ const InOrder = () => {
       );
       resetForm();
       Alert.alert('Success', 'Transaction saved successfully');
-      setFormData(prevState => ({
-        ...prevState,
-        modalVisible: false,
-      }));
+      setFormData(prevState => ({ ...prevState, modalVisible: false }));
     } catch (error) {
       Alert.alert(JSON.stringify(error.response.data.message));
     }
@@ -530,9 +513,8 @@ const InOrder = () => {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          setFormData(prevState => ({...prevState, modalVisible: true}))
-        }>
+        onPress={() => setFormData(prevState => ({ ...prevState, modalVisible: true }))}
+      >
         <Text style={styles.buttonText}>Request Item</Text>
       </TouchableOpacity>
 
@@ -540,65 +522,50 @@ const InOrder = () => {
         animationType="slide"
         transparent={false}
         visible={modalVisible}
-        onRequestClose={() =>
-          setFormData(prevState => ({...prevState, modalVisible: false}))
-        }>
-        <View
-          style={{
-            paddingHorizontal: 20,
-            backgroundColor: '#fbd33b',
-            paddingTop: 30,
-          }}>
-          <Text style= {{color: 'black'}}>Select Items:</Text>
+        onRequestClose={() => setFormData(prevState => ({ ...prevState, modalVisible: false }))}
+      >
+        <View style={{ paddingHorizontal: 20, backgroundColor: '#fbd33b', paddingTop: 30 }}>
+          <Text style={{ color: 'black' }}>Select Items:</Text>
           <MultiSelect
-            items={items}
+            items={filteredItems}
             uniqueKey="itemName"
             onSelectedItemsChange={handleItemSelect}
             selectedItems={selectedItems}
             selectText="Pick Items"
             searchInputPlaceholderText="Search Items..."
             displayKey="itemName"
-            hideSubmitButton={true}
-            styleDropdownMenuSubsection={{backgroundColor: '#fbd33b'}}
-            styleMainWrapper={styles.multiSelect}
+            hideSubmitButton
             styleListContainer={styles.listContainer}
-            placeholderTextColor={'#000'}
+            textColor="#000"
           />
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.modalContainer}>
-            <Text style= {{color: 'black'}}>Farmer Name:</Text>
+            <Text style={{ color: 'black' }}>Farmer Name:</Text>
             <TextInput
               value={farmerName}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, farmerName: text}))
-              }
+              onChangeText={text => setFormData(prevState => ({ ...prevState, farmerName: text }))}
               placeholder="Enter Name"
               style={styles.input}
               placeholderTextColor={'#000'}
             />
 
-            <Text style= {{color: 'black'}}>Farmer Contact Number:</Text>
+            <Text style={{ color: 'black' }}>Farmer Contact Number:</Text>
             <TextInput
               value={farmerContact}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, farmerContact: text}))
-              }
+              onChangeText={text => setFormData(prevState => ({ ...prevState, farmerContact: text }))}
               placeholder="Enter Contact"
               style={styles.input}
               maxLength={10}
               placeholderTextColor={'#000'}
             />
 
-            <Text style= {{color: 'black'}}>Farmer Village Name:</Text>
+            <Text style={{ color: 'black' }}>Farmer Village Name:</Text>
             <TextInput
               value={farmerVillageName}
               onChangeText={text =>
-                setFormData(prevState => ({
-                  ...prevState,
-                  farmerVillageName: text,
-                }))
+                setFormData(prevState => ({ ...prevState, farmerVillageName: text }))
               }
               placeholder="Enter Village"
               style={styles.input}
@@ -607,7 +574,7 @@ const InOrder = () => {
 
             {selectedItems.map((item, index) => (
               <View key={index}>
-                <Text style= {{color: 'black'}}>
+                <Text style={{ color: 'black' }}>
                   Quantity for <Text style={styles.itemText}>{item}</Text>:
                 </Text>
                 <TextInput
@@ -621,33 +588,23 @@ const InOrder = () => {
               </View>
             ))}
 
-            <Text style= {{color: 'black'}}>Serial Number:</Text>
+            <Text style={{ color: 'black' }}>Serial Number:</Text>
             <TextInput
               value={serialNumber}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, serialNumber: text}))
-              }
+              onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}
               placeholder="Enter Serial Number"
               style={styles.input}
               placeholderTextColor={'#000'}
             />
 
-            <Text style= {{color: 'black'}}>Warehouse:</Text>
+            <Text style={{ color: 'black' }}>Warehouse:</Text>
             <Picker
               selectedValue={selectedWarehouse}
               style={styles.picker}
-              onValueChange={value =>
-                setFormData(prevState => ({
-                  ...prevState,
-                  selectedWarehouse: value,
-                }))
-              }>
+              onValueChange={value => setFormData(prevState => ({ ...prevState, selectedWarehouse: value }))}
+            >
               {warehouses.map(warehouse => (
-                <Picker.Item
-                  key={warehouse._id}
-                  label={warehouse.warehouseName}
-                  value={warehouse.warehouseName}
-                />
+                <Picker.Item key={warehouse._id} label={warehouse.warehouseName} value={warehouse.warehouseName} />
               ))}
             </Picker>
 
@@ -655,24 +612,15 @@ const InOrder = () => {
               <View>
                 <Text>Select RMU or Without RMU:</Text>
                 <RadioButton.Group
-                  onValueChange={value =>
-                    setFormData(prevState => ({
-                      ...prevState,
-                      withoutRMU: value,
-                    }))
-                  }
-                  value={withoutRMU}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-around',
-                      marginVertical: 10,
-                    }}>
-                    <View style={{alignItems: 'center'}}>
+                  onValueChange={value => setFormData(prevState => ({ ...prevState, withoutRMU: value }))}
+                  value={withoutRMU}
+                >
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text>RMU</Text>
                       <RadioButton value={false} />
                     </View>
-                    <View style={{alignItems: 'center'}}>
+                    <View style={{ alignItems: 'center' }}>
                       <Text>Without RMU</Text>
                       <RadioButton value={true} />
                     </View>
@@ -685,10 +633,7 @@ const InOrder = () => {
                     <TextInput
                       value={rmuRemark}
                       onChangeText={text =>
-                        setFormData(prevState => ({
-                          ...prevState,
-                          rmuRemark: text,
-                        }))
+                        setFormData(prevState => ({ ...prevState, rmuRemark: text }))
                       }
                       placeholder="Enter Reason"
                       style={styles.input}
@@ -699,12 +644,10 @@ const InOrder = () => {
               </View>
             )}
 
-            <Text style= {{color: 'black'}}>Remarks:</Text>
+            <Text style={{ color: 'black' }}>Remarks:</Text>
             <TextInput
               value={remarks}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, remarks: text}))
-              }
+              onChangeText={text => setFormData(prevState => ({ ...prevState, remarks: text }))}
               placeholder="Enter Remarks"
               style={styles.input}
               placeholderTextColor={'#000'}
@@ -716,9 +659,8 @@ const InOrder = () => {
 
             <TouchableOpacity
               style={styles.button}
-              onPress={() =>
-                setFormData(prevState => ({...prevState, modalVisible: false}))
-              }>
+              onPress={() => setFormData(prevState => ({ ...prevState, modalVisible: false }))}
+            >
               <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
           </View>

@@ -153,7 +153,7 @@ const InstallationPart = ({route}) => {
     formData.append('farmerVillage', farmerVillage);
     formData.append('items', items);
     formData.append('serialNumber', serialNumber)
-    formData.append('status', false);
+    formData.append('installationDone', true );
     formData.append('pickupItemId', pickupItemId);
     formData.append('longitude', longitude);
     formData.append('latitude', latitude);
@@ -191,7 +191,7 @@ const InstallationPart = ({route}) => {
     const dataToSend = { 
       photos,
       pickupItemId, farmerName, farmerContact, farmerVillage,
-      items, serialNumber, latitude, longitude, status: false,
+      items, serialNumber, latitude, longitude, installationDone: true,
       installationDate: new Date()
     }
     

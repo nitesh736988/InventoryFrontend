@@ -34,6 +34,9 @@ import ShowComplaints from './Screens/ServicePerson/ShowComplaints';
 import InstallationPart from './Screens/ServicePerson/InstallationPart';
 import InstallationData from './Screens/ServicePerson/InstallationData';
 import InstallationHistoryData from './Screens/Warehouse/InstallationHistoryData';
+import InstallationHistory from './Screens/Admin/InstallationHistory';
+import ShowComplaintData from './Screens/ServicePerson/ShowComplaintData';
+
 
 
 const Stack = createStackNavigator();
@@ -232,6 +235,18 @@ const AppNavigator = () => {
           name="InstallationHistoryData"
           component={InstallationHistoryData}
           options={{title: 'InstallationHistoryData', headerShown: false}}
+        />
+
+       <Stack.Screen
+          name="InstallationHistory"
+          component={InstallationHistory}
+          options={{title: 'InstallationHistory', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ShowComplaintData"
+          component={ShowComplaintData}
+          options={{title: 'ShowComplaintData', headerShown: false}}
         />
 
       

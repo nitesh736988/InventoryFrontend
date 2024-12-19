@@ -79,6 +79,16 @@ const SidebarModal = () => {
     navigation.navigate('W2WApproved');
   };
 
+  const openInstallationHistory = () => {
+    closeModal();
+    navigation.navigate('InstallationHistory');
+  };
+
+  const openServicePersonData = () => {
+    closeModal();
+    navigation.navigate('ServicePersonData');
+  };
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -147,9 +157,21 @@ const SidebarModal = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
+            onPress={openServicePersonData}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>ServicePerson Data</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={openW2WApproveData}
             style={styles.optionButton}>
             <Text style={styles.optionText}>W2W Approve Data</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openInstallationHistory}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Installation History</Text>
           </TouchableOpacity>
 
 

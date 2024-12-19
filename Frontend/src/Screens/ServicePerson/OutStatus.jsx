@@ -24,9 +24,7 @@ const OutStatus = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${API_URL}/service-person/pickedup-items`,
-      );
+      const response = await axios.get(`${API_URL}/service-person/pickedup-items`);
       console.log(response.data.pickupItemsDetail);
       setOrders(response.data.pickupItemsDetail);
     } catch (error) {
@@ -229,7 +227,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 16,

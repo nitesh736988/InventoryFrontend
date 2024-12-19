@@ -11,7 +11,7 @@ import {
 import axios from 'axios';
 import { API_URL } from '@env';
 
-const { width, height } = Dimensions.get('window'); // Get screen dimensions
+const { width, height } = Dimensions.get('window');
 
 const ServicePersonData = () => {
   const [orders, setOrders] = useState([]);
@@ -46,24 +46,32 @@ const ServicePersonData = () => {
   const renderOrderItem = ({ item }) => (
     <View key={item._id} style={styles.card}>
       <View style={styles.infoRow}>
-        <Text style={styles.infoText}>Name: {item.servicePerson.name || 'N/A'}</Text>
+        <Text style={styles.infoTextBold}>
+          Name: {item.servicePerson?.name || 'N/A'}
+        </Text>
       </View>
       <View style={styles.contactRow}>
-        <Text style={styles.infoText}>Contact: {item.servicePerson.contact || 'N/A'}</Text>
+        <Text style={styles.infoTextBold}>
+          Contact: {item.servicePerson?.contact || 'N/A'}
+        </Text>
       </View>
+  
       <View style={styles.itemContainer}>
+        <Text style={styles.infoTextBold}>Product:</Text>
         {item.items?.map(({ _id, itemName, quantity }) => (
-          <Text key={_id} style={styles.itemText}>
-            {itemName}: {quantity}
-          </Text>
+          <View key={_id} style={styles.itemRow}>
+            <Text style={styles.itemName}>{itemName}:{' '}</Text>
+            <Text style={styles.itemQuantity}>{quantity}  {' '}</Text>
+          </View>
         ))}
       </View>
     </View>
   );
+  
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Incoming Items</Text>
+      <Text style={styles.header}>ServicePerson Total Data</Text>
       {loading ? (
         <ActivityIndicator
           size="large"
@@ -96,12 +104,12 @@ const styles = StyleSheet.create({
   header: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
-    marginBottom: width * 0.05,
+    
     textAlign: 'center',
   },
   card: {
     padding: width * 0.04,
-    marginVertical: height * 0.02, 
+    marginVertical: height * 0.02,
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
@@ -112,28 +120,40 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: height * 0.01,
+
   },
   contactRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: height * 0.01,
   },
   infoText: {
     color: '#000',
     fontSize: width * 0.04,
-    marginBottom: height * 0.005, 
+  },
+  infoTextBold: {
+    color: '#000',
+    fontSize: width * 0.04,
+    fontWeight: 'bold',
   },
   itemContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: height * 0.01,
+
   },
-  itemText: {
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+  },
+  itemName: {
     color: '#000',
     fontSize: width * 0.04,
-    marginRight: width * 0.04, 
-    marginBottom: height * 0.005, 
+    // fontWeight: 'bold',
+
+  },
+  itemQuantity: {
+    color: '#000',
+    fontSize: width * 0.04,
   },
   loadingIndicator: {
     flex: 1,
@@ -144,7 +164,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: width * 0.04,
     color: '#555',
-    marginTop: height * 0.02, 
+    marginTop: height * 0.02,
   },
 });
 
