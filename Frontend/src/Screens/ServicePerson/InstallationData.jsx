@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,21 @@ import {
   ActivityIndicator,
   TextInput,
   Image,
-  ScrollView,
+  TouchableOpacity,
+  Modal,
+  BackHandler,
 } from 'react-native';
 import axios from 'axios';
-import {useNavigation} from '@react-navigation/native';
-import {API_URL} from '@env';
+import { API_URL } from '@env';
 
 const InstallationData = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageLoadingStates, setImageLoadingStates] = useState({}); // Track loading state for each image
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -38,7 +42,7 @@ const InstallationData = () => {
     fetchOrders();
   }, []);
 
-  const formatDate = dateString => {
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -50,44 +54,96 @@ const InstallationData = () => {
 
   const filterOrders = () => {
     return orders.filter(
-      order =>
+      (order) =>
         order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
-  const renderOrderItem = ({item}) => (
+  const handleImagePress = (image) => {
+    setSelectedImage(image);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setSelectedImage(null);
+  };
+
+  // Handle Back Button
+  useEffect(() => {
+    const handleBackPress = () => {
+      if (isModalVisible) {
+        closeModal();
+        return true; // Prevent default back action
+      }
+      return false; // Allow default back action
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+    return () => backHandler.remove();
+  }, [isModalVisible]);
+
+  const handleImageLoadStart = (index) => {
+    setImageLoadingStates((prevState) => ({
+      ...prevState,
+      [index]: true,
+    }));
+  };
+
+  const handleImageLoad = (index) => {
+    setImageLoadingStates((prevState) => ({
+      ...prevState,
+      [index]: false,
+    }));
+  };
+
+  const handleImageError = (index) => {
+    setImageLoadingStates((prevState) => ({
+      ...prevState,
+      [index]: false,
+    }));
+  };
+
+  const renderOrderItem = ({ item }) => (
     <View key={item._id} style={styles.card}>
       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
       <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
       <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
 
       <View style={styles.itemContainer}>
-      <Text style={styles.infoText}>
-        Product: {' '}</Text>
-        {item.items.map(({_id, itemName, quantity}) => (
+        <Text style={styles.infoText}>Product: </Text>
+        {item.items.map(({ _id, itemName, quantity }) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
-          
         ))}
       </View>
       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
       <Text style={styles.infoText}>Longitude: {item.longitude}</Text>
       <Text style={styles.infoText}>Latitude: {item.latitude}</Text>
-        <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
-            <Image source={{ uri: item?.photos[0]}} style={{ width:  100, height: 100 }}/>
-            {item?.photos[1] && <Image source={{ uri: item?.photos[1]}} style={{ width:  100, height: 100 }}/>}
-            {item?.photos[2] && <Image source={{ uri: item?.photos[2]}} style={{ width:  100, height: 100 }}/>}
-            {item?.photos[3] && <Image source={{ uri: item?.photos[3]}} style={{ width:  100, height: 100 }}/>}
-        </View>
+      <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
+        {item.photos.map((photo, index) => (
+          <TouchableOpacity key={index} onPress={() => handleImagePress(photo)}>
+            {imageLoadingStates[index] && <ActivityIndicator size="small" color="#0000ff" />}
+            <Image
+              source={{ uri: photo }}
+              style={{ width: 100, height: 100 }}
+              onLoadStart={() => handleImageLoadStart(index)} // Set loading true for this image
+              onLoad={() => handleImageLoad(index)} // Set loading false when image is loaded
+              onError={() => handleImageError(index)} // Handle error case
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
       <Text style={styles.infoText}>Installation Date: {formatDate(item.installationDate)}</Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Approved Data</Text>
+      <Text style={styles.header}>Installation Complete Data</Text>
       <TextInput
         style={styles.searchBar}
         placeholder="Search by Farmer Name or Serial Number"
@@ -97,16 +153,12 @@ const InstallationData = () => {
       />
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#0000ff"
-          style={styles.loadingIndicator}
-        />
+        <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
       ) : (
         <FlatList
           data={filterOrders()}
           renderItem={renderOrderItem}
-          keyExtractor={item => item._id}
+          keyExtractor={(item) => item._id}
           refreshing={refreshing}
           onRefresh={handleRefresh}
           ListEmptyComponent={
@@ -114,6 +166,13 @@ const InstallationData = () => {
           }
         />
       )}
+
+      <Modal visible={isModalVisible} transparent={true} animationType="fade">
+        <View style={styles.modalBackground}>
+          <TouchableOpacity style={styles.modalCloseArea} onPress={closeModal} />
+          <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} />
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -129,7 +188,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
   },
   card: {
     padding: 16,
@@ -137,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
@@ -170,6 +229,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 16,
     backgroundColor: '#fff',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCloseArea: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  fullScreenImage: {
+    width: '90%',
+    height: '90%',
+    resizeMode: 'contain',
   },
 });
 

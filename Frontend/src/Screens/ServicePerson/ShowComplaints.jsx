@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 const ShowComplaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
 
@@ -28,13 +30,12 @@ const ShowComplaints = () => {
       const response = await axios.get(
         `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
       );
-      console.log(JSON.stringify(response.data.data));
-      setComplaints(response.data.data || []);
+      setComplaints(response.data.data);
     } catch (error) {
-      Alert.alert('Error', 'Unable to fetch complaints');
       console.log('Error fetching complaints:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -52,11 +53,16 @@ const ShowComplaints = () => {
     fetchComplaints();
   }, [loading]);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchComplaints();
+  };
+
   const handleApproveBtn = async (sendTransactionId, status) => {
     setLoading(true);
     try {
       const fieldEmpId = await AsyncStorage.getItem('_id');
-      console.log('hello', fieldEmpId, status, sendTransactionId);
+
       const sendRequest = await axios.post(
         `http://88.222.214.93:8001/filedService/complaintAccept`,
         {
@@ -66,12 +72,10 @@ const ShowComplaints = () => {
         },
       );
       console.log(sendRequest.data);
-      setBtnClickedStatus(prevData => ({
-        ...prevData,
-        [sendTransactionId]: true,
-      }));
     } catch (error) {
       Alert.alert(JSON.stringify(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,15 +94,22 @@ const ShowComplaints = () => {
           />
         ) : item?.Stage[0]._id === '675aaf9c44c74418017c1daf' ? (
           <EntypoIcon name="squared-cross" color="red" size={25} />
-        ) : (
-          ' '
-        )}
-        <TouchableOpacity
+        ) : null}
+        {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675be30222ae6f63bf772dcf" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
           onPress={() =>
-            navigation.navigate('ShowComplaintData',{ pickupItemId: item._id })
+            {navigation.navigate('ShowComplaintData', {
+              complaintId: item?._id,
+              farmerName: item?.Farmer[0]?.farmerName,
+              farmerContact: item?.Farmer[0]?.contact,
+              fatherOrHusbandName: item?.Farmer[0]?.fatherOrHusbandName,
+              pump_type: item?.Farmer[0]?.pump_type,
+              HP: item?.Farmer[0]?.HP,
+              AC_DC: item?.Farmer[0]?.AC_DC,
+            }); setLoading(true)
+          }
           }>
           <Text style={styles.approvedText}>Fill Form</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
 
       <Text style={styles.infoText}>
@@ -146,11 +157,14 @@ const ShowComplaints = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Complaints</Text>
       <FlatList
-        data={complaints}
+        data={filterComplaints()}
         renderItem={renderComplaintItem}
         keyExtractor={item => item._id}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No complaints found.</Text>
+        }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
     </View>
