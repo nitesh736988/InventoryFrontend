@@ -209,13 +209,13 @@
 //         onRequestClose={() =>
 //           setFormData(prevData => ({...prevData, modalVisible: false}))
 //         }>
-      
+
 //         <View
 //           style={{
 //             paddingHorizontal: 20,
 //             backgroundColor: '#fbd33b',
 //             paddingTop: 30,
-            
+
 //           }}>
 
 //          <Text style={styles.heading}>Warehouse to Warehouse Transfer</Text>
@@ -408,7 +408,7 @@
 
 // export default W2W;
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -421,11 +421,11 @@ import {
   Dimensions,
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
-const { width } = Dimensions.get('window'); // Get screen width
+const {width} = Dimensions.get('window');
 
 const W2W = () => {
   const [items, setItems] = useState([]);
@@ -447,13 +447,15 @@ const W2W = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/view-items`,
+        );
         const items = response.data.items.map((item, index) => ({
           _id: index + 1,
           itemName: item,
         }));
         setItems(items);
-        setFilteredItems(items); 
+        setFilteredItems(items);
       } catch (error) {
         console.log('Failed to fetch items:', error);
       }
@@ -461,7 +463,9 @@ const W2W = () => {
 
     const fetchWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/get-warehouse`,
+        );
         setFormData(prev => ({
           ...prev,
           fromWarehouse: response.data.warehouseName,
@@ -478,7 +482,9 @@ const W2W = () => {
   useEffect(() => {
     const fetchAllWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/all-warehouses`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/all-warehouses`,
+        );
         setAllWarehouse(response.data.allWarehouses);
       } catch (error) {
         console.log('Failed to fetch all warehouses:', error);
@@ -495,32 +501,32 @@ const W2W = () => {
     }));
   };
 
-  const handleItemSelect = (selected) => {
+  const handleItemSelect = selected => {
     const validItems = selected.filter(item =>
-      filteredItems.some(filteredItem => filteredItem.itemName === item)
+      filteredItems.some(filteredItem => filteredItem.itemName === item),
     );
     setSelectedItems(validItems);
 
-    const newQuantities = {};
-    validItems.forEach(item => {
-      newQuantities[item] = ''; // Initialize quantity for selected items
-    });
     setFormData(prevData => ({
       ...prevData,
-      quantities: newQuantities,
+      selectedItems: validItems,
+      quantities: validItems.reduce((acc, item) => {
+        acc[item] = prevData.quantities[item] || ''; // Retain existing quantities or set to empty
+        return acc;
+      }, {}),
     }));
   };
 
   const handleQuantityChange = (itemName, quantity) => {
     setFormData(prevData => ({
       ...prevData,
-      quantities: { ...prevData.quantities, [itemName]: quantity },
+      quantities: {...prevData.quantities, [itemName]: quantity},
     }));
   };
 
-  const handleSearch = (searchText) => {
+  const handleSearch = searchText => {
     const filtered = items.filter(item =>
-      item.itemName.toLowerCase().includes(searchText.toLowerCase())
+      item.itemName.toLowerCase().includes(searchText.toLowerCase()),
     );
     setFilteredItems(filtered);
   };
@@ -581,19 +587,19 @@ const W2W = () => {
         `${API_URL}/warehouse-admin/defective-order-data`,
         data,
         {
-          headers: { 'Content-Type': 'application/json' },
-        }
+          headers: {'Content-Type': 'application/json'},
+        },
       );
 
       if (response.status === 200) {
         resetForm();
         Alert.alert('Success', 'Transaction saved successfully');
-        setFormData(prevData => ({ ...prevData, modalVisible: false }));
+        setFormData(prevData => ({...prevData, modalVisible: false}));
       } else {
         Alert.alert('Error', 'Failed to save transaction');
       }
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error.response.data));
+      Alert.alert("warehouse Item does not exist's");
     }
   };
 
@@ -615,7 +621,9 @@ const W2W = () => {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => setFormData(prevData => ({ ...prevData, modalVisible: true }))}>
+        onPress={() =>
+          setFormData(prevData => ({...prevData, modalVisible: true}))
+        }>
         <Text style={styles.buttonText}>Outgoing Order</Text>
       </TouchableOpacity>
 
@@ -623,8 +631,15 @@ const W2W = () => {
         animationType="slide"
         transparent={false}
         visible={formData.modalVisible}
-        onRequestClose={() => setFormData(prevData => ({ ...prevData, modalVisible: false }))}>
-        <View style={{ paddingHorizontal: 20, backgroundColor: '#fbd33b', paddingTop: 30 }}>
+        onRequestClose={() =>
+          setFormData(prevData => ({...prevData, modalVisible: false}))
+        }>
+        <View
+          style={{
+            paddingHorizontal: 20,
+            backgroundColor: '#fbd33b',
+            paddingTop: 30,
+          }}>
           <Text style={styles.heading}>Warehouse to Warehouse Transfer</Text>
           <Text style={styles.label}>Select Items:</Text>
           <MultiSelect
@@ -679,8 +694,13 @@ const W2W = () => {
             <Picker
               selectedValue={formData.fromWarehouse}
               style={styles.picker}
-              onValueChange={value => handleInputChange('fromWarehouse', value)}>
-              <Picker.Item label={formData.fromWarehouse} value={formData.fromWarehouse} />
+              onValueChange={value =>
+                handleInputChange('fromWarehouse', value)
+              }>
+              <Picker.Item
+                label={formData.fromWarehouse}
+                value={formData.fromWarehouse}
+              />
             </Picker>
             <Text style={styles.label}>To Warehouse:</Text>
             <Picker
@@ -700,7 +720,10 @@ const W2W = () => {
               selectedValue={formData.isDefective}
               style={styles.picker}
               onValueChange={value => handleInputChange('isDefective', value)}>
-              {[{ _id: 1, name: 'Yes' }, { _id: 2, name: 'No' }].map(({ _id, name }) => (
+              {[
+                {_id: 1, name: 'Yes'},
+                {_id: 2, name: 'No'},
+              ].map(({_id, name}) => (
                 <Picker.Item key={_id} label={name} value={name} />
               ))}
             </Picker>
@@ -715,12 +738,16 @@ const W2W = () => {
               numberOfLines={4}
               placeholderTextColor={'#000'}
             />
-            <TouchableOpacity style={styles.button} onPress={handleDataOnSubmit}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleDataOnSubmit}>
               <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => setFormData(prevData => ({ ...prevData, modalVisible: false }))}>
+              onPress={() =>
+                setFormData(prevData => ({...prevData, modalVisible: false}))
+              }>
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -748,7 +775,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 5,
-    color: '#333',
+    color: '#000',
   },
   heading: {
     fontSize: 22,
@@ -785,9 +812,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   itemQuantityContainer: {
-    width: width - 32,
     paddingHorizontal: 16,
-    marginBottom: 12,
+    backgroundColor: '#fbd33b'
   },
   listContainer: {
     maxHeight: 250,
@@ -795,4 +821,3 @@ const styles = StyleSheet.create({
 });
 
 export default W2W;
-

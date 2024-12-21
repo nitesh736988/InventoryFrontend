@@ -48,7 +48,6 @@ const InstallationPart = ({ route }) => {
         setLoading(false);
       }
     };
-
     initialize();
   }, []);
 
@@ -164,13 +163,13 @@ const InstallationPart = ({ route }) => {
         </Text>
       )}
 
-      <Text style={styles.label}>Stage:</Text>
+      <Text style={styles.label}>Status:</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedStage}
           onValueChange={handleStageChange}
         >
-          <Picker.Item label="Select a stage" value="" />
+          <Picker.Item label="Select a Status" value="" />
           {stageOptions.map(({ _id, stage }) => (
             <Picker.Item key={_id} label={stage} value={_id} >{stage}</Picker.Item>
           ))}
@@ -181,10 +180,13 @@ const InstallationPart = ({ route }) => {
         <>
           <Text style={styles.label}>Remarks:</Text>
           <TextInput
-            style={[styles.input, showRemarks && !remarks ? styles.errorInput : null]}
+            style={[styles.inputBox, showRemarks && !remarks ? styles.errorInput : null, ]}
             value={remarks}
             onChangeText={setRemarks}
             placeholder="Enter remarks"
+            multiline={true}
+            numberOfLines={4}
+            
           />
         </>
       )}
@@ -218,19 +220,29 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, marginBottom: 4, color: 'black' },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderRadius: 8,
     padding: 8,
     fontSize: 16,
     marginBottom: 12,
-    backgroundColor: '#fff',
+    
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderRadius: 8,
     marginBottom: 12,
-    backgroundColor: '#fff',
+    // backgroundColor: 'black',
+  },
+
+  inputBox: {
+    height: 120, // Increase height for larger input area
+    borderColor: "#000",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 8,
+    textAlignVertical: "top", // Align text to the top
+    fontSize: 16,
   },
   submitButton: {
     backgroundColor: '#070604',

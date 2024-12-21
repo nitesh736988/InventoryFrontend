@@ -105,7 +105,7 @@ const Sidebarmodal = () => {
           <TouchableOpacity
             onPress={openOrderDetails}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Order Details</Text>
+            <Text style={styles.optionText}>Incoming Data</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={openInOrder} style={styles.optionButton}>
@@ -133,7 +133,7 @@ const Sidebarmodal = () => {
           <TouchableOpacity
             onPress={openShowInstallationData}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Installation Data</Text>
+            <Text style={styles.optionText}>Service Data</Text>
           </TouchableOpacity>
 
 

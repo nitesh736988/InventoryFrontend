@@ -402,8 +402,7 @@
 
 // export default AddTransaction;
 
-
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -415,9 +414,9 @@ import {
   ScrollView,
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const AddTransaction = () => {
   const [servicePersonName, setServicePersonName] = useState('');
@@ -440,13 +439,15 @@ const AddTransaction = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/view-items`,
+        );
         const items = response.data.items.map((item, index) => ({
           _id: index + 1,
           itemName: item,
         }));
         setAllItems(items);
-        setFilteredItems(items); 
+        setFilteredItems(items);
       } catch (error) {
         console.log('Failed to fetch items:', error);
       }
@@ -454,7 +455,9 @@ const AddTransaction = () => {
 
     const fetchWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/get-warehouse`,
+        );
         setAllWarehouses(response.data.warehouseName);
       } catch (error) {
         console.log('Failed to fetch warehouse names:', error);
@@ -466,10 +469,10 @@ const AddTransaction = () => {
     fetchWarehouses();
   }, []);
 
-  const  handleSearch = (query) => {
+  const handleSearch = query => {
     setSearchQuery(query);
     const filtered = allItems.filter(item =>
-      item.itemName.toLowerCase().includes(query.toLowerCase())
+      item.itemName.toLowerCase().includes(query.toLowerCase()),
     );
     setFilteredItems(filtered);
 
@@ -478,9 +481,9 @@ const AddTransaction = () => {
     }
   };
 
-  const handleItemSelect = (selected) => {
+  const handleItemSelect = selected => {
     const validItems = selected.filter(item =>
-      filteredItems.some(filteredItem => filteredItem.itemName === item)
+      filteredItems.some(filteredItem => filteredItem.itemName === item),
     );
     setSelectedItems(validItems);
 
@@ -492,7 +495,7 @@ const AddTransaction = () => {
   };
 
   const handleQuantityChange = (item, value) => {
-    setQuantities(prev => ({ ...prev, [item]: value }));
+    setQuantities(prev => ({...prev, [item]: value}));
   };
 
   const validateInput = () => {
@@ -544,6 +547,7 @@ const AddTransaction = () => {
       pickupDate: new Date(),
     };
 
+    console.log("data sent", data)
     try {
       const response = await axios.post(`${API_URL}/warehouse-admin/outgoing-items`,
         data,
@@ -551,7 +555,7 @@ const AddTransaction = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -592,7 +596,6 @@ const AddTransaction = () => {
         transparent={false}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}>
-        
         <View style={styles.modalHeader}>
           <Text style={styles.label}>Select Items:</Text>
           <MultiSelect
@@ -620,9 +623,16 @@ const AddTransaction = () => {
             <Text style={styles.label}>Service Person Contact:</Text>
             <TextInput
               value={servicePerContact}
-              onChangeText={setServicePerContact}
+              onChangeText={text => {
+                // Validate and restrict to numeric input of max length 10
+                if (/^\d{0,10}$/.test(text)) {
+                  setServicePerContact(text);
+                }
+              }}
+              keyboardType="numeric" // Brings up numeric keypad
               style={styles.input}
             />
+
             <Text style={styles.label}>Farmer Name:</Text>
             <TextInput
               value={farmerName}
@@ -634,6 +644,7 @@ const AddTransaction = () => {
               value={farmerContact}
               onChangeText={setFarmerContact}
               style={styles.input}
+              maxLength={10}
             />
             <Text style={styles.label}>Farmer Village Name:</Text>
             <TextInput
@@ -658,8 +669,8 @@ const AddTransaction = () => {
               onChangeText={setSerialNumber}
               style={styles.input}
             />
-             <Text style={{color:'#000'}}>Warehouse:</Text>
-             <Picker
+            <Text style={{color: '#000'}}>Warehouse:</Text>
+            <Picker
               selectedValue={selectedWarehouse}
               style={styles.picker}
               onValueChange={itemValue => setSelectedWarehouse(itemValue)}>
@@ -719,7 +730,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbd33b',
     borderRadius: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
@@ -822,6 +833,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-export default AddTransaction;
-                                                                                                                                                                                                                                                                                                                                                                                                                         
+export default AddTransaction;

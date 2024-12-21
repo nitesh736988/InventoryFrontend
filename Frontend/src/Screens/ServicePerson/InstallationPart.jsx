@@ -96,7 +96,7 @@ const InstallationPart = ({route}) => {
             'Error fetching installation data:',
             error.response?.data || error.message,
           );
-          Alert.alert('Error', 'Unable to fetch installation data.');
+          Alert.alert('Error', error.response.data.message);
         } finally {
           setLoading(false);
         }
@@ -219,7 +219,7 @@ const InstallationPart = ({route}) => {
         'Error submitting installation data:',
         error.response?.data || error.message,
       );
-      Alert.alert('Error', 'An error occurred while submitting the data.');
+      Alert.alert('Error', error.response?.data.message);
     }
   };
 
@@ -251,7 +251,7 @@ const InstallationPart = ({route}) => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.header}>Installation Pending</Text>
+      <Text style={styles.header}>Service Pending</Text>
 
       <Text style={styles.label}>Farmer Name:</Text>
       <TextInput

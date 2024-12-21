@@ -22,7 +22,7 @@ const InstallationData = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [imageLoadingStates, setImageLoadingStates] = useState({}); // Track loading state for each image
+  const [imageLoadingStates, setImageLoadingStates] = useState({});
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -137,7 +137,7 @@ const InstallationData = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.infoText}>Installation Date: {formatDate(item.installationDate)}</Text>
+      <Text style={styles.infoText}>Service Date: {formatDate(item.installationDate)}</Text>
     </View>
   );
 

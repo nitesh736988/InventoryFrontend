@@ -53,7 +53,7 @@ const TabNavigator = () => {
       <Tab.Screen
         name="OrderDetails"
         component={OrderDetails}
-        options={{title: 'OrderDetails'}}
+        options={{title: 'Incoming'}}
       />
 
       <Tab.Screen

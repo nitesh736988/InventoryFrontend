@@ -19,7 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 const ShowComplaints = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
 
@@ -95,7 +95,7 @@ const ShowComplaints = () => {
         ) : item?.Stage[0]._id === '675aaf9c44c74418017c1daf' ? (
           <EntypoIcon name="squared-cross" color="red" size={25} />
         ) : null}
-        {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675be30222ae6f63bf772dcf" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
+        {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
           onPress={() =>
             {navigation.navigate('ShowComplaintData', {
               complaintId: item?._id,
@@ -111,10 +111,14 @@ const ShowComplaints = () => {
           <Text style={styles.approvedText}>Fill Form</Text>
         </TouchableOpacity>}
       </View>
-
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
-      </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+        <Text style={styles.infoText}>
+          <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
+        </Text>
+        {item?.Stage[0]?._id === "675be30222ae6f63bf772dcf" && <Text style={{ color: 'red' }}>Pending</Text>}
+        {item?.Stage[0]?._id === "675be30222ae6f63bf772dd1" && <Text style={{ color: 'red'}}>Rejected</Text>}
+        {item?.Stage[0]?._id === "675be30222ae6f63bf772dd0" && <Text style={{ color: 'rgb(0, 200, 0)'}}>Resolved</Text>}
+      </View>
       <Text style={styles.infoText}>
         <Text style={styles.label}>Contact:</Text> {item.contact}
       </Text>
