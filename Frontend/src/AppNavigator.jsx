@@ -11,7 +11,6 @@ import Warehousepersons from './Screens/Admin/Warehousepersons';
 import Servicepersons from './Screens/Admin/Servicepersons';
 import WarehouseNavigation from './Screens/Warehouse/WarehouseNavigation';
 import ServicePersonRegistration from './Screens/Warehouse/ServicePersonRegistration';
-import AddItem from './Screens/Warehouse/AddItem';
 import RepairReject from './Screens/Admin/RepairReject';
 import DefectiveItem from './Screens/Warehouse/DefectiveItem';
 import RepairRejectData from './Screens/Warehouse/RepairRejectData';
@@ -36,6 +35,9 @@ import InstallationData from './Screens/ServicePerson/InstallationData';
 import InstallationHistoryData from './Screens/Warehouse/InstallationHistoryData';
 import InstallationHistory from './Screens/Admin/InstallationHistory';
 import ShowComplaintData from './Screens/ServicePerson/ShowComplaintData';
+import AddItem from './Screens/Admin/AddItem';
+import AddData from './Screens/Warehouse/AddData';
+
 
 
 
@@ -249,7 +251,18 @@ const AppNavigator = () => {
           options={{title: 'ShowComplaintData', headerShown: false}}
         />
 
-      
+        <Stack.Screen
+          name="AddData"
+          component={AddData}
+          options={{title: 'AddData', headerShown: false}}
+        />
+
+        {/* <Stack.Screen
+          name="OTPVerification"
+          component={OTPVerification}
+          options={{title: 'OTPVerification', headerShown: false}}
+        /> */}
+
       </Stack.Navigator>
     </NavigationContainer>
   );

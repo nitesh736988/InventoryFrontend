@@ -209,8 +209,8 @@ const InstallationPart = ({route}) => {
       );
 
       if (response.data.success) {
-        Alert.alert('Success', 'Installation data submitted successfully.');
-        navigation.goBack();
+        
+        navigation.navigate('OTPVerification', { pickupItemId });
       } else {
         Alert.alert('Error', 'Failed to submit installation data.');
       }
@@ -333,6 +333,7 @@ const InstallationPart = ({route}) => {
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
+        
       </TouchableOpacity>
 
       <TouchableOpacity

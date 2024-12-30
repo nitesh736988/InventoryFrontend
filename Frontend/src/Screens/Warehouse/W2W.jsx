@@ -657,7 +657,11 @@ const W2W = () => {
           />
         </View>
 
-        {formData.selectedItems.map(item => (
+        
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.modalContainer}>
+
+          {formData.selectedItems.map(item => (
           <View key={item} style={styles.itemQuantityContainer}>
             <Text style={styles.label}>Quantity for {item}:</Text>
             <TextInput
@@ -670,8 +674,6 @@ const W2W = () => {
             />
           </View>
         ))}
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.modalContainer}>
             <Text style={styles.label}>Driver Name:</Text>
             <TextInput
               value={formData.driverName}

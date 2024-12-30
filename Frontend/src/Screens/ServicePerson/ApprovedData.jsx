@@ -227,7 +227,6 @@ import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
 
-
 const ApprovedData = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -261,18 +260,16 @@ const ApprovedData = () => {
     fetchOrders();
   };
   const filterOrders = () => {
-    return orders.filter(
-      order =>
-        order.servicePersonName
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()),
+    return orders.filter(order =>
+      order.servicePersonName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
+  
   const renderOrderItem = ({ item }) => (
     <View key={item._id} style={styles.card}>
-      <Text
+      <Text 
         style={[
           styles.statusText,
           item.incoming ? styles.incoming : styles.outgoing,

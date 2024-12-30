@@ -89,6 +89,11 @@ const SidebarModal = () => {
     navigation.navigate('ServicePersonData');
   };
 
+  const openAddItem = () => {
+    closeModal();
+    navigation.navigate('AddItem');
+  };
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -127,6 +132,13 @@ const SidebarModal = () => {
             style={styles.optionButton}>
             <Text style={styles.optionText}>Warehouse Registration</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openAddItem}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Add Item</Text>
+          </TouchableOpacity>
+
 
           <TouchableOpacity onPress={openHistory} style={styles.optionButton}>
             <Text style={styles.optionText}>History</Text>

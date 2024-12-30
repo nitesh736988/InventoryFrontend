@@ -347,24 +347,6 @@ const Sidebar = ({userType}) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigateAndHighlight('AddItem')}
-              style={[
-                styles.optionButton,
-                activeSection === 'AddItem' &&
-                  styles.activeOptionButton,
-              ]}>
-              <Text
-                style={[
-                  styles.optionText,
-                  activeSection === 'AddItem' &&
-                    styles.activeOptionText,
-                ]}>
-                Add Item
-              </Text>
-            </TouchableOpacity>
-
-
-            <TouchableOpacity
               onPress={() => navigateAndHighlight('AddTransaction')}
               style={[
                 styles.optionButton,

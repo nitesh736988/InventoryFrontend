@@ -62,7 +62,7 @@ const ApprovalData = () => {
       }
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', 'Unable to update status');
+      Alert.alert('Error', 'Somethings is missing Please Check Product Name');
     }
   };
 
