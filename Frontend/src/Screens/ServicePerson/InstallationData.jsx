@@ -70,14 +70,14 @@ const InstallationData = () => {
     setSelectedImage(null);
   };
 
-  // Handle Back Button
+
   useEffect(() => {
     const handleBackPress = () => {
       if (isModalVisible) {
         closeModal();
-        return true; // Prevent default back action
+        return true; 
       }
-      return false; // Allow default back action
+      return false;
     };
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#ccc',        
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 16,

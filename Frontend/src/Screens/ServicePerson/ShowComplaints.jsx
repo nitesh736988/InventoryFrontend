@@ -33,7 +33,7 @@ const ShowComplaints = () => {
       setComplaints(response.data.data);
     } catch (error) {
       console.log('Error fetching complaints:', error);
-    } finally {
+    } finally {                 
       setLoading(false);
       setRefreshing(false);
     }
@@ -104,7 +104,9 @@ const ShowComplaints = () => {
               fatherOrHusbandName: item?.Farmer[0]?.fatherOrHusbandName,
               pump_type: item?.Farmer[0]?.pump_type,
               HP: item?.Farmer[0]?.HP,
-              AC_DC: item?.Farmer[0]?.AC_DC,
+              AC_DC: item?.Farmer[0]?.AC_DC, 
+              longitude2: item?.Farmer[0]?.longitude,
+              latitude2: item?.Farmer[0]?.latitude
             }); setLoading(true)
           }
           }>

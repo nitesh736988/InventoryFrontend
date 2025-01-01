@@ -209,8 +209,7 @@ const InstallationPart = ({route}) => {
       );
 
       if (response.data.success) {
-        
-        navigation.navigate('OTPVerification', { pickupItemId });
+        console.log("Installation Successfully")
       } else {
         Alert.alert('Error', 'Failed to submit installation data.');
       }

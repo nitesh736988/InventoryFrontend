@@ -87,7 +87,7 @@ const InOrder = () => {
       filteredItems.some(filteredItem => filteredItem.itemName === item)
     );
 
-    // Check if any item starts with "Controller"
+    
     const isControllerSelected = validItems.some(item => item.startsWith('Controller'));
 
     setFormData(prevState => ({
@@ -265,6 +265,24 @@ const InOrder = () => {
                 />
               </View>
             ))}
+
+            <Text style={{ color: 'black' }}>Sim Number:</Text>
+            <TextInput
+              value={serialNumber}
+              onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}
+              placeholder="Enter Serial Number"
+              style={styles.input}
+              placeholderTextColor={'#000'}
+            />
+
+           <Text style={{ color: 'black' }}>Controller     Number:</Text>
+            <TextInput
+              value={serialNumber}
+              onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}
+              placeholder="Enter Serial Number"
+              style={styles.input}
+              placeholderTextColor={'#000'}
+            />
 
             <Text style={{ color: 'black' }}>Serial Number:</Text>
             <TextInput
