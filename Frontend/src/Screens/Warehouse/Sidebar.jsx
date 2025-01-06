@@ -499,6 +499,74 @@ const Sidebar = ({userType}) => {
                 Installation Data
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateAndHighlight('Repaired')}
+              style={[
+                styles.optionButton,
+                activeSection === 'Repaired' &&
+                  styles.activeOptionButton,
+              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  activeSection === 'Repaired' &&
+                    styles.activeOptionText,
+                ]}>
+                Repaired
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateAndHighlight('Reject')}
+              style={[
+                styles.optionButton,
+                activeSection === 'Reject' &&
+                  styles.activeOptionButton,
+              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  activeSection === 'Reject' &&
+                    styles.activeOptionText,
+                ]}>
+                Reject
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateAndHighlight('RepairHistory')}
+              style={[
+                styles.optionButton,
+                activeSection === 'RepairHistory' &&
+                  styles.activeOptionButton,
+              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  activeSection === 'RepairHistory' &&
+                    styles.activeOptionText,
+                ]}>
+                Repair History
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateAndHighlight('RejectedHistory')}
+              style={[
+                styles.optionButton,
+                activeSection === 'RejectedHistory' &&
+                  styles.activeOptionButton,
+              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  activeSection === 'RejectedHistory' &&
+                    styles.activeOptionText,
+                ]}>
+                Rejected History
+              </Text>
+            </TouchableOpacity>
           </>
         </Animated.View>
       </Modal>
@@ -516,6 +584,7 @@ const styles = StyleSheet.create({
     top: 20,
     left: 15,
     zIndex: 10,
+    
   },
   overlay: {
     flex: 1,
@@ -523,7 +592,7 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     width: 300,
-    backgroundColor: 'white',
+    backgroundColor: '#fbd33b',
     padding: 20,
     position: 'absolute',
     top: 0,

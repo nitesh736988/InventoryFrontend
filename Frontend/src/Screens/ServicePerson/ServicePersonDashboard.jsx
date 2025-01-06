@@ -93,8 +93,9 @@ const ServicePersonDashboard = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Sidebarmodal/>
+      
       <View style={styles.header}>
+      <Sidebarmodal/>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Icon name="sign-out" size={20} color="white" />
         </TouchableOpacity>
@@ -122,24 +123,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbd33b'
   },
   header: {
+    width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 20,
+    justifyContent: 'flex-end',
+    paddingVertical: 10,
+    
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: 'black',
-    paddingVertical: width * 0.02,
-    paddingHorizontal: width * 0.04,
-    borderRadius: width * 0.02,
-    marginLeft: 'auto',
+    padding: 10,
+    borderRadius: 20,
   },
-  logoutText: {
-    marginLeft: 8,
-    color: 'white',
-    fontSize: 16,
-  },
+
   scrollViewContent: {
     paddingBottom: 20,
   },

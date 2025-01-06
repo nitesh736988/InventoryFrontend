@@ -91,8 +91,9 @@ const WarehouseDashboard = () => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-      <Sidebar />
+      
       <View style={styles.header}>
+      <Sidebar />
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Icon name="sign-out" size={20} color="white" />
         </TouchableOpacity>
@@ -117,22 +118,11 @@ const WarehouseDashboard = () => {
             <Text style={{...styles.cardDetails, color: '#000'}}>
               Stock: {quantity}
             </Text>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('DefectiveItem', {
-                  itemId: _id,
-                  itemName,
-                })
-              }>
-              <Text
-                style={[
-                  styles.cardDetails,
-                  styles.link,
-                  styles.defectiveHighlight,
-                ]}>
-                Defective: {defective}
-              </Text>
-            </TouchableOpacity>
+
+            <Text style={{...styles.cardDetails, color: '#000'}}>
+             Defective: {defective}
+            </Text>
+            
             <Text style={{...styles.cardDetails, color: '#000'}}>
               Repaired: {repaired}
             </Text>

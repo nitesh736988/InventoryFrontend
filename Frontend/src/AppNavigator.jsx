@@ -12,7 +12,6 @@ import Servicepersons from './Screens/Admin/Servicepersons';
 import WarehouseNavigation from './Screens/Warehouse/WarehouseNavigation';
 import ServicePersonRegistration from './Screens/Warehouse/ServicePersonRegistration';
 import RepairReject from './Screens/Admin/RepairReject';
-import DefectiveItem from './Screens/Warehouse/DefectiveItem';
 import RepairRejectData from './Screens/Warehouse/RepairRejectData';
 import AddTransaction from './Screens/Warehouse/AddTransaction';
 import ServicePersonNavigation from './Screens/ServicePerson/ServicePersonNavigation';
@@ -37,9 +36,10 @@ import InstallationHistory from './Screens/Admin/InstallationHistory';
 import ShowComplaintData from './Screens/ServicePerson/ShowComplaintData';
 import AddItem from './Screens/Admin/AddItem';
 import AddData from './Screens/Warehouse/AddData';
-
-
-
+import Repaired from './Screens/Warehouse/Repaired';
+import Reject from './Screens/Warehouse/Reject'
+import RepairHistory from './Screens/Warehouse/RepairHistory'
+import RejectedHistory from './Screens/Warehouse/RejectedHistory';
 
 const Stack = createStackNavigator();
 
@@ -111,12 +111,6 @@ const AppNavigator = () => {
           name="RepairReject"
           component={RepairReject}
           options={{title: 'RepairReject', headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="DefectiveItem"
-          component={DefectiveItem}
-          options={{title: 'DefectiveItem', headerShown: false}}
         />
 
         <Stack.Screen
@@ -257,11 +251,29 @@ const AppNavigator = () => {
           options={{title: 'AddData', headerShown: false}}
         />
 
-        {/* <Stack.Screen
-          name="OTPVerification"
-          component={OTPVerification}
-          options={{title: 'OTPVerification', headerShown: false}}
-        /> */}
+        <Stack.Screen
+          name="Repaired"
+          component={Repaired}
+          options={{title: 'Repaired', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Reject"
+          component={Reject}
+          options={{title: 'Reject', headerShown: false}}
+        />
+
+       <Stack.Screen
+          name="RepairHistory"
+          component={RepairHistory}
+          options={{title: 'RepairHistory', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="RejectedHistory"
+          component={RejectedHistory}
+          options={{title: 'RejectedHistory', headerShown: false}}
+        />
 
       </Stack.Navigator>
     </NavigationContainer>

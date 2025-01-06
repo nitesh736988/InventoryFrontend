@@ -84,11 +84,11 @@ const InOrder = () => {
 
   const handleItemSelect = (selected) => {
     const validItems = selected.filter(item =>
-      filteredItems.some(filteredItem => filteredItem.itemName === item)
+    filteredItems.some(filteredItem => filteredItem.itemName.toLowerCase() === item.toLowerCase())
     );
 
     
-    const isControllerSelected = validItems.some(item => item.startsWith('Controller'));
+  const isControllerSelected = validItems.some(item => item.toLowerCase().includes('controller'));
 
     setFormData(prevState => ({
       ...prevState,
@@ -98,6 +98,9 @@ const InOrder = () => {
       withoutRMU: isControllerSelected ? null : prevState.withoutRMU, // Reset if not applicable
     }));
   };
+
+ 
+  
 
   const handleQuantityChange = (itemName, quantity) => {
     setFormData(prevState => ({

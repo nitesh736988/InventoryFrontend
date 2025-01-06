@@ -8,273 +8,8 @@
 //   ScrollView,
 //   ActivityIndicator,
 //   Alert,
-// } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
-// import axios from 'axios';
-// import { Picker } from '@react-native-picker/picker'; 
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// const InstallationPart = ({ route }) => {
-//   const {complaintId, farmerName, farmerContact, fatherOrHusbandName, pump_type,HP,AC_DC } = route.params;
-//   console.log("farmer details" , { farmerName, farmerContact, fatherOrHusbandName, pump_type,HP,AC_DC }, typeof(farmerContact))
-//   const [installationData, setInstallationData] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [stageOptions, setStageOptions] = useState([]);
-//   const [selectedStage, setSelectedStage] = useState('');
-//   const [remarks, setRemarks] = useState('');
-//   const [showRemarks, setShowRemarks] = useState(false); 
-//   const navigation = useNavigation();
-
-//   useEffect(() => {
-//     const initialize = async () => {
-//       const serviceId = await AsyncStorage.getItem('_id');
-//       try {
-//         const response = await axios.get(
-//           `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`);
-//           console.log(response.data.data)
-//         setInstallationData(response.data.data);
-
-//         const stageResponse = await axios.get(
-//           `http://88.222.214.93:8001/filedService/showStage`);
-//         setStageOptions(stageResponse.data?.stages || []);
-//         console.log("All Stages",stageResponse.data?.stages);
-//       } catch (error) {
-//         console.log(
-//           'Error fetching data:',
-//           error.response?.data || error.message
-//         );
-//         Alert.alert('Error', 'Unable to fetch data.');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     initialize();
-//   }, []);
-
-//   const handleStageChange = (itemValue) => {
-//     setSelectedStage(itemValue);
-//     setShowRemarks(itemValue !== '');
-//   };
-
-//   const handleSubmit = async (complaintId) => {
-//     const serviceId = await AsyncStorage.getItem('_id');
-//     if (!selectedStage) {
-//       Alert.alert('Error', 'Please select a stage.');
-//       return;
-//     }
-
-//     if (showRemarks && !remarks.trim()) {
-//       Alert.alert('Error', 'Remarks are required.');
-//       return;
-//     }
-
-//     const requestData = {
-//       fieldEmpID: serviceId,
-//       complaintId,
-//       stageId: selectedStage,
-//       remarks,
-//     };
-
-//     try {
-//       setLoading(true);
-//       // console.log("Requested Data",requestData);
-//       const response = await axios.put(`http://88.222.214.93:8001/filedService/complaintUpdate`,
-//         requestData
-//       );
-//       if (response.status === 200) {
-//         Alert.alert('Success', 'Form submitted successfully!');
-//         navigation.goBack();
-//       }
-//     } catch (error) {
-//       console.log('Error submitting form:', error.response?.data || error.message);
-//       Alert.alert('Error', 'Failed to submit form.');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   if (loading) {
-//     return (
-//       <View style={styles.loaderContainer}>
-//         <ActivityIndicator size="large" color="#0000ff" />
-//         <Text>Loading...</Text>
-//       </View>
-//     );
-//   }
-
-//   if (!installationData) {
-//     return (
-//       <View style={styles.loaderContainer}>
-//         <Text style={styles.errorText}>Unable to load complaint data.</Text>
-//       </View>
-//     );
-//   }
-
-//   return (
-//     <ScrollView style={styles.container}>
-//       <Text style={styles.header}>Complaint Details</Text>
-
-//       <Text style={styles.label}>Farmer Name:</Text>
-//       <TextInput
-//         style={[styles.input, styles.nonEditable]}
-//         value={farmerName}
-//         editable={false}
-//       />
-
-//       <Text style={styles.label}>Farmer Contact:</Text>
-//       <TextInput
-//         style={[styles.input, styles.nonEditable]}
-//         value={farmerContact?.toString()}
-//         keyboardType='phone-pad'
-//         editable={false}
-//       />
-
-//       <Text style={styles.label}>Father/Husband Name:</Text>
-//       <TextInput
-//         style={[styles.input, styles.nonEditable]}
-//         value={fatherOrHusbandName}
-//         editable={false}
-//       />
-
-//       <Text style={styles.label}>Pump Type:</Text>
-//       <TextInput
-//         style={[styles.input, styles.nonEditable]}
-//         value={pump_type}
-//         editable={false}
-//       />
-
-//       <Text style={styles.label}>HP:</Text>
-//       <TextInput
-//         style={[styles.input, styles.nonEditable]}
-//         value={HP}
-//         editable={false}
-//       />
-
-//       <Text style={styles.label}>AC/DC:</Text>
-//       <TextInput
-//         style={[styles.input, styles.nonEditable]}
-//         value={AC_DC}
-//         editable={false}
-//       />
-
-//       {installationData?.installationDate && (
-//         <Text style={styles.infoText}>
-//           Installation Date: {new Date(installationData.installationDate).toLocaleDateString()}
-//         </Text>
-//       )}
-
-//       <Text style={styles.label}>Status:</Text>
-//       <View style={styles.pickerContainer}>
-//         <Picker
-//           selectedValue={selectedStage}
-//           onValueChange={handleStageChange}
-//         >
-//           <Picker.Item label="Select a Status" value="" />
-//           {stageOptions.map(({ _id, stage }) => (
-//             <Picker.Item key={_id} label={stage} value={_id} >{stage}</Picker.Item>
-//           ))}
-//         </Picker>
-//       </View>
-
-//       {showRemarks && (
-//         <>
-//           <Text style={styles.label}>Remarks:</Text>
-//           <TextInput
-//             style={[styles.inputBox, showRemarks && !remarks ? styles.errorInput : null, ]}
-//             value={remarks}
-//             onChangeText={setRemarks}
-//             placeholder="Enter remarks"
-//             multiline={true}
-//             numberOfLines={4}
-            
-//           />
-//         </>
-//       )}
-
-//       <TouchableOpacity
-//         style={styles.submitButton}
-//         onPress={() => handleSubmit(complaintId)}
-//       >
-//         <Text style={styles.buttonText}>Submit</Text>
-//       </TouchableOpacity>
-
-//       <TouchableOpacity
-//         style={styles.submitButton}
-//         onPress={() => navigation.goBack()}
-//       >
-//         <Text style={styles.buttonText}>Close</Text>
-//       </TouchableOpacity>
-//     </ScrollView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, padding: 16, backgroundColor: '#fbd33b' },
-//   header: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 16,
-//     textAlign: 'center',
-//     color: 'black',
-//   },
-//   label: { fontSize: 16, marginBottom: 4, color: 'black' },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: '#000',
-//     borderRadius: 8,
-//     padding: 8,
-//     fontSize: 16,
-//     marginBottom: 12,
-    
-//   },
-//   pickerContainer: {
-//     borderWidth: 1,
-//     borderColor: '#000',
-//     borderRadius: 8,
-//     marginBottom: 12,
-//     // backgroundColor: 'black',
-//   },
-
-//   inputBox: {
-//     height: 120, // Increase height for larger input area
-//     borderColor: "#000",
-//     borderWidth: 1,
-//     borderRadius: 8,
-//     padding: 8,
-//     textAlignVertical: "top", // Align text to the top
-//     fontSize: 16,
-//   },
-//   submitButton: {
-//     backgroundColor: '#070604',
-//     paddingVertical: 12,
-//     paddingHorizontal: 20,
-//     borderRadius: 8,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     marginVertical: 10,
-//   },
-//   buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
-//   nonEditable: { backgroundColor: '#e9ecef', color: '#6c757d' },
-//   infoText: { fontSize: 16, color: '#333', marginBottom: 4 },
-//   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-//   errorText: { fontSize: 16, color: 'red', textAlign: 'center' },
-//   errorInput: { borderColor: 'red' },
-// });
-
-// export default InstallationPart;
-
-
-// import React, { useState, useEffect } from 'react';
-// import {
-//   View,
-//   Text,
-//   StyleSheet,
-//   TextInput,
-//   TouchableOpacity,
-//   ScrollView,
-//   ActivityIndicator,
-//   Alert,
 //   Image,
+//   Platform,
 // } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
 // import axios from 'axios';
@@ -282,6 +17,7 @@
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { launchCamera } from 'react-native-image-picker';
 // import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import Geolocation from '@react-native-community/geolocation';
 // import { PermissionsAndroid } from 'react-native';
 
 // const requestCameraPermission = async () => {
@@ -303,6 +39,25 @@
 //   }
 // };
 
+// const requestLocationPermission = async () => {
+//   try {
+//     const granted = await PermissionsAndroid.request(
+//       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+//       {
+//         title: 'Location Permission',
+//         message: 'We need access to your location to fetch coordinates',
+//         buttonNeutral: 'Ask Me Later',
+//         buttonNegative: 'Cancel',
+//         buttonPositive: 'OK',
+//       }
+//     );
+//     return granted === PermissionsAndroid.RESULTS.GRANTED;
+//   } catch (err) {
+//     console.warn(err);
+//     return false;
+//   }
+// };
+
 // const ShowComplaintData = ({ route }) => {
 //   const {
 //     complaintId,
@@ -312,6 +67,8 @@
 //     pump_type,
 //     HP,
 //     AC_DC,
+//     longitude2,
+//     latitude2
 //   } = route.params;
 
 //   const [installationData, setInstallationData] = useState(null);
@@ -325,9 +82,44 @@
 //   const [simNumber, setSimNumber] = useState('');
 //   const [photos, setPhotos] = useState([]);
 //   const navigation = useNavigation();
+//   const [longitude, setLongitude] = useState('');
+//   const [latitude, setLatitude] = useState('');
+
+
+//   // function getDistance(lat1, lon1, lat2, lon2) {
+//   //   const toRadians = (degrees) => degrees * (Math.PI / 180);
+
+//   //   const R = 6371; 
+//   //   const dLat = toRadians(lat2 - lat1);
+//   //   const dLon = toRadians(lon2 - lon1);
+
+//   //   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//   //             Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+//   //             Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+//   //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//   //   const distance = R * c * 1000;
+//   //   return distance;
+//   // }
 
 //   useEffect(() => {
 //     const initialize = async () => {
+//       if (Platform.OS === 'android') {
+//         const locationGranted = await requestLocationPermission();
+//         if (locationGranted) {
+//           Geolocation.getCurrentPosition(
+//             position => {
+//               setLongitude(position.coords.longitude);
+//               setLatitude(position.coords.latitude);
+//             },
+//             error => {
+//               console.log('Error getting location:', error.message);
+//               Alert.alert('Error', 'Unable to fetch location.');
+//             }
+//           );
+//         }
+//       }
+
 //       const serviceId = await AsyncStorage.getItem('_id');
 //       try {
 //         const response = await axios.get(
@@ -377,10 +169,22 @@
 
 //   const handleStageChange = (itemValue) => {
 //     setSelectedStage(itemValue);
-//     setShowRemarks(itemValue !== '');
+//     setShowRemarks(itemValue !== ''
+      
+//     );
 //   };
 
 //   const handleSubmit = async () => {
+//     // const distanceBetween = (getDistance(latitude, longitude, latitude2, longitude2));
+//     // console.log(distanceBetween);
+//     // if(distanceBetween > 150){
+//     //   Alert.alert('First Reach at your location');
+//     //   return;
+//     // }
+//     // else{
+//     //   // console.log()
+//     //   Alert.alert('farmer Reached at Location');
+//     // }
 //     const serviceId = await AsyncStorage.getItem('_id');
 //     if (!selectedStage) {
 //       Alert.alert('Error', 'Please select a stage.');
@@ -402,37 +206,32 @@
 //     ).filter(Boolean);
 
 //     const requestData = {
-//       fieldEmpID: serviceId,  
+//       fieldEmpID: serviceId,
 //       complaintId,
 //       stageId: selectedStage,
 //       remarks,
 //       rmuNumber,
-//       controllerNumber,   
+//       controllerNumber,
 //       simNumber,
 //       photos: photosBase64,
+//       longitude,
+//       latitude,
 //     };
 
 //     try {
 //       setLoading(true);
-//       console.log(requestData)
 //       const response = await axios.put(
 //         `http://88.222.214.93:8001/filedService/complaintUpdate`,
 //         requestData
 //       );
 
-      
-      
-
 //       if (response.status === 200) {
 //         Alert.alert('Success', 'Form submitted successfully!');
-
 //         navigation.goBack();
 //       }
 //     } catch (error) {
 //       console.log('Error submitting form:', error.response?.data || error.message);
-//       Alert.alert(JSON.stringify(error.response.data.message));
-//       // Alert.alert('Error', 'Failed to submit form.');
-      
+//       Alert.alert('Error', 'Failed to submit form.');
 //     } finally {
 //       setLoading(false);
 //     }
@@ -499,6 +298,20 @@
 //       <TextInput
 //         style={[styles.input, styles.nonEditable]}
 //         value={AC_DC}
+//         editable={false}
+//       />
+
+//       <Text style={styles.label}>Longitude:</Text>
+//       <TextInput
+//         style={[styles.input, styles.nonEditable]}
+//         value={longitude?.toString()}
+//         editable={false}
+//       />
+
+//       <Text style={styles.label}>Latitude:</Text>
+//       <TextInput
+//         style={[styles.input, styles.nonEditable]}
+//         value={latitude?.toString()}
 //         editable={false}
 //       />
 
@@ -624,13 +437,13 @@
 //   errorText: { fontSize: 16, color: 'red', textAlign: 'center' },
 //   imagePreviewContainer: { flexDirection: 'row', marginVertical: 10 },
 //   imagePreview: { width: 100, height: 100, marginRight: 10, borderRadius: 8 },
+//   imageButton: { marginBottom: 10 },
 // });
 
 // export default ShowComplaintData;
 
 
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';           
 import {
   View,
   Text,
@@ -699,8 +512,6 @@ const ShowComplaintData = ({ route }) => {
     pump_type,
     HP,
     AC_DC,
-    longitude2,
-    latitude2
   } = route.params;
 
   const [installationData, setInstallationData] = useState(null);
@@ -716,23 +527,6 @@ const ShowComplaintData = ({ route }) => {
   const navigation = useNavigation();
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
-
-
-  function getDistance(lat1, lon1, lat2, lon2) {
-    const toRadians = (degrees) => degrees * (Math.PI / 180);
-
-    const R = 6371; 
-    const dLat = toRadians(lat2 - lat1);
-    const dLon = toRadians(lon2 - lon1);
-
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c * 1000;
-    return distance;
-  }
 
   useEffect(() => {
     const initialize = async () => {
@@ -801,23 +595,12 @@ const ShowComplaintData = ({ route }) => {
 
   const handleStageChange = (itemValue) => {
     setSelectedStage(itemValue);
-    setShowRemarks(itemValue !== ''
-      
-    );
+    setShowRemarks(itemValue !== '');
   };
 
   const handleSubmit = async () => {
-    const distanceBetween = (getDistance(latitude, longitude, latitude2, longitude2));
-    console.log(distanceBetween);
-    if(distanceBetween > 150){
-      Alert.alert('First Reach at your location');
-      return;
-    }
-    else{
-      // console.log()
-      Alert.alert('farmer Reached at Location');
-    }
     const serviceId = await AsyncStorage.getItem('_id');
+
     if (!selectedStage) {
       Alert.alert('Error', 'Please select a stage.');
       return;
@@ -825,6 +608,16 @@ const ShowComplaintData = ({ route }) => {
 
     if (showRemarks && !remarks.trim()) {
       Alert.alert('Error', 'Remarks are required.');
+      return;
+    }
+
+    if (!rmuNumber.trim()) {
+      Alert.alert('Error', 'RMU Number is required.');
+      return;
+    }
+
+    if (!simNumber.trim()) {
+      Alert.alert('Error', 'SIM Number is required.');
       return;
     }
 
@@ -1003,6 +796,7 @@ const ShowComplaintData = ({ route }) => {
             placeholder="Enter remarks"
             multiline={true}
             numberOfLines={4}
+            placeholderTextColor={'#000'}
           />
         </>
       )}
@@ -1050,26 +844,32 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     borderWidth: 1,
     borderRadius: 8,
-    padding: 8,
     textAlignVertical: 'top',
+    padding: 8,
     fontSize: 16,
+    marginBottom: 12,
   },
+  imageButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 50,
+  },
+  imagePreviewContainer: { flexDirection: 'row', marginBottom: 16 },
+  imagePreview: { width: 100, height: 100, marginRight: 8, borderRadius: 8 },
   submitButton: {
-    backgroundColor: '#070604',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    backgroundColor: '#000',
     borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
   },
-  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
-  nonEditable: { backgroundColor: '#e9ecef', color: '#6c757d' },
+  buttonText: { color: '#fff', fontSize: 16 },
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  errorText: { fontSize: 16, color: 'red', textAlign: 'center' },
-  imagePreviewContainer: { flexDirection: 'row', marginVertical: 10 },
-  imagePreview: { width: 100, height: 100, marginRight: 10, borderRadius: 8 },
-  imageButton: { marginBottom: 10 },
+  errorText: { fontSize: 16, color: 'red' },
+
+  nonEditable: { backgroundColor: '#e9ecef', color: '#000' },
 });
 
 export default ShowComplaintData;

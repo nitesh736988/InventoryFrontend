@@ -125,8 +125,8 @@ const Dashboard = () => {
 
   return (
     <View style={styles.container}>
-      <SidebarModal />
       <View style={styles.header}>
+      <SidebarModal />
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Icon name="sign-out" size={20} color="white" />
         </TouchableOpacity>
@@ -191,23 +191,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    alignItems: 'flex-end',
-    marginBottom: width * 0.03,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingVertical: 10,
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: 'black',
-    paddingVertical: width * 0.02,
-    paddingHorizontal: width * 0.04,
-    borderRadius: width * 0.02,
-    marginTop: width * 0.02,
+    padding: 10,
+    borderRadius: 20,
   },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: width * 0.04,
-    marginLeft: 5,
-  },
+
   picker: {
     height: 50,
     width: '100%',
