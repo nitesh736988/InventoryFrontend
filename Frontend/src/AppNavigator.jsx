@@ -40,6 +40,8 @@ import Repaired from './Screens/Warehouse/Repaired';
 import Reject from './Screens/Warehouse/Reject'
 import RepairHistory from './Screens/Warehouse/RepairHistory'
 import RejectedHistory from './Screens/Warehouse/RejectedHistory';
+import LocationTracker from './Screens/ServicePerson/LocationTracker';
+import EditServicePerson from './Screens/Admin/EditServicePerson';
 
 const Stack = createStackNavigator();
 
@@ -273,6 +275,18 @@ const AppNavigator = () => {
           name="RejectedHistory"
           component={RejectedHistory}
           options={{title: 'RejectedHistory', headerShown: false}}
+        />
+
+         <Stack.Screen
+          name="LocationTracker"
+          component={LocationTracker}
+          options={{title: 'LocationTracker', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="EditServicePerson"
+          component={EditServicePerson}
+          options={{title: 'EditServicePerson', headerShown: false}}
         />
 
       </Stack.Navigator>

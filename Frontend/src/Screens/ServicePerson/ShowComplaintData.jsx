@@ -85,18 +85,17 @@
 //   const [longitude, setLongitude] = useState('');
 //   const [latitude, setLatitude] = useState('');
 
-
 //   // function getDistance(lat1, lon1, lat2, lon2) {
 //   //   const toRadians = (degrees) => degrees * (Math.PI / 180);
 
-//   //   const R = 6371; 
+//   //   const R = 6371;
 //   //   const dLat = toRadians(lat2 - lat1);
 //   //   const dLon = toRadians(lon2 - lon1);
 
 //   //   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 //   //             Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
 //   //             Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
+
 //   //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 //   //   const distance = R * c * 1000;
 //   //   return distance;
@@ -170,7 +169,7 @@
 //   const handleStageChange = (itemValue) => {
 //     setSelectedStage(itemValue);
 //     setShowRemarks(itemValue !== ''
-      
+
 //     );
 //   };
 
@@ -442,8 +441,7 @@
 
 // export default ShowComplaintData;
 
-
-import React, { useState, useEffect } from 'react';           
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -456,14 +454,16 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { launchCamera } from 'react-native-image-picker';
+import {launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
-import { PermissionsAndroid } from 'react-native';
+import {PermissionsAndroid} from 'react-native';
+import ImageResizer from 'react-native-image-resizer';
+import RNFS from 'react-native-fs';
 
 const requestCameraPermission = async () => {
   try {
@@ -475,7 +475,7 @@ const requestCameraPermission = async () => {
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',
         buttonPositive: 'OK',
-      }
+      },
     );
     return granted === PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
@@ -494,7 +494,7 @@ const requestLocationPermission = async () => {
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',
         buttonPositive: 'OK',
-      }
+      },
     );
     return granted === PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
@@ -503,7 +503,7 @@ const requestLocationPermission = async () => {
   }
 };
 
-const ShowComplaintData = ({ route }) => {
+const ShowComplaintData = ({route}) => {
   const {
     complaintId,
     farmerName,
@@ -541,7 +541,7 @@ const ShowComplaintData = ({ route }) => {
             error => {
               console.log('Error getting location:', error.message);
               Alert.alert('Error', 'Unable to fetch location.');
-            }
+            },
           );
         }
       }
@@ -549,16 +549,19 @@ const ShowComplaintData = ({ route }) => {
       const serviceId = await AsyncStorage.getItem('_id');
       try {
         const response = await axios.get(
-          `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`
+          `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
         );
         setInstallationData(response.data.data);
 
         const stageResponse = await axios.get(
-          `http://88.222.214.93:8001/filedService/showStage`
+          `http://88.222.214.93:8001/filedService/showStage`,
         );
         setStageOptions(stageResponse.data?.stages || []);
       } catch (error) {
-        console.log('Error fetching data:', error.response?.data || error.message);
+        console.log(
+          'Error fetching data:',
+          error.response?.data || error.message,
+        );
         Alert.alert('Error', 'Unable to fetch data.');
       } finally {
         setLoading(false);
@@ -573,7 +576,7 @@ const ShowComplaintData = ({ route }) => {
       Alert.alert('Permission Denied', 'Camera access is required.');
       return;
     }
-
+  
     launchCamera(
       {
         mediaType: 'photo',
@@ -581,19 +584,47 @@ const ShowComplaintData = ({ route }) => {
         quality: 1,
         includeBase64: true,
       },
-      (response) => {
+      async response => {
         if (response.didCancel) {
           console.log('User cancelled camera picker');
         } else if (response.errorCode) {
           console.error('Camera Error:', response.errorMessage);
         } else if (response.assets && response.assets.length > 0) {
-          setPhotos((prevImages) => [...prevImages, response.assets[0]]);
+          try {
+            const originalPhoto = response.assets[0];
+            const resizedImage = await ImageResizer.createResizedImage(
+              originalPhoto.uri,
+              800, // New width
+              800, // New height
+              'JPEG', // Format
+              80, // Quality (0-100)
+              0, // Rotation
+              null // Output path
+            );
+
+            // Get the file size in bytes
+            const fileStats = await RNFS.stat(resizedImage.uri);
+            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); // Convert bytes to KB
+  
+            console.log(`Resized image size: ${fileSizeInKB} KB`);
+  
+            // Add the resized image to the state
+            const resizedPhoto = {
+              ...originalPhoto,
+              uri: resizedImage.uri,
+              base64: resizedImage.base64 || originalPhoto.base64,
+            };
+            setPhotos(prevImages => [...prevImages, resizedPhoto]);
+          } catch (error) {
+            console.error('Error resizing image:', error.message);
+            Alert.alert('Error', 'Failed to resize the image.');
+          }
         }
-      }
+      },
     );
   };
 
-  const handleStageChange = (itemValue) => {
+  const handleStageChange = itemValue => {
     setSelectedStage(itemValue);
     setShowRemarks(itemValue !== '');
   };
@@ -626,9 +657,11 @@ const ShowComplaintData = ({ route }) => {
       return;
     }
 
-    const photosBase64 = photos.map((photo) =>
-      photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null
-    ).filter(Boolean);
+    const photosBase64 = photos
+      .map(photo =>
+        photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null,
+      )
+      .filter(Boolean);
 
     const requestData = {
       fieldEmpID: serviceId,
@@ -647,7 +680,7 @@ const ShowComplaintData = ({ route }) => {
       setLoading(true);
       const response = await axios.put(
         `http://88.222.214.93:8001/filedService/complaintUpdate`,
-        requestData
+        requestData,
       );
 
       if (response.status === 200) {
@@ -655,7 +688,10 @@ const ShowComplaintData = ({ route }) => {
         navigation.goBack();
       }
     } catch (error) {
-      console.log('Error submitting form:', error.response?.data || error.message);
+      console.log(
+        'Error submitting form:',
+        error.response?.data || error.message,
+      );
       Alert.alert('Error', 'Failed to submit form.');
     } finally {
       setLoading(false);
@@ -772,7 +808,17 @@ const ShowComplaintData = ({ route }) => {
 
       <ScrollView horizontal style={styles.imagePreviewContainer}>
         {photos.map((photo, index) => (
-          <Image key={index} source={{ uri: photo.uri }} style={styles.imagePreview} />
+          <View key={index} style={styles.imageWrapper}>
+            <Image source={{uri: photo.uri}} style={styles.imagePreview} />
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => {
+                const updatedPhotos = photos.filter((_, i) => i !== index);
+                setPhotos(updatedPhotos);
+              }}>
+              <Icon name="close-circle" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
 
@@ -780,7 +826,7 @@ const ShowComplaintData = ({ route }) => {
       <View style={styles.pickerContainer}>
         <Picker selectedValue={selectedStage} onValueChange={handleStageChange}>
           <Picker.Item label="Select a Status" value="" />
-          {stageOptions.map(({ _id, stage }) => (
+          {stageOptions.map(({_id, stage}) => (
             <Picker.Item key={_id} label={stage} value={_id} />
           ))}
         </Picker>
@@ -807,8 +853,7 @@ const ShowComplaintData = ({ route }) => {
 
       <TouchableOpacity
         style={styles.submitButton}
-        onPress={() => navigation.goBack()}
-      >
+        onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Close</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -816,7 +861,7 @@ const ShowComplaintData = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fbd33b' },
+  container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -824,7 +869,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
   },
-  label: { fontSize: 16, marginBottom: 4, color: 'black' },
+  label: {fontSize: 16, marginBottom: 4, color: 'black'},
   input: {
     borderWidth: 1,
     borderColor: '#000',
@@ -833,6 +878,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 12,
   },
+
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 8,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: '#fff',
+    borderRadius: 50,
+    padding: 2,
+    elevation: 3,
+  },
+
   pickerContainer: {
     borderWidth: 1,
     borderColor: '#000',
@@ -856,8 +916,8 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 50,
   },
-  imagePreviewContainer: { flexDirection: 'row', marginBottom: 16 },
-  imagePreview: { width: 100, height: 100, marginRight: 8, borderRadius: 8 },
+  imagePreviewContainer: {flexDirection: 'row', marginBottom: 16},
+  imagePreview: {width: 100, height: 100, marginRight: 8, borderRadius: 8},
   submitButton: {
     backgroundColor: '#000',
     borderRadius: 8,
@@ -865,11 +925,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: 'center',
   },
-  buttonText: { color: '#fff', fontSize: 16 },
-  loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  errorText: { fontSize: 16, color: 'red' },
+  buttonText: {color: '#fff', fontSize: 16},
+  loaderContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  errorText: {fontSize: 16, color: 'red'},
 
-  nonEditable: { backgroundColor: '#e9ecef', color: '#000' },
+  nonEditable: {backgroundColor: '#e9ecef', color: '#000'},
 });
 
 export default ShowComplaintData;

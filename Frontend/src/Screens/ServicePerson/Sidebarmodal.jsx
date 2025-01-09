@@ -68,6 +68,12 @@ const Sidebarmodal = () => {
     navigation.navigate('InstallationData');
   };
 
+  const openShowLocationTracker = () => {
+    closeModal();
+    navigation.navigate('LocationTracker');
+  };
+
+
 
   useEffect(() => {
     if (!visible) {
@@ -134,6 +140,12 @@ const Sidebarmodal = () => {
             onPress={openShowInstallationData}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Service Data</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openShowLocationTracker}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Location Tracker</Text>
           </TouchableOpacity>
 
 

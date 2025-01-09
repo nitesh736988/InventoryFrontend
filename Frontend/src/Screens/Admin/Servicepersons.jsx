@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const Servicepersons = () => {
   const [servicepersons, setServicepersons] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const fetchServicepersons = async () => {
     setLoading(true);
@@ -21,13 +34,16 @@ const Servicepersons = () => {
     }
   };
 
-  const deleteServicePerson = async (id) => {
+  const deleteServicePerson = async id => {
     try {
       await axios.delete(`${API_URL}/admin/remove-service-person?id=${id}`);
       Alert.alert('Success', 'Service person deleted successfully');
-      setServicepersons((prev) => prev.filter((person) => person._id !== id));
+      setServicepersons(prev => prev.filter(person => person._id !== id));
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.message || 'Failed to delete service person');
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to delete service person',
+      );
       console.log('Error deleting data:', error);
     }
   };
@@ -36,7 +52,7 @@ const Servicepersons = () => {
     fetchServicepersons();
   }, []);
 
-  const renderServicepersons = ({ item }) => (
+  const renderServicepersons = ({item}) => (
     <View style={styles.card}>
       <Text style={styles.label}>
         Name: <Text style={styles.value}>{item.name}</Text>
@@ -47,6 +63,15 @@ const Servicepersons = () => {
       <Text style={styles.label}>
         Contact: <Text style={styles.value}>{item.contact}</Text>
       </Text>
+
+      <Text style={styles.label}>
+        Longitude: <Text style={styles.value}>{item.longitude ?? 'NA'}</Text>
+      </Text>
+
+      <Text style={styles.label}>
+        Latitude: <Text style={styles.value}>{item.latitude ?? 'NA'}</Text>
+      </Text>
+
       <TouchableOpacity
         accessibilityLabel={`Delete ${item.name}`}
         style={styles.deleteButton}
@@ -55,13 +80,35 @@ const Servicepersons = () => {
             'Confirm Deletion',
             `Are you sure you want to delete ${item.name}?`,
             [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Delete', style: 'destructive', onPress: () => deleteServicePerson(item._id) },
-            ]
+              {text: 'Cancel', style: 'cancel'},
+              {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: () => deleteServicePerson(item._id),
+              },
+            ],
           )
-        }
-      >
+        }>
         <Icon name="trash" size={20} color="#fff" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={async() => {
+          const customerId = await AsyncStorage.getItem('_id')
+          console.log("customerId", customerId);
+          navigation.navigate('EditServicePerson',
+          {
+            _id: customerId,
+            // complaintId: item?._id,
+            name: item?.name,
+            email: item?.email,
+            contact: item?.contact,
+            longitude: item?.longitude,
+            latitude: item?.latitude,
+          }
+        )}}>
+        <Icon name="edit" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -72,12 +119,16 @@ const Servicepersons = () => {
         <ActivityIndicator size="large" color="#fbd33b" />
       ) : (
         <>
-          <Text style={styles.label}>Total Service Persons: {servicepersons.length}</Text>
+          <Text style={styles.label}>
+            Total Service Persons: {servicepersons.length}
+          </Text>
           <FlatList
             data={servicepersons}
-            keyExtractor={(item) => item._id}
+            keyExtractor={item => item._id}
             renderItem={renderServicepersons}
-            ListEmptyComponent={<Text style={styles.emptyText}>No service persons found.</Text>}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No service persons found.</Text>
+            }
           />
         </>
       )}
@@ -109,13 +160,22 @@ const styles = StyleSheet.create({
   value: {
     fontWeight: 'normal',
     fontSize: 16,
-    color: '#555',
+    color: '#000',
   },
   emptyText: {
     textAlign: 'center',
     fontSize: 16,
     color: '#999',
     marginTop: 20,
+  },
+
+  button: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#4caf50',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   deleteButton: {
     marginTop: 10,

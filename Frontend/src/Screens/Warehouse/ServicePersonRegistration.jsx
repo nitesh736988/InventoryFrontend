@@ -208,6 +208,8 @@ const ServicePersonRegistration = ({ navigation }) => {
     email: '',
     contact: '',
     password: '',
+    longitude: '',
+    latitude: '',
     createdAt: new Date(),
   });
   const [loading, setLoading] = useState(false);
@@ -221,7 +223,7 @@ const ServicePersonRegistration = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
-    const { name, email, contact, password } = formData;
+    const { name, email, contact, password,longitude,latitude } = formData;
     const createdAt = new Date().toISOString();
 
     if (!name || !email || !contact || !password) {
@@ -234,7 +236,7 @@ const ServicePersonRegistration = ({ navigation }) => {
     try {
       const response = await axios.post(
         `${API_URL}/warehouse-admin/service-person-signup`,
-        { name, email, contact, password, createdAt }
+        { name, email, contact, password,longitude, latitude, createdAt }
       );
       Alert.alert('Registration Successful');
       setFormData({
@@ -242,6 +244,8 @@ const ServicePersonRegistration = ({ navigation }) => {
         email: '',
         contact: '',
         password: '',
+        longitude: '',
+        latitude: '',
         createdAt: new Date(),
       });
     } catch (error) {
@@ -261,7 +265,7 @@ const ServicePersonRegistration = ({ navigation }) => {
           <Text style={styles.title}>Service Person Registration</Text>
 
           <Text style={styles.label}>
-            Name <Text style={styles.required}>*</Text>
+            Name
           </Text>
           <TextInput
             style={styles.input}
@@ -272,7 +276,7 @@ const ServicePersonRegistration = ({ navigation }) => {
           />
 
           <Text style={styles.label}>
-            Contact <Text style={styles.required}>*</Text>
+            Contact
           </Text>
           <TextInput
             style={styles.input}
@@ -285,7 +289,31 @@ const ServicePersonRegistration = ({ navigation }) => {
           />
 
           <Text style={styles.label}>
-            Email <Text style={styles.required}>*</Text>
+          Longitude
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Longitude"
+            value={formData.longitude}
+            onChangeText={(value) => handleChange('longitude', value)}
+            keyboardType="phone-pad"
+            placeholderTextColor={'#000'}
+          />
+
+          <Text style={styles.label}>
+          Latitude
+          </Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Latitude"
+            value={formData.latitude}
+            onChangeText={(value) => handleChange('latitude', value)}
+            keyboardType="phone-pad"
+            placeholderTextColor={'#000'}
+          />
+
+          <Text style={styles.label}>
+            Email
           </Text>
           <TextInput
             style={styles.input}
@@ -297,7 +325,7 @@ const ServicePersonRegistration = ({ navigation }) => {
           />
 
           <Text style={styles.label}>
-            Password <Text style={styles.required}>*</Text>
+            Password
           </Text>
           <View style={styles.passwordContainer}>
             <TextInput
@@ -368,10 +396,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: '#070604',
   },
-  required: {
-    color: '#D82100',
-    fontSize: 18,
-  },
+
   input: {
     height: 50,
     borderColor: '#F7A600', 
