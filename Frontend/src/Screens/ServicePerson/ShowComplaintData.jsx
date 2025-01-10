@@ -523,6 +523,7 @@ const ShowComplaintData = ({route}) => {
   const [rmuNumber, setRmuNumber] = useState('');
   const [controllerNumber, setControllerNumber] = useState('');
   const [simNumber, setSimNumber] = useState('');
+  const [simPhotos, setSimPhotos] = useState([]);
   const [photos, setPhotos] = useState([]);
   const navigation = useNavigation();
   const [longitude, setLongitude] = useState('');
@@ -576,7 +577,7 @@ const ShowComplaintData = ({route}) => {
       Alert.alert('Permission Denied', 'Camera access is required.');
       return;
     }
-  
+
     launchCamera(
       {
         mediaType: 'photo',
@@ -588,7 +589,7 @@ const ShowComplaintData = ({route}) => {
         if (response.didCancel) {
           console.log('User cancelled camera picker');
         } else if (response.errorCode) {
-          console.error('Camera Error:', response.errorMessage);
+          console.log('Camera Error:', response.errorMessage);
         } else if (response.assets && response.assets.length > 0) {
           try {
             const originalPhoto = response.assets[0];
@@ -599,16 +600,70 @@ const ShowComplaintData = ({route}) => {
               'JPEG', // Format
               80, // Quality (0-100)
               0, // Rotation
-              null // Output path
+              null, // Output path
             );
 
             // Get the file size in bytes
             const fileStats = await RNFS.stat(resizedImage.uri);
             const fileSizeInKB = (fileStats.size / 1024).toFixed(2); // Convert bytes to KB
-  
+
             console.log(`Resized image size: ${fileSizeInKB} KB`);
-  
+
             // Add the resized image to the state
+            const resizedPhoto = {
+              ...originalPhoto,
+              uri: resizedImage.uri,
+              base64: resizedImage.base64 || originalPhoto.base64,
+            };
+            setSimPhotos([resizedPhoto]);
+          } catch (error) {
+            console.log('Error resizing image:', error.message);
+            Alert.alert('Error', 'Failed to resize the image.');
+          }
+        }
+      },
+    );
+  };
+
+  const openGeneralCamera = async () => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert('Permission Denied', 'Camera access is required.');
+      return;
+    }
+
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'back',
+        quality: 1,
+        includeBase64: true,
+      },
+      async response => {
+        if (response.didCancel) {
+          console.log('User cancelled camera picker');
+        } else if (response.errorCode) {
+          console.log('Camera Error:', response.errorMessage);
+        } else if (response.assets && response.assets.length > 0) {
+          try {
+            const originalPhoto = response.assets[0];
+            const resizedImage = await ImageResizer.createResizedImage(
+              originalPhoto.uri,
+              800, // New width
+              800, // New height
+              'JPEG', // Format
+              80, // Quality (0-100)
+              0, // Rotation
+              null, // Output path
+            );
+
+            // Get the file size in bytes
+            const fileStats = await RNFS.stat(resizedImage.uri);
+            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); // Convert bytes to KB
+
+            console.log(`Resized image size: ${fileSizeInKB} KB`);
+
+            // Add the resized image to the photos state
             const resizedPhoto = {
               ...originalPhoto,
               uri: resizedImage.uri,
@@ -616,7 +671,7 @@ const ShowComplaintData = ({route}) => {
             };
             setPhotos(prevImages => [...prevImages, resizedPhoto]);
           } catch (error) {
-            console.error('Error resizing image:', error.message);
+            console.log('Error resizing image:', error.message);
             Alert.alert('Error', 'Failed to resize the image.');
           }
         }
@@ -657,12 +712,17 @@ const ShowComplaintData = ({route}) => {
       return;
     }
 
-    const photosBase64 = photos
+    const simPhotosBase64 = simPhotos
       .map(photo =>
         photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null,
       )
       .filter(Boolean);
 
+    const photosBase64 = photos
+      .map(photo =>
+        photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null,
+      )
+      .filter(Boolean);
     const requestData = {
       fieldEmpID: serviceId,
       complaintId,
@@ -671,13 +731,17 @@ const ShowComplaintData = ({route}) => {
       rmuNumber,
       controllerNumber,
       simNumber,
+      simPhotos: simPhotosBase64,
       photos: photosBase64,
       longitude,
       latitude,
     };
 
+    console.log(requestData);
+
     try {
       setLoading(true);
+
       const response = await axios.put(
         `http://88.222.214.93:8001/filedService/complaintUpdate`,
         requestData,
@@ -801,8 +865,19 @@ const ShowComplaintData = ({route}) => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Images:</Text>
+      <Text style={styles.label}>Sim Photo:</Text>
       <TouchableOpacity onPress={openCamera} style={styles.imageButton}>
+        <Icon name="camera-plus" size={28} color="#000" />
+      </TouchableOpacity>
+
+      <ScrollView horizontal style={styles.imagePreviewContainer}>
+          <View style={styles.imageWrapper}>
+            { simPhotos.length !== 0 && <Image source={{uri: simPhotos[0]?.uri}} style={styles.imagePreview} />}
+          </View>
+      </ScrollView>
+
+      <Text style={styles.label}>Images:</Text>
+      <TouchableOpacity onPress={openGeneralCamera} style={styles.imageButton}>
         <Icon name="camera-plus" size={28} color="#000" />
       </TouchableOpacity>
 
