@@ -42,6 +42,7 @@ import RepairHistory from './Screens/Warehouse/RepairHistory'
 import RejectedHistory from './Screens/Warehouse/RejectedHistory';
 import LocationTracker from './Screens/ServicePerson/LocationTracker';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
+import ResolvedComplaint from './Screens/ServicePerson/ResolvedComplaint';
 
 const Stack = createStackNavigator();
 
@@ -287,6 +288,12 @@ const AppNavigator = () => {
           name="EditServicePerson"
           component={EditServicePerson}
           options={{title: 'EditServicePerson', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ResolvedComplaint"
+          component={ResolvedComplaint}
+          options={{title: 'ResolvedComplaint', headerShown: false}}
         />
 
       </Stack.Navigator>

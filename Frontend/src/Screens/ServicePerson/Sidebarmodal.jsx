@@ -73,6 +73,12 @@ const Sidebarmodal = () => {
     navigation.navigate('LocationTracker');
   };
 
+  const openShowResolvedComplaint = () => {
+    closeModal();
+    navigation.navigate('ResolvedComplaint');
+  };
+
+
 
 
   useEffect(() => {
@@ -146,6 +152,12 @@ const Sidebarmodal = () => {
             onPress={openShowLocationTracker}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Location Tracker</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openShowResolvedComplaint}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Resolved Complaint</Text>
           </TouchableOpacity>
 
 
