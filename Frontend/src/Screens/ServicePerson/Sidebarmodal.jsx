@@ -73,12 +73,10 @@ const Sidebarmodal = () => {
     navigation.navigate('LocationTracker');
   };
 
-  const openShowResolvedComplaint = () => {
+  const openShowQuaterVisit = () => {
     closeModal();
-    navigation.navigate('ResolvedComplaint');
+    navigation.navigate('QuaterVisit');
   };
-
-
 
 
   useEffect(() => {
@@ -155,10 +153,11 @@ const Sidebarmodal = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={openShowResolvedComplaint}
+            onPress={openShowQuaterVisit}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Resolved Complaint</Text>
+            <Text style={styles.optionText}>Quater Visit</Text>
           </TouchableOpacity>
+
 
 
         </Animated.View>

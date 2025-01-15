@@ -427,6 +427,7 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
+import Video from 'react-native-video';
 
 const requestCameraPermission = async () => {
   try {

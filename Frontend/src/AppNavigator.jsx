@@ -42,7 +42,8 @@ import RepairHistory from './Screens/Warehouse/RepairHistory'
 import RejectedHistory from './Screens/Warehouse/RejectedHistory';
 import LocationTracker from './Screens/ServicePerson/LocationTracker';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
-import ResolvedComplaint from './Screens/ServicePerson/ResolvedComplaint';
+import QuaterVisit from './Screens/ServicePerson/QuaterVisit';
+
 
 const Stack = createStackNavigator();
 
@@ -291,9 +292,9 @@ const AppNavigator = () => {
         />
 
         <Stack.Screen
-          name="ResolvedComplaint"
-          component={ResolvedComplaint}
-          options={{title: 'ResolvedComplaint', headerShown: false}}
+          name="QuaterVisit"
+          component={QuaterVisit}
+          options={{title: 'QuaterVisit', headerShown: false}}
         />
 
       </Stack.Navigator>
