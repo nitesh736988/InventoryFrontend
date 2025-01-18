@@ -73,9 +73,9 @@ const Sidebarmodal = () => {
     navigation.navigate('LocationTracker');
   };
 
-  const openShowQuaterVisit = () => {
+  const openShowQuaterData = () => {
     closeModal();
-    navigation.navigate('QuaterVisit');
+    navigation.navigate('QuaterData');
   };
 
 
@@ -153,9 +153,9 @@ const Sidebarmodal = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={openShowQuaterVisit}
+            onPress={openShowQuaterData}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Quater Visit</Text>
+            <Text style={styles.optionText}>Quater Data</Text>
           </TouchableOpacity>
 
 

@@ -278,7 +278,7 @@ const InOrder = () => {
               placeholderTextColor={'#000'}
             />
 
-           <Text style={{ color: 'black' }}>Controller     Number:</Text>
+           <Text style={{ color: 'black' }}>Controller Number:</Text>
             <TextInput
               value={serialNumber}
               onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}

@@ -42,7 +42,8 @@ import RepairHistory from './Screens/Warehouse/RepairHistory'
 import RejectedHistory from './Screens/Warehouse/RejectedHistory';
 import LocationTracker from './Screens/ServicePerson/LocationTracker';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
-import QuaterVisit from './Screens/ServicePerson/QuaterVisit';
+import QuaterData from './Screens/ServicePerson/QuaterData';
+import QuarterlyVisit from './Screens/ServicePerson/QuaterlyVisit';
 
 
 const Stack = createStackNavigator();
@@ -292,9 +293,15 @@ const AppNavigator = () => {
         />
 
         <Stack.Screen
-          name="QuaterVisit"
-          component={QuaterVisit}
-          options={{title: 'QuaterVisit', headerShown: false}}
+          name="QuaterData"
+          component={QuaterData}
+          options={{title: 'QuaterData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="QuarterlyVisit"
+          component={QuarterlyVisit}
+          options={{title: 'QuarterlyVisit', headerShown: false}}
         />
 
       </Stack.Navigator>

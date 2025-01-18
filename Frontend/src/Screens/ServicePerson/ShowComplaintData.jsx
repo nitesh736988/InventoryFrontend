@@ -152,21 +152,20 @@ const ShowComplaintData = ({route}) => {
             const originalPhoto = response.assets[0];
             const resizedImage = await ImageResizer.createResizedImage(
               originalPhoto.uri,
-              800, // New width
-              800, // New height
-              'JPEG', // Format
-              80, // Quality (0-100)
-              0, // Rotation
-              null, // Output path
+              800,
+              800, 
+              'JPEG', 
+              80, 
+              0, 
+              null, 
             );
 
-            // Get the file size in bytes
             const fileStats = await RNFS.stat(resizedImage.uri);
-            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); // Convert bytes to KB
+            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); 
 
             console.log(`Resized image size: ${fileSizeInKB} KB`);
 
-            // Add the resized image to the state
+
             const resizedPhoto = {
               ...originalPhoto,
               uri: resizedImage.uri,
@@ -206,21 +205,20 @@ const ShowComplaintData = ({route}) => {
             const originalPhoto = response.assets[0];
             const resizedImage = await ImageResizer.createResizedImage(
               originalPhoto.uri,
-              800, // New width
-              800, // New height
-              'JPEG', // Format
-              80, // Quality (0-100)
-              0, // Rotation
-              null, // Output path
+              800,
+              800,
+              'JPEG', 
+              80, 
+              0, 
+              null, 
             );
 
-            // Get the file size in bytes
             const fileStats = await RNFS.stat(resizedImage.uri);
-            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); // Convert bytes to KB
+            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); 
 
             console.log(`Resized image size: ${fileSizeInKB} KB`);
 
-            // Add the resized image to the photos state
+         
             const resizedPhoto = {
               ...originalPhoto,
               uri: resizedImage.uri,
@@ -242,7 +240,36 @@ const ShowComplaintData = ({route}) => {
   };
 
   const handleSubmit = async () => {
+
     const serviceId = await AsyncStorage.getItem('_id');
+
+      if (!simNumber.trim()) {
+        Alert.alert('Error', 'Please enter a SIM number.');
+        return;
+      }
+
+      // try {
+      //   console.log("simNumber", simNumber);
+
+      //   const response = await axios.get(
+      //     `http://88.222.214.93:8001/farmer/showFarmer?simNo=${simNumber}`,
+      //   );
+      //   console.log("sim response", response.data);
+
+      //   if (response.data?.success) {
+      //     Alert.alert('Success', 'SIM number is available in the database.');      
+      //   } else {
+      //     Alert.alert(
+      //       'Not Found',
+      //       'SIM number is not available in the database.',
+      //     );
+      //     return;
+      //   }
+      // } catch (error) {
+      //   console.log('Error checking SIM number:', error.response);
+      //   Alert.alert('Error', JSON.stringify(error.response));
+      //   return;
+      // }
 
     if (!selectedStage) {
       Alert.alert('Error', 'Please select a stage.');
@@ -281,28 +308,6 @@ const ShowComplaintData = ({route}) => {
       )
       .filter(Boolean);
 
-      const handleSimNumberCheck = async () => {
-        if (!simNumber.trim()) {
-          Alert.alert('Error', 'Please enter a SIM number.');
-          return;
-        }
-    
-        try {
-          const response = await axios.get(
-            `http://88.214:8001/farmer/showFarmer?simNo=${simNumber}`,
-          );
-    
-          if (response.data?.found) {
-            Alert.alert('Success', 'SIM number is available in the database.');
-          } else {
-            Alert.alert('Not Found', 'SIM number is not available in the database.');
-          }
-        } catch (error) {
-          console.log('Error checking SIM number:', error.message);
-          Alert.alert('Error', 'Failed to check SIM number.');
-        }
-      };
-
     const requestData = {
       fieldEmpID: serviceId,
       complaintId,
@@ -317,11 +322,12 @@ const ShowComplaintData = ({route}) => {
       latitude,
     };
 
+
     try {
       setLoading(true);
       const response = await axios.put(
         `http://88.222.214.93:8001/filedService/complaintUpdate`,
-        requestData,
+        requestData,           
       );
 
       if (response.status === 200) {
@@ -355,6 +361,8 @@ const ShowComplaintData = ({route}) => {
       </View>
     );
   }
+
+
 
   return (
     <ScrollView style={styles.container}>
@@ -423,6 +431,7 @@ const ShowComplaintData = ({route}) => {
         value={rmuNumber}
         onChangeText={setRmuNumber}
         placeholder="Enter RMU Number"
+        placeholderTextColor={'#000'}
       />
 
       <Text style={styles.label}>Controller Number:</Text>
@@ -431,28 +440,30 @@ const ShowComplaintData = ({route}) => {
         value={controllerNumber}
         onChangeText={setControllerNumber}
         placeholder="Enter Controller Number"
+        placeholderTextColor={'#000'}
       />
 
-<Text style={styles.label}>SIM Number:</Text>
-          <TextInput
-            style={styles.input}
-            value={simNumber}
-            onChangeText={setSimNumber}
-            placeholder="Enter SIM Number"
-            onBlur={validateSimNumber}
-          />
-          {simValidationMessage && (
-            <Text
-              style={{
-                color:
-                  simValidationMessage === 'SIM number exists in the database.'
-                    ? 'green'
-                    : 'red',
-                marginBottom: 8,
-              }}>
-              {simValidationMessage}
-            </Text>        
-          )}
+      <Text style={styles.label}>SIM Number:</Text>
+      <TextInput
+        style={styles.input}
+        value={simNumber}
+        onChangeText={setSimNumber}
+        placeholder="Enter SIM Number"
+        placeholderTextColor={'#000'}
+      
+      />
+      {/* {simValidationMessage && (
+        <Text
+          style={{
+            color:
+              simValidationMessage === 'SIM number exists in the database.'
+                ? 'green'
+                : 'red',
+            marginBottom: 8,
+          }}>
+          {simValidationMessage}
+        </Text>
+      )} */}
 
       <Text style={styles.label}>Sim Photo:</Text>
       <TouchableOpacity onPress={openCamera} style={styles.imageButton}>

@@ -84,7 +84,12 @@ const ShowComplaints = () => {
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text style={styles.infoText}>
           <Text style={styles.label}>Complainant Name:</Text>{' '}
-          {item.complainantName}
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', width: 130 }}>
+            <Text
+              numberOfLines={1}
+              ellipse="tail"
+            >{item.complainantName}</Text>
+          </View>
         </Text>
 
         {item?.Stage[0]?._id === '675aaf9c44c74418017c1dae' ? (
