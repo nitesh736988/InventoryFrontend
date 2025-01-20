@@ -68,9 +68,9 @@ const Sidebarmodal = () => {
     navigation.navigate('InstallationData');
   };
 
-  const openShowLocationTracker = () => {
+  const openShowNewInstallation = () => {
     closeModal();
-    navigation.navigate('LocationTracker');
+    navigation.navigate('NewInstallation');
   };
 
   const openShowQuaterData = () => {
@@ -147,9 +147,9 @@ const Sidebarmodal = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={openShowLocationTracker}
+            onPress={openShowNewInstallation}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Location Tracker</Text>
+            <Text style={styles.optionText}>New Installation</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

@@ -153,18 +153,17 @@ const ShowComplaintData = ({route}) => {
             const resizedImage = await ImageResizer.createResizedImage(
               originalPhoto.uri,
               800,
-              800, 
-              'JPEG', 
-              80, 
-              0, 
-              null, 
+              800,
+              'JPEG',
+              80,
+              0,
+              null,
             );
 
             const fileStats = await RNFS.stat(resizedImage.uri);
-            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); 
+            const fileSizeInKB = (fileStats.size / 1024).toFixed(2);
 
             console.log(`Resized image size: ${fileSizeInKB} KB`);
-
 
             const resizedPhoto = {
               ...originalPhoto,
@@ -207,18 +206,17 @@ const ShowComplaintData = ({route}) => {
               originalPhoto.uri,
               800,
               800,
-              'JPEG', 
-              80, 
-              0, 
-              null, 
+              'JPEG',
+              80,
+              0,
+              null,
             );
 
             const fileStats = await RNFS.stat(resizedImage.uri);
-            const fileSizeInKB = (fileStats.size / 1024).toFixed(2); 
+            const fileSizeInKB = (fileStats.size / 1024).toFixed(2);
 
             console.log(`Resized image size: ${fileSizeInKB} KB`);
 
-         
             const resizedPhoto = {
               ...originalPhoto,
               uri: resizedImage.uri,
@@ -240,36 +238,35 @@ const ShowComplaintData = ({route}) => {
   };
 
   const handleSubmit = async () => {
-
     const serviceId = await AsyncStorage.getItem('_id');
 
-      if (!simNumber.trim()) {
-        Alert.alert('Error', 'Please enter a SIM number.');
-        return;
-      }
+    if (!simNumber.trim()) {
+      Alert.alert('Error', 'Please enter a SIM number.');
+      return;
+    }
 
-      // try {
-      //   console.log("simNumber", simNumber);
+    // try {
+    //   console.log("simNumber", simNumber);
 
-      //   const response = await axios.get(
-      //     `http://88.222.214.93:8001/farmer/showFarmer?simNo=${simNumber}`,
-      //   );
-      //   console.log("sim response", response.data);
+    //   const response = await axios.get(
+    //     `http://88.222.214.93:8001/farmer/showFarmer?simNo=${simNumber}`,
+    //   );
+    //   console.log("sim response", response.data);
 
-      //   if (response.data?.success) {
-      //     Alert.alert('Success', 'SIM number is available in the database.');      
-      //   } else {
-      //     Alert.alert(
-      //       'Not Found',
-      //       'SIM number is not available in the database.',
-      //     );
-      //     return;
-      //   }
-      // } catch (error) {
-      //   console.log('Error checking SIM number:', error.response);
-      //   Alert.alert('Error', JSON.stringify(error.response));
-      //   return;
-      // }
+    //   if (response.data?.success) {
+    //     Alert.alert('Success', 'SIM number is available in the database.');
+    //   } else {
+    //     Alert.alert(
+    //       'Not Found',
+    //       'SIM number is not available in the database.',
+    //     );
+    //     return;
+    //   }
+    // } catch (error) {
+    //   console.log('Error checking SIM number:', error.response);
+    //   Alert.alert('Error', JSON.stringify(error.response));
+    //   return;
+    // }
 
     if (!selectedStage) {
       Alert.alert('Error', 'Please select a stage.');
@@ -322,12 +319,11 @@ const ShowComplaintData = ({route}) => {
       latitude,
     };
 
-
     try {
       setLoading(true);
       const response = await axios.put(
         `http://88.222.214.93:8001/filedService/complaintUpdate`,
-        requestData,           
+        requestData,
       );
 
       if (response.status === 200) {
@@ -362,23 +358,28 @@ const ShowComplaintData = ({route}) => {
     );
   }
 
-
-
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Complaint Details</Text>
 
-      <Text style={styles.label}>Farmer Name:</Text>
+      {/* <Text style={styles.label}>Farmer Name:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
         value={farmerName}
+        editable={false}
+      /> */}
+
+      <Text style={styles.label}>Farmer Name:</Text>
+      <TextInput
+        style={[styles.input, styles.nonEditable]}
+        value={farmerName || 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>Farmer Contact:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={farmerContact?.toString()}
+        value={farmerContact?.toString() || 'N/A'}
         keyboardType="phone-pad"
         editable={false}
       />
@@ -386,42 +387,42 @@ const ShowComplaintData = ({route}) => {
       <Text style={styles.label}>Father/Husband Name:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={fatherOrHusbandName}
+        value={fatherOrHusbandName || 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>Pump Type:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={pump_type}
+        value={pump_type || 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>HP:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={HP}
+        value={HP || 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>AC/DC:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={AC_DC}
+        value={AC_DC || 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>Longitude:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={longitude?.toString()}
+        value={longitude?.toString()|| 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>Latitude:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={latitude?.toString()}
+        value={latitude?.toString() }
         editable={false}
       />
 
@@ -450,7 +451,6 @@ const ShowComplaintData = ({route}) => {
         onChangeText={setSimNumber}
         placeholder="Enter SIM Number"
         placeholderTextColor={'#000'}
-      
       />
       {/* {simValidationMessage && (
         <Text
@@ -557,6 +557,7 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 16,
     marginBottom: 12,
+    color: '#000',
   },
 
   imageWrapper: {

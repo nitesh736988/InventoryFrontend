@@ -40,7 +40,7 @@ import Repaired from './Screens/Warehouse/Repaired';
 import Reject from './Screens/Warehouse/Reject'
 import RepairHistory from './Screens/Warehouse/RepairHistory'
 import RejectedHistory from './Screens/Warehouse/RejectedHistory';
-import LocationTracker from './Screens/ServicePerson/LocationTracker';
+import NewInstallation from './Screens/ServicePerson/NewInstallation';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
 import QuaterData from './Screens/ServicePerson/QuaterData';
 import QuarterlyVisit from './Screens/ServicePerson/QuaterlyVisit';
@@ -281,9 +281,9 @@ const AppNavigator = () => {
         />
 
          <Stack.Screen
-          name="LocationTracker"
-          component={LocationTracker}
-          options={{title: 'LocationTracker', headerShown: false}}
+          name="NewInstallation"
+          component={NewInstallation}
+          options={{title: 'NewInstallation', headerShown: false}}
         />
 
         <Stack.Screen
