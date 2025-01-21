@@ -44,6 +44,8 @@ import NewInstallation from './Screens/ServicePerson/NewInstallation';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
 import QuaterData from './Screens/ServicePerson/QuaterData';
 import QuarterlyVisit from './Screens/ServicePerson/QuaterlyVisit';
+import SurveyAssign from './Screens/ServicePerson/SurveyAssign';
+import Survey from './Screens/ServicePerson/Survey';
 
 
 const Stack = createStackNavigator();
@@ -303,6 +305,19 @@ const AppNavigator = () => {
           component={QuarterlyVisit}
           options={{title: 'QuarterlyVisit', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="SurveyAssign"
+          component={SurveyAssign}
+          options={{title: 'SurveyAssign', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Survey"
+          component={Survey}
+          options={{title: 'Survey', headerShown: false}}
+        />
+
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -206,6 +206,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  TextInput,
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -215,27 +216,26 @@ import {useNavigation} from '@react-navigation/native';
 const QuaterData = () => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(20);
+  const [limit] = useState(100);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
 
-  const fetchData = async (pageNum = page) => {
+  const fetchData = async (pageNum = page, filterText = searchText) => {
     const serviceBlock = await AsyncStorage.getItem('block');
     const convertedData = JSON.parse(serviceBlock);
     const dataToSend = {
       block: convertedData,
       page: pageNum,
       limit,
+      search: filterText,
     };
-    console.log('data', dataToSend);
+
     try {
       if (!refreshing) setLoading(true);
 
-      const response = await axios.post(
-        `http://88.222.214.93:8001/filedService/quarterlyList`,
-        dataToSend,
-      );
+      const response = await axios.post(`http://88.222.214.93:8001/filedService/quarterlyList`,dataToSend);
       setData(response.data.data);
       setPage(pageNum);
     } catch (error) {
@@ -259,7 +259,12 @@ const QuaterData = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchData(1); // Reload the first page when refreshing
+    await fetchData(1);
+  };
+
+  const handleSearch = async (text) => {
+    setSearchText(text);
+    await fetchData(1, text);
   };
 
   useEffect(() => {
@@ -313,7 +318,14 @@ const QuaterData = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Quarterly Data:</Text>
+      <Text style={styles.label}>QUARTERLY DATA</Text>
+
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search by farmer name or Saral ID"
+        value={searchText}
+        onChangeText={handleSearch}
+      />
 
       {loading && !refreshing ? (
         <Text>Loading...</Text>
@@ -353,10 +365,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+    textAlign:'center'
   },
   approvedText: {
     color: 'green',
     fontWeight: 'bold',
+  },
+  searchBar: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   ellipse: {
     width: 100,

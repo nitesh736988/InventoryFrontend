@@ -79,6 +79,12 @@ const Sidebarmodal = () => {
   };
 
 
+  const openShowSurveyAssign = () => {
+    closeModal();
+    navigation.navigate('SurveyAssign');
+  };
+
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -156,6 +162,12 @@ const Sidebarmodal = () => {
             onPress={openShowQuaterData}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Quater Data</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openShowSurveyAssign}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Survey Assign</Text>
           </TouchableOpacity>
 
 
