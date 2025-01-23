@@ -105,7 +105,7 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholderTextColor={'#000'}
           />
 
-<Text style={styles.label}>
+          <Text style={styles.label}>
             Email
           </Text>
           <TextInput
@@ -149,7 +149,6 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholder="Working Block"
             value={formData.block}
             onChangeText={(value) => handleChange('block', value)}
-            keyboardType="phone-pad"
             maxLength={10}
             placeholderTextColor={'#000'}
           />
@@ -162,7 +161,6 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholder="Working District"
             value={formData.district}
             onChangeText={(value) => handleChange('district', value)}
-            keyboardType="phone-pad"
             maxLength={10}
             placeholderTextColor={'#000'}
           />
@@ -175,7 +173,6 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholder="State"
             value={formData.state}
             onChangeText={(value) => handleChange('district', value)}
-            keyboardType="phone-pad"
             maxLength={10}
             placeholderTextColor={'#000'}
           />

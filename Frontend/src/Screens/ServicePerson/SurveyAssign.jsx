@@ -2,154 +2,92 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
+  StyleSheet,
+  ActivityIndicator,
   TextInput,
-  Alert,
+  RefreshControl,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const QuaterData = () => {
-  const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [limit] = useState(100);
-  const [loading, setLoading] = useState(false);
+const SurveyAssign = () => {
+  const [surveys, setSurveys] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchData = async (pageNum = page, filterText = searchText) => {
-    const serviceBlock = await AsyncStorage.getItem('block');
-    const convertedData = JSON.parse(serviceBlock);
-    const dataToSend = {
-      block: convertedData,
-      page: pageNum,
-      limit,
-      search: filterText,
-    };
-
+  const fetchSurveys = async () => {
     try {
-      if (!refreshing) setLoading(true);
-
-      const response = await axios.post(`http://88.222.214.93:8001/filedService/quarterlyList`,dataToSend);
-      setData(response.data.data);
-      setPage(pageNum);
+      const serviceId = await AsyncStorage.getItem('_id');
+      const response = await axios.get(
+        `http://88.222.214.93:8001/filedService/complaintUpdate=${serviceId}`,
+      );
+      setSurveys(response.data.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch data');
-      console.log(JSON.stringify(error.response));
+      console.log('Error fetching surveys:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  const handleNextPage = () => {
-    fetchData(page + 1);
-  };
-
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      fetchData(page - 1);
-    }
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchData(1);
-  };
-
-  const handleSearch = async (text) => {
-    setSearchText(text);
-    await fetchData(1, text);
-  };
-
   useEffect(() => {
-    fetchData();
+    fetchSurveys();
   }, []);
 
-  const renderItem = ({item}) => (
-    <View style={styles.dataItem}>
-      <View
-        style={{
-          ...styles.dataText,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
-        <Text style={styles.label}>Saral ID: {item.saralId}</Text>
-        {item?.quarterlyVisit === false ? (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('Survey', {farmerId: item?._id})
-            }>
-            <Text style={styles.approvedText}>Fill Form</Text>
-          </TouchableOpacity>
-        ) : (
-          <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
-        )}
-      </View>
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
-        <View>
-          <Text style={styles.label}>Farmer Name:</Text>
-        </View>
-        <View style={styles.ellipse}>
-          <Text numberOfLines={1} ellipsizeMode="tail">
-            {item.farmerName}
-          </Text>
-        </View>
-      </View>
-      <Text style={styles.dataText}>
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchSurveys();
+  };
+
+  const renderSurveyItem = ({item}) => (
+    <View style={styles.card}>
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Saral ID:</Text> {item.saralId}
+      </Text>
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Farmer Name:</Text> {item.farmerName}
+      </Text>
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Father/Husband Name:</Text>{' '}
+        {item.fatherOrHusbandName}
+      </Text>
+      <Text style={styles.infoText}>
         <Text style={styles.label}>Contact:</Text> {item.contact}
       </Text>
-      <Text style={styles.dataText}>
+      <Text style={styles.infoText}>
         <Text style={styles.label}>State:</Text> {item.state}
-      </Text>
-      <Text style={styles.dataText}>
-        <Text style={styles.label}>District:</Text> {item.district}
-      </Text>
-      <Text style={styles.dataText}>
-        <Text style={styles.label}>Block:</Text> {item.block}
       </Text>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>SURVEY DATA</Text>
-
+      <Text style={styles.header}>Survey Assign</Text>
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by farmer name or Saral ID"
-        value={searchText}
-        onChangeText={handleSearch}
+        placeholder="Search by Farmer Name"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
       />
-
-      {loading && !refreshing ? (
-        <Text>Loading...</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" style={styles.loadingIndicator} />
       ) : (
         <FlatList
-          data={data}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={renderItem}
-          onRefresh={handleRefresh}
-          refreshing={refreshing}
+          data={surveys.filter(item =>
+            item.farmerName.toLowerCase().includes(searchQuery.toLowerCase()),
+          )}
+          keyExtractor={item => item.saralId.toString()}
+          renderItem={renderSurveyItem}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No surveys found.</Text>
+          }
         />
       )}
-
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          onPress={handlePreviousPage}
-          style={[styles.pageButton, page === 1 && styles.disabledButton]}
-          disabled={page === 1}>
-          <Text style={styles.buttonText}>Previous</Text>
-        </TouchableOpacity>
-        <Text style={styles.pageInfo}>Page: {page}</Text>
-        <TouchableOpacity onPress={handleNextPage} style={styles.pageButton}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -157,68 +95,55 @@ const QuaterData = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
     backgroundColor: '#fbd33b',
   },
-  label: {
-    fontSize: 16,
+  header: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign:'center'
+    marginBottom: 16,
+    textAlign: 'center',
+    color: '#000',
   },
-  approvedText: {
-    color: 'green',
-    fontWeight: 'bold',
-  },
-  searchBar: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  ellipse: {
-    width: 100,
-  },
-  dataItem: {
-    padding: 15,
-    backgroundColor: '#fff',
+  card: {
+    padding: 16,
     marginVertical: 8,
+    backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
     shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
-  dataText: {
-    fontSize: 14,
-    marginVertical: 2,
-    color: '#444',
+  infoText: {
+    color: '#000',
+    marginBottom: 4,
   },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  label: {
+    fontWeight: 'bold',
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
   },
-  pageButton: {
-    padding: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  pageInfo: {
+  searchBar: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 16,
+    paddingHorizontal: 10,
     fontSize: 16,
-    fontWeight: 'bold',
+    backgroundColor: '#fff',
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#555',
+    marginTop: 20,
   },
 });
 
-export default QuaterData;
+export default SurveyAssign;

@@ -269,26 +269,9 @@ const InOrder = () => {
               </View>
             ))}
 
-            <Text style={{ color: 'black' }}>Sim Number:</Text>
-            <TextInput
-              value={serialNumber}
-              onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}
-              placeholder="Enter Serial Number"
-              style={styles.input}
-              placeholderTextColor={'#000'}
-            />
-
-           <Text style={{ color: 'black' }}>Controller Number:</Text>
-            <TextInput
-              value={serialNumber}
-              onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}
-              placeholder="Enter Serial Number"
-              style={styles.input}
-              placeholderTextColor={'#000'}
-            />
 
             <Text style={{ color: 'black' }}>Serial Number:</Text>
-            <TextInput
+            <TextInput             
               value={serialNumber}
               onChangeText={text => setFormData(prevState => ({ ...prevState, serialNumber: text }))}
               placeholder="Enter Serial Number"
@@ -298,7 +281,7 @@ const InOrder = () => {
 
             <Text style={{ color: 'black' }}>Warehouse:</Text>
             <Picker
-              selectedValue={selectedWarehouse}
+              selectedValue={selectedWarehouse} 
               style={styles.picker}
               onValueChange={value => setFormData(prevState => ({ ...prevState, selectedWarehouse: value }))}
             >

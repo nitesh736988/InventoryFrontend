@@ -567,6 +567,25 @@ const Sidebar = ({userType}) => {
                 Rejected History
               </Text>
             </TouchableOpacity>
+
+
+            <TouchableOpacity
+              onPress={() => navigateAndHighlight('Logout')}
+              style={[
+                styles.optionButton,
+                activeSection === 'Logout' &&
+                  styles.activeOptionButton,
+              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  activeSection === 'Logout' &&
+                    styles.activeOptionText,
+                ]}>
+                Logout
+              </Text>
+            </TouchableOpacity>
+
           </>
         </Animated.View>
       </Modal>

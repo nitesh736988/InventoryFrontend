@@ -215,29 +215,27 @@ import {useNavigation} from '@react-navigation/native';
 
 const QuaterData = () => {
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [limit] = useState(100);
+  const [filteredData, setFilteredData] = useState([]); 
+  const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const navigation = useNavigation();
 
-  const fetchData = async (pageNum = page, filterText = searchText) => {
+  const fetchData = async () => {
     const serviceBlock = await AsyncStorage.getItem('block');
     const convertedData = JSON.parse(serviceBlock);
     const dataToSend = {
       block: convertedData,
-      page: pageNum,
-      limit,
-      search: filterText,
     };
-
     try {
       if (!refreshing) setLoading(true);
 
-      const response = await axios.post(`http://88.222.214.93:8001/filedService/quarterlyList`,dataToSend);
+      const response = await axios.post(
+        `http://88.222.214.93:8001/filedService/quarterlyList`,
+        dataToSend,
+      );
       setData(response.data.data);
-      setPage(pageNum);
+      setFilteredData(response.data.data); 
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch data');
       console.log(JSON.stringify(error.response));
@@ -247,25 +245,25 @@ const QuaterData = () => {
     }
   };
 
-  const handleNextPage = () => {
-    fetchData(page + 1);
-  };
-
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      fetchData(page - 1);
-    }
-  };
-
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchData(1);
+    await fetchData(); 
   };
 
-  const handleSearch = async (text) => {
+  const handleSearch = (text) => {
     setSearchText(text);
-    await fetchData(1, text);
+    if (text.trim() === '') {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter((item) =>
+        item.farmerName.toLowerCase().includes(text.toLowerCase()) ||
+        item.saralId?.toString().includes(text) ||
+        item.contact?.toString().includes(text)
+      );
+      setFilteredData(filtered);
+    }
   };
+  
 
   useEffect(() => {
     fetchData();
@@ -319,10 +317,9 @@ const QuaterData = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>QUARTERLY DATA</Text>
-
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by farmer name or Saral ID"
+        placeholder="Search by Farmer Name, Saral Id, Contact"
         value={searchText}
         onChangeText={handleSearch}
       />
@@ -331,26 +328,13 @@ const QuaterData = () => {
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={data}
+          data={filteredData}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderItem}
           onRefresh={handleRefresh}
           refreshing={refreshing}
         />
       )}
-
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          onPress={handlePreviousPage}
-          style={[styles.pageButton, page === 1 && styles.disabledButton]}
-          disabled={page === 1}>
-          <Text style={styles.buttonText}>Previous</Text>
-        </TouchableOpacity>
-        <Text style={styles.pageInfo}>Page: {page}</Text>
-        <TouchableOpacity onPress={handleNextPage} style={styles.pageButton}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -365,19 +349,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    textAlign:'center'
+    textAlign: 'center',
+  },
+  searchBar: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
   },
   approvedText: {
     color: 'green',
     fontWeight: 'bold',
-  },
-  searchBar: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
   },
   ellipse: {
     width: 100,
@@ -397,28 +381,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginVertical: 2,
     color: '#444',
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  pageButton: {
-    padding: 10,
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  pageInfo: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
