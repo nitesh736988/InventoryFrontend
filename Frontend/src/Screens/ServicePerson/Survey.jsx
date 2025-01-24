@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator,
   PermissionsAndroid,
   Platform,
 } from 'react-native';
@@ -39,7 +40,9 @@ const requestCameraPermission = async () => {
   return true;
 };
 
-const Survey = () => {
+const Survey = ({ route }) => {
+  const { farmerId } = route.params;
+
   const [images, setImages] = useState({
     consentLetter: [],
     consentWithFarmer: [],
@@ -48,6 +51,8 @@ const Survey = () => {
     aadharFront: [],
     aadharBack: [],
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleImageUpload = async (field) => {
     const hasPermission = await requestCameraPermission();
@@ -113,35 +118,43 @@ const Survey = () => {
     }
 
     try {
+      setLoading(true);
       const userId = await AsyncStorage.getItem('_id');
+      if (!userId) {
+        Alert.alert('Error', 'User ID is missing.');
+        return;
+      }
+
+      const imagesBase64 = {};
+      fields.forEach((field) => {
+        imagesBase64[field] = images[field].map((photo) =>
+          photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null,
+        ).filter(Boolean);
+      });
+
       const formData = {
         farmerId,
         submitDate: new Date().toISOString(),
-        images,
+        consentLetter: imagesBase64,
+        consentWithFarmer: imagesBase64,
+        landDoc: imagesBase64,
+        aadharFront: imagesBase64,
+        aadharBack: imagesBase64,
       };
+
+      console.log('form data', images);
 
       const response = await axios.post(
         'http://88.222.214.93:8001/filedService/addInstallationSurvey',
         formData,
       );
-
-      Alert.alert('Success', 'Data submitted successfully!', [
-        {
-          text: 'OK',
-          onPress: () =>
-            setImages({
-              consentLetter: [],
-              consentWithFarmer: [],
-              landDoc: [],
-              challan: [],
-              aadharFront: [],
-              aadharBack: [],
-            }),
-        },
-      ]);
+      console.log(response.data.data)
+      Alert.alert('Success', 'Data submitted successfully!')
     } catch (error) {
-      console.log('Error submitting form:', error);
+      console.log('Error submitting form:', JSON.stringify(error.response.message));
       Alert.alert('Error', 'Failed to submit data.');
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -176,9 +189,7 @@ const Survey = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text>Survey</Text>
-        </View>
+        <Text style={styles.header}>Survey</Text>
         {renderImageSection('consentLetter', 'Consent Letter')}
         {renderImageSection('consentWithFarmer', 'Consent with Farmer')}
         {renderImageSection('landDoc', 'Land Document')}
@@ -186,8 +197,15 @@ const Survey = () => {
         {renderImageSection('aadharFront', 'Aadhar Front')}
         {renderImageSection('aadharBack', 'Aadhar Back')}
 
-        <TouchableOpacity onPress={handleFormSubmit} style={styles.submitButton}>
-          <Text style={styles.buttonText}>Submit Data</Text>
+        <TouchableOpacity
+          onPress={handleFormSubmit}
+          style={styles.submitButton}
+          disabled={loading}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Submit Data</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -248,6 +266,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 5,
+    opacity: 1,
   },
   buttonText: {
     color: '#fff',
@@ -258,7 +277,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: 'black'
+    textAlign: 'center',
+    color: '#000',
   },
 });
 

@@ -7,25 +7,33 @@ import {
   ActivityIndicator,
   TextInput,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
 
 const SurveyAssign = () => {
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState(null);
+
+  const navigation = useNavigation();
 
   const fetchSurveys = async () => {
     try {
+      setError(null);
       const serviceId = await AsyncStorage.getItem('_id');
+
       const response = await axios.get(
-        `http://88.222.214.93:8001/filedService/complaintUpdate=${serviceId}`,
+        `http://88.222.214.93:8001/filedService/installationSurveyList?fieldEmpID=${serviceId}`,
       );
       setSurveys(response.data.data);
     } catch (error) {
-      console.log('Error fetching surveys:', error);
+      console.error('Error fetching surveys:', error);
+      setError('Failed to fetch surveys. Please try again later.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -42,43 +50,68 @@ const SurveyAssign = () => {
   };
 
   const renderSurveyItem = ({item}) => (
-    <View style={styles.card}>
+    <View key={item._id} style={styles.card}>
+      <View style={styles.statusBadge}>
+      <Text style={styles.label}>Saral ID: {item.farmerId.saralId}</Text>
+        {item?.farmerId?.quarterlyVisit === false ? (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Survey', {farmerId: item?.farmerId?._id})
+            }>
+            <Text style={styles.fillFormText}>Fill Form</Text>
+            
+          </TouchableOpacity>
+        ) : (
+          <Text style={styles.resolvedText}>Resolved</Text>
+        )}
+      </View>
       <Text style={styles.infoText}>
-        <Text style={styles.label}>Saral ID:</Text> {item.saralId}
-      </Text>
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Farmer Name:</Text> {item.farmerName}
+        <Text style={styles.label}>Farmer Name:</Text> {item.farmerId.farmerName}
       </Text>
       <Text style={styles.infoText}>
         <Text style={styles.label}>Father/Husband Name:</Text>{' '}
-        {item.fatherOrHusbandName}
+        {item.farmerId.fatherOrHusbandName || 'N/A'}
       </Text>
       <Text style={styles.infoText}>
-        <Text style={styles.label}>Contact:</Text> {item.contact}
+        <Text style={styles.label}>Contact:</Text> {item.farmerId.contact}
       </Text>
       <Text style={styles.infoText}>
-        <Text style={styles.label}>State:</Text> {item.state}
+        <Text style={styles.label}>State:</Text> {item.farmerId.state}
       </Text>
     </View>
   );
-
+  
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Survey Assign</Text>
+
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by Farmer Name"
+        placeholder="Search by Farmer Name or Saral ID"
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
       {loading ? (
-        <ActivityIndicator size="large" color="#000" style={styles.loadingIndicator} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#000" />
+        </View>
       ) : (
         <FlatList
-          data={surveys.filter(item =>
-            item.farmerName.toLowerCase().includes(searchQuery.toLowerCase()),
+          data={surveys.filter(
+            item =>
+              (item.farmerId.farmerName &&
+                item.farmerId.farmerName
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())) ||
+              (item.farmerId.saralId &&
+                item.farmerId.saralId
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())),
           )}
-          keyExtractor={item => item.saralId.toString()}
+          keyExtractor={item => item._id}
           renderItem={renderSurveyItem}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
@@ -105,6 +138,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#000',
   },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  approvedText: {
+    color: 'green',
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
   card: {
     padding: 16,
     marginVertical: 8,
@@ -115,6 +158,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    position: 'relative',
+  },
+
+  statusBadge: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+
+  fillFormText: {
+    color: '#007bff',
+    fontWeight: 'bold',
+  },
+  resolvedText: {
+    color: 'green',
+    fontWeight: 'bold',
   },
   infoText: {
     color: '#000',
@@ -122,8 +181,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: 'bold',
+    color: 'black'
   },
-  loadingIndicator: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -138,11 +198,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#fff',
   },
+  fillFormButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    marginTop: 8,
+  },
+  fillFormButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   emptyText: {
     textAlign: 'center',
     fontSize: 16,
     color: '#555',
     marginTop: 20,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 16,
   },
 });
 

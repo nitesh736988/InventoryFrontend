@@ -94,6 +94,12 @@ const SidebarModal = () => {
     navigation.navigate('AddItem');
   };
 
+  const openSurvayRegistration = () => {
+    closeModal();
+    navigation.navigate('SurvayRegistration');
+  };
+
+
   useEffect(() => {
     if (!visible) {
       slideAnim.setValue(-300);
@@ -184,6 +190,12 @@ const SidebarModal = () => {
             onPress={openInstallationHistory}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Installation History</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openSurvayRegistration}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Survay Registration</Text>
           </TouchableOpacity>
 
 
