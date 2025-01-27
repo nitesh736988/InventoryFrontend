@@ -40,13 +40,15 @@ import Repaired from './Screens/Warehouse/Repaired';
 import Reject from './Screens/Warehouse/Reject'
 import RepairHistory from './Screens/Warehouse/RepairHistory'
 import RejectedHistory from './Screens/Warehouse/RejectedHistory';
-import NewInstallation from './Screens/ServicePerson/NewInstallation';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
 import QuaterData from './Screens/ServicePerson/QuaterData';
 import QuarterlyVisit from './Screens/ServicePerson/QuaterlyVisit';
 import SurveyAssign from './Screens/ServicePerson/SurveyAssign';
 import Survey from './Screens/ServicePerson/Survey';
 import SurvayRegistration from './Screens/Admin/SurvayRegistration';
+import NewInstallation from './Screens/Warehouse/NewInstallation';
+import AddSystem from './Screens/Warehouse/AddSystem';
+import AddSystemData from './Screens/Warehouse/AddSystemData';
 
 
 const Stack = createStackNavigator();
@@ -283,12 +285,6 @@ const AppNavigator = () => {
           options={{title: 'RejectedHistory', headerShown: false}}
         />
 
-         <Stack.Screen
-          name="NewInstallation"
-          component={NewInstallation}
-          options={{title: 'NewInstallation', headerShown: false}}
-        />
-
         <Stack.Screen
           name="EditServicePerson"
           component={EditServicePerson}
@@ -325,8 +321,24 @@ const AppNavigator = () => {
           options={{title: 'SurvayRegistration', headerShown: false}}
         />
 
+        <Stack.Screen
+          name="NewInstallation"
+          component={NewInstallation}
+          options={{title: 'NewInstallation', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="AddSystem"
+          component={AddSystem}
+          options={{title: 'AddSystem', headerShown: false}}
+        />
 
 
+        <Stack.Screen
+          name="AddSystemData"
+          component={AddSystemData}
+          options={{title: 'AddSystemData', headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

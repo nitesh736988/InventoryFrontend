@@ -309,8 +309,12 @@ const QuaterData = () => {
         <Text style={styles.label}>District:</Text> {item.district}
       </Text>
       <Text style={styles.dataText}>
+        <Text style={styles.label}>Village:</Text> {item.village}
+      </Text>
+      <Text style={styles.dataText}>
         <Text style={styles.label}>Block:</Text> {item.block}
       </Text>
+
     </View>
   );
 

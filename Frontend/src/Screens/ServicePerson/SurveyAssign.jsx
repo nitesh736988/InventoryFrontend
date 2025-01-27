@@ -32,7 +32,7 @@ const SurveyAssign = () => {
       );
       setSurveys(response.data.data);
     } catch (error) {
-      console.error('Error fetching surveys:', error);
+      console.log('Error fetching surveys:', error);
       setError('Failed to fetch surveys. Please try again later.');
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ const SurveyAssign = () => {
     <View key={item._id} style={styles.card}>
       <View style={styles.statusBadge}>
       <Text style={styles.label}>Saral ID: {item.farmerId.saralId}</Text>
-        {item?.farmerId?.quarterlyVisit === false ? (
+        {item?.farmerId?.installationSurvey === false ? (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('Survey', {farmerId: item?.farmerId?._id})

@@ -28,9 +28,8 @@ const requestCameraPermission = async () => {
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
-        },
+        }
       );
-
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
       Alert.alert('Error', 'Failed to request camera permission.');
@@ -83,7 +82,7 @@ const Survey = ({ route }) => {
               'JPEG',
               80,
               0,
-              null,
+              null
             );
 
             const resizedPhoto = {
@@ -101,7 +100,7 @@ const Survey = ({ route }) => {
             Alert.alert('Error', 'Failed to resize the image.');
           }
         }
-      },
+      }
     );
   };
 
@@ -112,7 +111,7 @@ const Survey = ({ route }) => {
     if (incompleteFields.length > 0) {
       Alert.alert(
         'Error',
-        `Please upload images for: ${incompleteFields.join(', ')}`,
+        `Please upload images for: ${incompleteFields.join(', ')}`
       );
       return;
     }
@@ -127,34 +126,34 @@ const Survey = ({ route }) => {
 
       const imagesBase64 = {};
       fields.forEach((field) => {
-        imagesBase64[field] = images[field].map((photo) =>
-          photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null,
-        ).filter(Boolean);
+        imagesBase64[field] = images[field]
+          .map((photo) =>
+            photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null
+          )
+          .filter(Boolean);
       });
 
       const formData = {
         farmerId,
         submitDate: new Date().toISOString(),
-        consentLetter: imagesBase64,
-        consentWithFarmer: imagesBase64,
-        landDoc: imagesBase64,
-        aadharFront: imagesBase64,
-        aadharBack: imagesBase64,
+        consentLetter: imagesBase64.consentLetter,
+        consentWithFarmer: imagesBase64.consentWithFarmer,
+        landDoc: imagesBase64.landDoc,
+        challan: imagesBase64.challan,
+        aadharFront: imagesBase64.aadharFront,
+        aadharBack: imagesBase64.aadharBack,
       };
-
-      console.log('form data', images);
 
       const response = await axios.post(
         'http://88.222.214.93:8001/filedService/addInstallationSurvey',
-        formData,
+        formData
       );
-      console.log(response.data.data)
-      Alert.alert('Success', 'Data submitted successfully!')
+      Alert.alert('Success', 'Data submitted successfully!');
     } catch (error) {
-      console.log('Error submitting form:', JSON.stringify(error.response.message));
+      console.log('Error submitting form:', JSON.stringify(error.response));
       Alert.alert('Error', 'Failed to submit data.');
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 

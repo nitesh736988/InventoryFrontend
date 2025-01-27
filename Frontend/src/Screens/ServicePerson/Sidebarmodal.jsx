@@ -68,10 +68,6 @@ const Sidebarmodal = () => {
     navigation.navigate('InstallationData');
   };
 
-  const openShowNewInstallation = () => {
-    closeModal();
-    navigation.navigate('NewInstallation');
-  };
 
   const openShowQuaterData = () => {
     closeModal();
@@ -150,12 +146,6 @@ const Sidebarmodal = () => {
             onPress={openShowInstallationData}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Service Data</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={openShowNewInstallation}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>New Installation</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
