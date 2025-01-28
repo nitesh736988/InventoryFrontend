@@ -14,18 +14,19 @@ import { API_URL } from '@env';
 
 const AddSystemData = () => {
   const [itemName, setItemName] = useState('');
-  const [systemId,  setSystemId ] = useState('');
+  const [systemId, setSystemId] = useState('');
   const [quantity, setQuantity] = useState('');
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
-        console.log('System data:', response.data.data);
-        setItems(response.data.data);
+        const { data } = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+        console.log('System data:', data.data);
+        setItems(data.data);
       } catch (error) {
         console.error('Failed to fetch items:', error);
+        Alert.alert('Error', 'Unable to fetch system items. Please try again later.');
       }
     };
 
@@ -33,30 +34,27 @@ const AddSystemData = () => {
   }, []);
 
   const handleSubmit = async () => {
-    if (!itemName || !quantity) {
+    if (!systemId || !itemName || !quantity) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
     }
 
-    const newItem = {
-      itemName,
-      quantity,
-      systemId
-
-    };
-    console.log(systemId);
+    const newItem = { systemId, itemName, quantity };
+    console.log("send data", newItem)
 
     try {
       console.log('Submitting:', newItem);
-      const response = await axios.post(`${API_URL}/warehouse-admin/add-system-item`, newItem);
-      console.log('Response:', response.data.data);
+      const { data } = await axios.post(`${API_URL}/warehouse-admin/add-system-item`, newItem);
+      console.log('Response:', data.data);
 
       Alert.alert('Success', 'Item data has been submitted.');
+    
       setItemName('');
+      setSystemId('');
       setQuantity('');
     } catch (error) {
-      console.error('Error submitting data:', error);
-      Alert.alert('Error', 'Something went wrong while submitting.');
+      console.log('Error submitting data:', error);
+      Alert.alert('Error', JSON.stringify(Response.error.message));
     }
   };
 
@@ -65,31 +63,38 @@ const AddSystemData = () => {
       <Text style={styles.heading}>Add System Form</Text>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Item Name:</Text>
+      
+        <Text style={styles.label}>System ID:</Text>
         <Picker
-          selectedValue={`${itemName}%${systemId}`} 
-          onValueChange={(itemValue) => {
-            console.log(itemValue);
-                const data = itemValue.split('%');
-                setItemName(data[0]);
-                setSystemId(data[1])
-            }}
+          selectedValue={systemId}
+          onValueChange={(itemValue) => setSystemId(itemValue)}
           style={styles.input}
         >
-          <Picker.Item label="Select Item" value="" />
+          <Picker.Item label="Select System" value="" />
           {items.map((item) => (
-            <Picker.Item key={item._id} label={item?.systemName} value={item?.systemName+'%'+item?._id} />
+            <Picker.Item key={item._id} label={item.systemName} value={item._id} />
           ))}
         </Picker>
+        <Text style={styles.label}>Item Name:</Text>
+        <TextInput
+          value={itemName}
+          onChangeText={setItemName}
+          style={styles.input}
+          placeholder="Enter item name"
+          placeholderTextColor="#aaa"
+        />
 
         <Text style={styles.label}>Quantity:</Text>
         <TextInput
           value={quantity}
           onChangeText={setQuantity}
           style={styles.input}
+          placeholder="Enter quantity"
+          placeholderTextColor="#aaa"
           keyboardType="numeric"
         />
 
+        {/* Submit Button */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
@@ -105,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   heading: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,

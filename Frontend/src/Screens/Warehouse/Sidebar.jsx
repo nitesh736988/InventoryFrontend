@@ -561,8 +561,6 @@ const Sidebar = ({userType}) => {
             </>
           )}
 
-      
-
           <TouchableOpacity
             onPress={() => toggleSection('history')}
             style={styles.optionButton}>
@@ -594,6 +592,14 @@ const Sidebar = ({userType}) => {
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigateAndHighlight('RejectHistory')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Reject History</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigateAndHighlight('ApprovalData')} style={styles.optionButton}>
+                <Text style={styles.optionText}>Approval Data</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigateAndHighlight('ApprovalHistoryData')} style={styles.optionButton}>
+                <Text style={styles.optionText}>Approval History Data</Text>
               </TouchableOpacity>
             </>
           )}
@@ -633,6 +639,21 @@ const Sidebar = ({userType}) => {
               <TouchableOpacity onPress={() => navigateAndHighlight('Reject')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Reject</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigateAndHighlight('ItemStockUpdate')} style={styles.optionButton}>
+                <Text style={styles.optionText}>Item Stock Update</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigateAndHighlight('NewInstallation')} style={styles.optionButton}>
+                <Text style={styles.optionText}>New Installation</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigateAndHighlight('AssignSystem')} style={styles.optionButton}>
+                <Text style={styles.optionText}>Assign System</Text>
+              </TouchableOpacity>
+
+
+              
             </>
           )}
         </Animated.View>

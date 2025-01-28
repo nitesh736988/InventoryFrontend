@@ -49,6 +49,8 @@ import SurvayRegistration from './Screens/Admin/SurvayRegistration';
 import NewInstallation from './Screens/Warehouse/NewInstallation';
 import AddSystem from './Screens/Warehouse/AddSystem';
 import AddSystemData from './Screens/Warehouse/AddSystemData';
+import ItemStockUpdate from './Screens/Warehouse/ItemStockUpdate';
+import AssignSystem from './Screens/Warehouse/AssignSystem';
 
 
 const Stack = createStackNavigator();
@@ -339,6 +341,20 @@ const AppNavigator = () => {
           component={AddSystemData}
           options={{title: 'AddSystemData', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="ItemStockUpdate"
+          component={ItemStockUpdate}
+          options={{title: 'ItemStockUpdate', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="AssignSystem"
+          component={AssignSystem}
+          options={{title: 'AssignSystem', headerShown: false}}
+        />
+
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
