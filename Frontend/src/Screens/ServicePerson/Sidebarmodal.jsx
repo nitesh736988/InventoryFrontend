@@ -75,9 +75,9 @@ const Sidebarmodal = () => {
   };
 
 
-  const openShowSurveyAssign = () => {
+  const openShowSurveyAssignData = () => {
     closeModal();
-    navigation.navigate('SurveyAssign');
+    navigation.navigate('SurveyAssignData');
   };
 
 
@@ -155,9 +155,9 @@ const Sidebarmodal = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={openShowSurveyAssign}
+            onPress={openShowSurveyAssignData}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Survey Assign</Text>
+            <Text style={styles.optionText}>Survey Assign Data</Text>
           </TouchableOpacity>
 
 

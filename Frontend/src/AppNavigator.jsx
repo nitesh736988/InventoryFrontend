@@ -43,14 +43,18 @@ import RejectedHistory from './Screens/Warehouse/RejectedHistory';
 import EditServicePerson from './Screens/Admin/EditServicePerson';
 import QuaterData from './Screens/ServicePerson/QuaterData';
 import QuarterlyVisit from './Screens/ServicePerson/QuaterlyVisit';
-import SurveyAssign from './Screens/ServicePerson/SurveyAssign';
-import Survey from './Screens/ServicePerson/Survey';
+import SurveyAssign from './Screens/Survey/SurveyAssign';
+import Survey from './Screens/Survey/Survey';
 import SurvayRegistration from './Screens/Admin/SurvayRegistration';
 import NewInstallation from './Screens/Warehouse/NewInstallation';
 import AddSystem from './Screens/Warehouse/AddSystem';
 import AddSystemData from './Screens/Warehouse/AddSystemData';
 import ItemStockUpdate from './Screens/Warehouse/ItemStockUpdate';
 import AssignSystem from './Screens/Warehouse/AssignSystem';
+import SurvayNavigation from './Screens/Survey/SurvayNavigation';
+import SurveyDashboard from './Screens/Survey/SurveyDashboard';
+import SurveyAssignData from './Screens/ServicePerson/SurveyAssignData'
+import SurvayData from './Screens/ServicePerson/SurveyData'
 
 
 const Stack = createStackNavigator();
@@ -352,6 +356,30 @@ const AppNavigator = () => {
           name="AssignSystem"
           component={AssignSystem}
           options={{title: 'AssignSystem', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SurvayNavigation"
+          component={SurvayNavigation}
+          options={{title: 'SurvayNavigation', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SurveyDashboard"
+          component={SurveyDashboard}
+          options={{title: 'SurveyDashboard', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SurveyAssignData"
+          component={SurveyAssignData}
+          options={{title: 'SurveyAssignData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SurveyData"
+          component={SurvayData}
+          options={{title: 'SurveyData', headerShown: false}}
         />
 
         

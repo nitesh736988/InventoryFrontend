@@ -272,6 +272,12 @@ const LoginPage = () => {
       } else if (role === 'admin') {
         navigation.navigate('Navigation');
       }
+      else if (role === 'surveyperson') {
+        const { id} = response.data;
+        console.log("Login Person id", id);
+        await AsyncStorage.setItem("_id", id);
+        navigation.navigate('SurvayNavigation');
+      }
     } catch (error) {
       if (error.response) {
         switch (error.response.status) {
@@ -309,7 +315,7 @@ const LoginPage = () => {
           <Picker.Item label="Admin" value="admin" />
           <Picker.Item label="Warehouse Admin" value="warehouseAdmin" />
           <Picker.Item label="ServicePerson" value="serviceperson" />
-          <Picker.Item label="Survey" value="Survey" />
+          <Picker.Item label="Survey" value="surveyperson" />
         </Picker>
         {role !== '' && (
           <>

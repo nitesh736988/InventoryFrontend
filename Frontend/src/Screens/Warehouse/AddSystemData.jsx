@@ -93,8 +93,6 @@ const AddSystemData = () => {
           placeholderTextColor="#aaa"
           keyboardType="numeric"
         />
-
-        {/* Submit Button */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>

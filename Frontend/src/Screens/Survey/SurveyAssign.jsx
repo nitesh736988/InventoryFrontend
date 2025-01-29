@@ -53,7 +53,7 @@ const SurveyAssign = () => {
     <View key={item._id} style={styles.card}>
       <View style={styles.statusBadge}>
       <Text style={styles.label}>Saral ID: {item.farmerId.saralId}</Text>
-        {item?.farmerId?.installationSurvey === false ? (
+        {item?.installationSurvey === false ? (
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('Survey', {farmerId: item?.farmerId?._id})
