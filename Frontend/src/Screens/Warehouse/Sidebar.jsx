@@ -578,9 +578,7 @@ const Sidebar = ({userType}) => {
           </TouchableOpacity>
           {expandedSections.history && (
             <>
-              <TouchableOpacity onPress={() => navigateAndHighlight('RepairRejectData')} style={styles.optionButton}>
-                <Text style={styles.optionText}>Repair-Reject Data</Text>
-              </TouchableOpacity>
+
               <TouchableOpacity onPress={() => navigateAndHighlight('UpperHistory')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Upper History</Text>
               </TouchableOpacity>
@@ -590,7 +588,7 @@ const Sidebar = ({userType}) => {
               <TouchableOpacity onPress={() => navigateAndHighlight('RepairHistory')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Repair History</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('RejectHistory')} style={styles.optionButton}>
+              <TouchableOpacity onPress={() => navigateAndHighlight('RejectedHistory')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Reject History</Text>
               </TouchableOpacity>
 
@@ -633,7 +631,7 @@ const Sidebar = ({userType}) => {
               <TouchableOpacity onPress={() => navigateAndHighlight('AddSystemData')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Add System Data</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('Repair')} style={styles.optionButton}>
+              <TouchableOpacity onPress={() => navigateAndHighlight('Repaired')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Repair</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => navigateAndHighlight('Reject')} style={styles.optionButton}>

@@ -12,7 +12,7 @@ import Servicepersons from './Screens/Admin/Servicepersons';
 import WarehouseNavigation from './Screens/Warehouse/WarehouseNavigation';
 import ServicePersonRegistration from './Screens/Warehouse/ServicePersonRegistration';
 import RepairReject from './Screens/Admin/RepairReject';
-import RepairRejectData from './Screens/Warehouse/RepairRejectData';
+// import RepairRejectData from './Screens/Warehouse/RepairRejectData';
 import AddTransaction from './Screens/Warehouse/AddTransaction';
 import ServicePersonNavigation from './Screens/ServicePerson/ServicePersonNavigation';
 import ApprovalHistoryData from './Screens/Warehouse/ApprovalHistoryData';
@@ -129,11 +129,11 @@ const AppNavigator = () => {
           options={{title: 'RepairReject', headerShown: false}}
         />
 
-        <Stack.Screen
+        {/* <Stack.Screen
           name="RepairRejectData"
           component={RepairRejectData}
           options={{title: 'RepairRejectData', headerShown: false}}
-        />
+        /> */}
 
         <Stack.Screen
           name="AddTransaction"
@@ -282,7 +282,7 @@ const AppNavigator = () => {
        <Stack.Screen
           name="RepairHistory"
           component={RepairHistory}
-          options={{title: 'RepairHistory', headerShown: false}}
+          options={{title: 'RepairHistory', headerShown: false}}     
         />
 
         <Stack.Screen
