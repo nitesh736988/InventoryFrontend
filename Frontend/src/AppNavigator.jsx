@@ -55,6 +55,7 @@ import SurvayNavigation from './Screens/Survey/SurvayNavigation';
 import SurveyDashboard from './Screens/Survey/SurveyDashboard';
 import SurveyAssignData from './Screens/ServicePerson/SurveyAssignData'
 import SurvayData from './Screens/ServicePerson/SurveyData'
+import StoredSurveys from './Screens/Survey/StoredSurveys';
 
 
 const Stack = createStackNavigator();
@@ -380,6 +381,12 @@ const AppNavigator = () => {
           name="SurveyData"
           component={SurvayData}
           options={{title: 'SurveyData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="StoredSurveys"
+          component={StoredSurveys}
+          options={{title: 'StoredSurveys', headerShown: false}}
         />
 
         

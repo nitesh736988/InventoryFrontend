@@ -128,13 +128,23 @@ const ShowComplaints = () => {
       </View>
       <Text style={styles.infoText}>
         <Text style={styles.label}>Contact:</Text> {item.contact}
-      </Text>
+      </Text>      
       <Text style={styles.infoText}>
         <Text style={styles.label}>Company:</Text> {item.company}
-      </Text>
+      </Text>     
       <Text style={styles.infoText}>
         <Text style={styles.label}>ComplaintDetails:</Text>{' '}
         {item.complaintDetails}
+      </Text>
+           
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Village:</Text>{' '}
+        {item.Farmer[0].village}
+      </Text>
+
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Block:</Text>{' '}
+        {item.Farmer[0].block}
       </Text>
       <Text style={styles.infoText}>
         <Text style={styles.label}>Created At:</Text>{' '}

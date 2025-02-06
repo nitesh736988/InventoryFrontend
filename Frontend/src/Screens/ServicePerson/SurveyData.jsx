@@ -245,7 +245,7 @@ const SurveyData = ({route}) => {
     } catch (error) {
       console.error('Error in axios request:', error.response || error);
       Alert.alert('Error', 'Failed to submit data.');
-    }
+    }        
   };
 
   const renderImageSection = (field, label) => (
@@ -397,7 +397,7 @@ const SurveyData = ({route}) => {
             <ActivityIndicator size="small" color="#fff" />
           ) : (
             <Text style={styles.buttonText}>Submit Data</Text>
-          )}
+          )}    
         </TouchableOpacity>
       </View>
     </ScrollView>
