@@ -625,9 +625,7 @@ const Sidebar = ({userType}) => {
               <TouchableOpacity onPress={() => navigateAndHighlight('ServicePersonRegistration')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Service Person Registration</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('AddSystem')} style={styles.optionButton}>
-                <Text style={styles.optionText}>Add System</Text>
-              </TouchableOpacity>
+             
               <TouchableOpacity onPress={() => navigateAndHighlight('AddSystemData')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Add System Data</Text>
               </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   TextInput,
@@ -9,64 +9,55 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
-const ItemStockUpdate = ({ route }) => {
-  const { itemName } = route.params; // Extract the itemName passed via route
-  const [updatedQuantity, setUpdatedQuantity] = useState(''); // State to hold the updated quantity
-  const [loading, setLoading] = useState(false); // Loading state for the button
+const ItemStockUpdate = ({route}) => {
+  const {subItemId, itemName} = route.params;
+  const [updatedQuantity, setUpdatedQuantity] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Function to handle stock update submission
   const handleSubmit = async () => {
-    // Validation: Ensure the updatedQuantity field is not empty
     if (!updatedQuantity) {
       Alert.alert('Error', 'Please fill in the stock field.');
       return;
     }
 
-    // Convert updatedQuantity to an integer and validate it
     const quantityValue = parseInt(updatedQuantity);
     if (isNaN(quantityValue) || quantityValue < 0) {
       Alert.alert('Error', 'Stock must be a positive integer.');
       return;
     }
 
-    // Construct the payload for the API
     const payload = {
-      itemName,
+      subItemId,
       updatedQuantity: quantityValue,
     };
 
-    setLoading(true); // Show loading indicator while the request is in progress
-    console.log(payload);
+    setLoading(true);
+    console.log("SubItem Id", updatedQuantity);
 
     try {
-      // Make an API call to update the item stock
       const response = await axios.put(
-        `${API_URL}/warehouse-admin/update-item-quantity`,
-        payload
+        `${API_URL}/warehouse-admin/update-subItem-quantity`,
+        payload,
       );
 
-      // Log and show success message on successful update
       console.log('Response:', response.data);
       Alert.alert('Success', 'Stock updated successfully!');
-      setUpdatedQuantity(''); // Clear the input field
+      setUpdatedQuantity('');
     } catch (error) {
-      // Log and display error message
-      console.log('Error updating stock:', error);
+      console.log('Error updating stock:' , JSON.stringify(response.error));
+
       if (error.response && error.response.data) {
         Alert.alert(
           'Error',
-          error.response.data.message || 'An error occurred.'
+          error.response.data.message || 'An error occurred.',
         );
       } else {
-        Alert.alert(
-          'Error',
-          'An unexpected error occurred. Please try again.'
-        );
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
       }
     } finally {
-      setLoading(false); // Hide loading indicator
+      setLoading(false);
     }
   };
 
@@ -84,7 +75,10 @@ const ItemStockUpdate = ({ route }) => {
         placeholderTextColor="#888"
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSubmit}
+        disabled={loading}>
         {loading ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
@@ -95,7 +89,6 @@ const ItemStockUpdate = ({ route }) => {
   );
 };
 
-// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

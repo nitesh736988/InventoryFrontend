@@ -47,7 +47,7 @@ import SurveyAssign from './Screens/Survey/SurveyAssign';
 import Survey from './Screens/Survey/Survey';
 import SurvayRegistration from './Screens/Admin/SurvayRegistration';
 import NewInstallation from './Screens/Warehouse/NewInstallation';
-import AddSystem from './Screens/Warehouse/AddSystem';
+import AddSystem from './Screens/Admin/AddSystem';
 import AddSystemData from './Screens/Warehouse/AddSystemData';
 import ItemStockUpdate from './Screens/Warehouse/ItemStockUpdate';
 import AssignSystem from './Screens/Warehouse/AssignSystem';

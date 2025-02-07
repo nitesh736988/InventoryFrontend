@@ -44,7 +44,7 @@ const AddSystem = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/warehouse-admin/add-system`, {
+      const response = await axios.post(`${API_URL}/admin/add-system`, {
         systemName,
       });
 

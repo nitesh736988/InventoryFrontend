@@ -173,11 +173,11 @@ const WarehouseDashboard = () => {
         )
       ) : (
         newInstallationData.length > 0 ? (
-          newInstallationData.map(({ _id, itemName, quantity }) => (
-            <View key={_id} style={styles.card}>
+          newInstallationData.map(({ subItemId, quantity }) => (
+            <View key={subItemId._id} style={styles.card}>
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate('ItemStockUpdate', { itemName })
+                  navigation.navigate('ItemStockUpdate', {subItemId: subItemId._id, itemName: subItemId.subItemName,})
                 }>
                 <Text
                   style={{
@@ -185,7 +185,7 @@ const WarehouseDashboard = () => {
                     color: '#000',
                     textDecorationLine: 'underline',
                   }}>
-                  {itemName}
+                  {subItemId.subItemName}
                 </Text>
               </TouchableOpacity>
               <Text style={{ ...styles.cardDetails, color: '#000' }}>

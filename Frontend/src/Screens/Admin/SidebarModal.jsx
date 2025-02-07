@@ -99,6 +99,11 @@ const SidebarModal = () => {
     navigation.navigate('SurvayRegistration');
   };
 
+  const openAddSystem = () => {
+    closeModal();
+    navigation.navigate('AddSystem');
+  };
+
 
   useEffect(() => {
     if (!visible) {
@@ -196,6 +201,12 @@ const SidebarModal = () => {
             onPress={openSurvayRegistration}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Survay Registration</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openAddSystem}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>AddSystem</Text>
           </TouchableOpacity>
 
 

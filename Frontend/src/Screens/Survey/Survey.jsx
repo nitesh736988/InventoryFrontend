@@ -545,8 +545,6 @@ const requestCameraPermission = async () => {
   }
   return true;
 };
-
-// Function to request location permission
 const requestLocationPermission = async () => {
   try {
     const granted = await PermissionsAndroid.request(
