@@ -15,7 +15,6 @@ import { API_URL } from '@env';
 const AddSystemData = () => {
   const [itemName, setItemName] = useState('');
   const [systemId, setSystemId] = useState('');
-  const [quantity, setQuantity] = useState('');
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -34,24 +33,24 @@ const AddSystemData = () => {
   }, []);
 
   const handleSubmit = async () => {
-    if (!systemId || !itemName || !quantity) {
+    if (!systemId || !itemName ) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
     }
 
-    const newItem = { systemId, itemName, quantity };
+    const newItem = { systemId, itemName};
     console.log("send data", newItem)
 
     try {
       console.log('Submitting:', newItem);
-      const { data } = await axios.post(`${API_URL}/warehouse-admin/add-system-item`, newItem);
+      const { data } = await axios.post(`${API_URL}/admin/add-system-item`, newItem);
       console.log('Response:', data.data);
 
       Alert.alert('Success', 'Item data has been submitted.');
     
       setItemName('');
       setSystemId('');
-      setQuantity('');
+    
     } catch (error) {
       console.log('Error submitting data:', error);
       Alert.alert('Error', JSON.stringify(Response.error.message));
@@ -60,11 +59,11 @@ const AddSystemData = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.heading}>Add System Form</Text>
+      <Text style={styles.heading}>Add System Item</Text>
 
       <View style={styles.form}>
       
-        <Text style={styles.label}>System ID:</Text>
+        <Text style={styles.label}>System</Text>
         <Picker
           selectedValue={systemId}
           onValueChange={(itemValue) => setSystemId(itemValue)}
@@ -84,15 +83,7 @@ const AddSystemData = () => {
           placeholderTextColor="#aaa"
         />
 
-        <Text style={styles.label}>Quantity:</Text>
-        <TextInput
-          value={quantity}
-          onChangeText={setQuantity}
-          style={styles.input}
-          placeholder="Enter quantity"
-          placeholderTextColor="#aaa"
-          keyboardType="numeric"
-        />
+  
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>

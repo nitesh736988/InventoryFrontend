@@ -644,10 +644,6 @@ const Sidebar = ({userType}) => {
                 <Text style={styles.optionText}>New Installation</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('AssignSystem')} style={styles.optionButton}>
-                <Text style={styles.optionText}>Assign System</Text>
-              </TouchableOpacity>
-
 
               
             </>

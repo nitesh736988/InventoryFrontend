@@ -104,6 +104,12 @@ const SidebarModal = () => {
     navigation.navigate('AddSystem');
   };
 
+  const openAddSystemData = () => {
+    closeModal();
+    navigation.navigate('AddSystemData');
+  };
+
+
 
   useEffect(() => {
     if (!visible) {
@@ -207,6 +213,12 @@ const SidebarModal = () => {
             onPress={openAddSystem}
             style={styles.optionButton}>
             <Text style={styles.optionText}>AddSystem</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openAddSystemData}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>AddSystem Data</Text>
           </TouchableOpacity>
 
 

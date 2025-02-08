@@ -48,7 +48,7 @@ import Survey from './Screens/Survey/Survey';
 import SurvayRegistration from './Screens/Admin/SurvayRegistration';
 import NewInstallation from './Screens/Warehouse/NewInstallation';
 import AddSystem from './Screens/Admin/AddSystem';
-import AddSystemData from './Screens/Warehouse/AddSystemData';
+import AddSystemData from './Screens/Admin/AddSystemData';
 import ItemStockUpdate from './Screens/Warehouse/ItemStockUpdate';
 import AssignSystem from './Screens/Warehouse/AssignSystem';
 import SurvayNavigation from './Screens/Survey/SurvayNavigation';
