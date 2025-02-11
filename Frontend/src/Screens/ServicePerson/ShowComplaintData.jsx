@@ -245,28 +245,7 @@ const ShowComplaintData = ({route}) => {
       return;
     }
 
-    // try {
-    //   console.log("simNumber", simNumber);
-
-    //   const response = await axios.get(
-    //     `http://88.222.214.93:8001/farmer/showFarmer?simNo=${simNumber}`,
-    //   );
-    //   console.log("sim response", response.data);
-
-    //   if (response.data?.success) {
-    //     Alert.alert('Success', 'SIM number is available in the database.');
-    //   } else {
-    //     Alert.alert(
-    //       'Not Found',
-    //       'SIM number is not available in the database.',
-    //     );
-    //     return;
-    //   }
-    // } catch (error) {
-    //   console.log('Error checking SIM number:', error.response);
-    //   Alert.alert('Error', JSON.stringify(error.response));
-    //   return;
-    // }
+   
 
     if (!selectedStage) {
       Alert.alert('Error', 'Please select a stage.');
@@ -319,26 +298,63 @@ const ShowComplaintData = ({route}) => {
       latitude,
     };
 
-    try {
-      setLoading(true);
-      const response = await axios.put(
-        `http://88.222.214.93:8001/filedService/complaintUpdate`,
-        requestData,
-      );
+    // const state = await NetInfo.fetch();
+    // if (state.isConnected) {
+    //   try {
+    //     setLoading(true);
+    //     const response = await axios.put(
+    //       `http://88.222.214.93:8001/filedService/complaintUpdate`,
+    //       requestData,
+    //     );
 
-      if (response.status === 200) {
-        Alert.alert('Success', 'Form submitted successfully!');
-        navigation.goBack();
-      }
-    } catch (error) {
-      console.log(
-        'Error submitting form:',
-        error.response?.data || error.message,
-      );
-      Alert.alert('Error', 'Failed to submit form.');
-    } finally {
-      setLoading(false);
-    }
+    //     if (response.status === 200) {
+    //       Alert.alert('Success', 'Form submitted successfully!');
+    //       navigation.goBack();
+    //     }
+    //   } catch (error) {
+    //     console.log(
+    //       'Error submitting form:',
+    //       error.response?.data || error.message,
+    //     );
+    //     Alert.alert('Error', 'Failed to submit form.');
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // } else{
+        const fetchComplaints = await AsyncStorage.getItem('pendingComplaints');
+        const usableFormat = JSON.parse(fetchComplaints);
+        const totalLenth = usableFormat.length;
+        const path1 = `${RNFS.DocumentDirectoryPath}/${totalLenth}.jpg`; 
+        const path2 = `${RNFS.DocumentDirectoryPath}/${totalLenth + 1}.jpg`; 
+        await RNFS.writeFile(path1, requestData.simPhoto, 'base64');
+        await RNFS.writeFile(path2, requestData.photos, 'base64');
+        // console.log("Request Data", requestData);
+        const updatedComplaints = 
+        [ ...usableFormat, JSON.stringify({
+            fieldEmpID: serviceId,
+            complaintId,
+            stageId: selectedStage,
+            remarks,
+            rmuNumber,
+            controllerNumber,
+            simNumber,
+            longitude,
+            latitude,
+            path1, 
+            path2,
+            complaintId,
+            farmerName,
+            farmerContact,
+            fatherOrHusbandName,
+            pump_type,
+            HP,
+            AC_DC,
+          })
+        ];
+        console.log("Updated Complaints", updatedComplaints);
+        await AsyncStorage.setItem('pendingComplaints', JSON.stringify(updatedComplaints));
+        // Alert.alert('No Internet', 'Data saved locally. It will be uploaded when the network is available.');
+    // }
   };
 
   if (loading) {
@@ -361,13 +377,6 @@ const ShowComplaintData = ({route}) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Complaint Details</Text>
-
-      {/* <Text style={styles.label}>Farmer Name:</Text>
-      <TextInput
-        style={[styles.input, styles.nonEditable]}
-        value={farmerName}
-        editable={false}
-      /> */}
 
       <Text style={styles.label}>Farmer Name:</Text>
       <TextInput

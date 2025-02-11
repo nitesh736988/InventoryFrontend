@@ -80,6 +80,12 @@ const Sidebarmodal = () => {
     navigation.navigate('SurveyAssignData');
   };
 
+  const openNetworkConnectivityCompaintForms = () => {
+    closeModal();
+    navigation.navigate('NetworkConnectivityCompaintForms');
+  };
+
+
 
   useEffect(() => {
     if (!visible) {
@@ -159,6 +165,13 @@ const Sidebarmodal = () => {
             style={styles.optionButton}>
             <Text style={styles.optionText}>Survey Assign Data</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openNetworkConnectivityCompaintForms}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Network Connectivity CompaintForms</Text>
+          </TouchableOpacity>
+
 
 
 

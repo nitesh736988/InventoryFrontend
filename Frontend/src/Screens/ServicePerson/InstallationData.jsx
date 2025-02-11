@@ -130,9 +130,9 @@ const InstallationData = () => {
             <Image
               source={{ uri: photo }}
               style={{ width: 100, height: 100 }}
-              onLoadStart={() => handleImageLoadStart(index)} // Set loading true for this image
-              onLoad={() => handleImageLoad(index)} // Set loading false when image is loaded
-              onError={() => handleImageError(index)} // Handle error case
+              onLoadStart={() => handleImageLoadStart(index)} 
+              onLoad={() => handleImageLoad(index)} 
+              onError={() => handleImageError(index)}
             />
           </TouchableOpacity>
         ))}

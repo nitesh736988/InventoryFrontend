@@ -522,6 +522,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageResizer from 'react-native-image-resizer';
 import Geolocation from '@react-native-community/geolocation';
 import {Picker} from '@react-native-picker/picker';
+import NetInfo from '@react-native-community/netinfo';
 
 // Function to request camera permission
 const requestCameraPermission = async () => {
@@ -589,6 +590,15 @@ const Survey = ({route}) => {
   const [remark, setRemark] = useState('');
 
   const navigation = useNavigation();
+
+  const [isConnected, setIsConnected] = useState(true);
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
 
   useEffect(() => {
@@ -710,6 +720,8 @@ const Survey = ({route}) => {
 
       console.log('Images Base64:', imagesBase64);
 
+      const networkData = { ...formData, imagesBase64 };
+
       const formData = {
         fieldEmpId: serviceId,
         farmerId,
@@ -731,7 +743,9 @@ const Survey = ({route}) => {
       };
 
       console.log('Form Data:', formData);
+     
 
+      if (isConnected) {
       const response = await axios.post(
         'http://88.222.214.93:8001/filedService/addInstallationSurvey',
         formData,
@@ -739,15 +753,45 @@ const Survey = ({route}) => {
       if (response.status === 200) {
         Alert.alert('Success', 'Data submitted successfully!');
         navigation.goBack();
-      } else {
-        console.error('API Error:', response);
-        Alert.alert('Error', 'Failed to submit data.');
+      }else {
+          Alert.alert('Error', 'Failed to submit data.');
+        }
+      }
+      else {
+        // console.error('API Error:', response);
+        await AsyncStorage.setItem('formData', JSON.stringify(networkData));
+        Alert.alert('Data Saved', 'You are offline. Your data will be submitted when the network is available.');
       }
     } catch (error) {
-      console.error('Error in axios request:', error.response || error);
+      console.log('Error in axios request:', error.response || error);
       Alert.alert('Error', 'Failed to submit data.');
     }
+    finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    const submitOfflineData = async () => {
+      if (isConnected) {
+        const offlineData = await AsyncStorage.getItem('formData');
+        if (offlineData) {
+          const data = JSON.parse(offlineData);
+          try {
+            const response = await axios.post('http://88.222.214.93:8001/filedService/addInstallationSurvey', data);
+            if (response.status === 200) {
+              Alert.alert('Success', 'Offline data submitted successfully!');
+              await AsyncStorage.removeItem('formData');
+            }
+          } catch (error) {
+            Alert.alert('Error', 'Failed to submit offline data.');
+          }
+        }
+      }
+    };
+
+    submitOfflineData();
+  }, [isConnected]);
 
   const renderImageSection = (field, label) => (
     <View>

@@ -55,7 +55,9 @@ import SurvayNavigation from './Screens/Survey/SurvayNavigation';
 import SurveyDashboard from './Screens/Survey/SurveyDashboard';
 import SurveyAssignData from './Screens/ServicePerson/SurveyAssignData'
 import SurvayData from './Screens/ServicePerson/SurveyData'
-import StoredSurveys from './Screens/Survey/StoredSurveys';
+import AddSystemSubItem from './Screens/Admin/AddSystemSubItem';
+import NetworkConnectivityCompaintForms from './Screens/ServicePerson/NetworkConnectivityCompaintForms';
+
 
 
 const Stack = createStackNavigator();
@@ -383,11 +385,18 @@ const AppNavigator = () => {
           options={{title: 'SurveyData', headerShown: false}}
         />
 
-        <Stack.Screen
-          name="StoredSurveys"
-          component={StoredSurveys}
-          options={{title: 'StoredSurveys', headerShown: false}}
+       <Stack.Screen
+          name="AddSystemSubItem"
+          component={AddSystemSubItem}
+          options={{title: 'AddSystemSubItem', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="NetworkConnectivityCompaintForms"
+          component={NetworkConnectivityCompaintForms}
+          options={{title: 'NetworkConnectivityCompaintForms', headerShown: false}}
+        />
+
 
         
       </Stack.Navigator>

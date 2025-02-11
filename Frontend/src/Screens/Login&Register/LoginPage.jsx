@@ -278,6 +278,7 @@ const LoginPage = () => {
         await AsyncStorage.setItem("_id", id);
         navigation.navigate('SurvayNavigation');
       }
+      await AsyncStorage.setItem('pendingComplaints', JSON.stringify([]));
     } catch (error) {
       if (error.response) {
         switch (error.response.status) {

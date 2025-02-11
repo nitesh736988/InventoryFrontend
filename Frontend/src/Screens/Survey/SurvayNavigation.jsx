@@ -3,7 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SurveyDashboard from './SurveyDashboard';
 import SurveyAssign from './SurveyAssign';
-import StoredSurveys from './StoredSurveys';
+
 
 const headerColor = '#186cbf';
 
@@ -33,10 +33,6 @@ const TabNavigator = () => {
             iconName = 'truck-delivery';
           }
 
-          else if (route.name === 'StoredSurveys') {
-            iconName = 'truck-delivery';
-          }
-
           return (
             <MaterialCommunityIcons name={iconName} color={color} size={size} />
           );
@@ -51,12 +47,6 @@ const TabNavigator = () => {
         name="SurveyAssign"
         component={SurveyAssign}
         options={{title: 'SurveyAssign'}}
-      />
-
-      <Tab.Screen
-        name="StoredSurveys "
-        component={StoredSurveys }
-        options={{title: 'StoredSurveys'}}
       />
     </Tab.Navigator>
   );
