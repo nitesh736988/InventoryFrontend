@@ -640,9 +640,6 @@ const Sidebar = ({userType}) => {
                 <Text style={styles.optionText}>Item Stock Update</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('NewInstallation')} style={styles.optionButton}>
-                <Text style={styles.optionText}>New Installation</Text>
-              </TouchableOpacity>
 
 
               

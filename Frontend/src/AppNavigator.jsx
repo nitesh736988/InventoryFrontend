@@ -46,7 +46,7 @@ import QuarterlyVisit from './Screens/ServicePerson/QuaterlyVisit';
 import SurveyAssign from './Screens/Survey/SurveyAssign';
 import Survey from './Screens/Survey/Survey';
 import SurvayRegistration from './Screens/Admin/SurvayRegistration';
-import NewInstallation from './Screens/Warehouse/NewInstallation';
+import NewInstallation from './Screens/ServicePerson/NewInstallation';
 import AddSystem from './Screens/Admin/AddSystem';
 import AddSystemData from './Screens/Admin/AddSystemData';
 import ItemStockUpdate from './Screens/Warehouse/ItemStockUpdate';
