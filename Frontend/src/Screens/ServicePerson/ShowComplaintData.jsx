@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {
   View,
-  Text,             
+  Text,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -224,7 +224,7 @@ const ShowComplaintData = ({route}) => {
             };
             setPhotos(prevImages => [...prevImages, resizedPhoto]);
           } catch (error) {
-            console.error('Error resizing image:', error.message);
+            console.log('Error resizing image:', error.message);
             Alert.alert('Error', 'Failed to resize the image.');
           }
         }
@@ -237,6 +237,30 @@ const ShowComplaintData = ({route}) => {
     setShowRemarks(itemValue !== '');
   };
 
+  const handleSaveLocally = async () => {
+    const savedData = {
+      complaintId,
+      selectedStage,
+      remarks,
+      rmuNumber,
+      controllerNumber,
+      simNumber,
+      simPhoto,
+      photos,
+      longitude,
+      latitude,
+    };
+    try {
+      await AsyncStorage.setItem(
+        'savedComplaintData',
+        JSON.stringify(savedData));
+      Alert.alert('Success', 'Data saved locally!');
+    } catch (error) {
+      console.log('Error saving data locally', error);
+      Alert.alert('Error', 'Failed to save data locally.');
+    }
+  };
+
   const handleSubmit = async () => {
     const serviceId = await AsyncStorage.getItem('_id');
 
@@ -244,9 +268,6 @@ const ShowComplaintData = ({route}) => {
       Alert.alert('Error', 'Please enter a SIM number.');
       return;
     }
-
-   
-
     if (!selectedStage) {
       Alert.alert('Error', 'Please select a stage.');
       return;
@@ -297,64 +318,26 @@ const ShowComplaintData = ({route}) => {
       longitude,
       latitude,
     };
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `http://88.222.214.93:8001/filedService/complaintUpdate`,
+        requestData,
+      );
 
-    // const state = await NetInfo.fetch();
-    // if (state.isConnected) {
-    //   try {
-    //     setLoading(true);
-    //     const response = await axios.put(
-    //       `http://88.222.214.93:8001/filedService/complaintUpdate`,
-    //       requestData,
-    //     );
-
-    //     if (response.status === 200) {
-    //       Alert.alert('Success', 'Form submitted successfully!');
-    //       navigation.goBack();
-    //     }
-    //   } catch (error) {
-    //     console.log(
-    //       'Error submitting form:',
-    //       error.response?.data || error.message,
-    //     );
-    //     Alert.alert('Error', 'Failed to submit form.');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // } else{
-        const fetchComplaints = await AsyncStorage.getItem('pendingComplaints');
-        const usableFormat = JSON.parse(fetchComplaints);
-        const totalLenth = usableFormat.length;
-        const path1 = `${RNFS.DocumentDirectoryPath}/${totalLenth}.jpg`; 
-        const path2 = `${RNFS.DocumentDirectoryPath}/${totalLenth + 1}.jpg`; 
-        await RNFS.writeFile(path1, requestData.simPhoto, 'base64');
-        await RNFS.writeFile(path2, requestData.photos, 'base64');
-        // console.log("Request Data", requestData);
-        const updatedComplaints = 
-        [ ...usableFormat, JSON.stringify({
-            fieldEmpID: serviceId,
-            complaintId,
-            stageId: selectedStage,
-            remarks,
-            rmuNumber,
-            controllerNumber,
-            simNumber,
-            longitude,
-            latitude,
-            path1, 
-            path2,
-            complaintId,
-            farmerName,
-            farmerContact,
-            fatherOrHusbandName,
-            pump_type,
-            HP,
-            AC_DC,
-          })
-        ];
-        console.log("Updated Complaints", updatedComplaints);
-        await AsyncStorage.setItem('pendingComplaints', JSON.stringify(updatedComplaints));
-        // Alert.alert('No Internet', 'Data saved locally. It will be uploaded when the network is available.');
-    // }
+      if (response.status === 200) {
+        Alert.alert('Success', 'Form submitted successfully!');
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.log(
+        'Error submitting form:',
+        error.response?.data || error.message,
+      );
+      Alert.alert('Error', 'Failed to submit form.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -424,14 +407,14 @@ const ShowComplaintData = ({route}) => {
       <Text style={styles.label}>Longitude:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={longitude?.toString()|| 'N/A'}
+        value={longitude?.toString() || 'N/A'}
         editable={false}
       />
 
       <Text style={styles.label}>Latitude:</Text>
       <TextInput
         style={[styles.input, styles.nonEditable]}
-        value={latitude?.toString() }
+        value={latitude?.toString()}
         editable={false}
       />
 
@@ -536,15 +519,19 @@ const ShowComplaintData = ({route}) => {
         </>
       )}
 
+      <TouchableOpacity onPress={handleSaveLocally} style={styles.submitButton}>
+        <Text style={styles.buttonText}>Upload Data Locally</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.submitButton}
         onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Close</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScrollView>
   );
 };

@@ -85,6 +85,11 @@ const Sidebarmodal = () => {
     navigation.navigate('NetworkConnectivityCompaintForms');
   };
 
+  const openUserForm = () => {
+    closeModal();
+    navigation.navigate('UserForm');
+  };
+
 
 
   useEffect(() => {
@@ -170,6 +175,12 @@ const Sidebarmodal = () => {
             onPress={openNetworkConnectivityCompaintForms}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Network Connectivity CompaintForms</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openUserForm}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>User Form</Text>
           </TouchableOpacity>
 
 

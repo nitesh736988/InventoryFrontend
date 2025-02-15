@@ -389,7 +389,7 @@ const SidebarModal = () => {
             </View>
           )}
 
-          {/* History Section */}
+      
           <TouchableOpacity onPress={() => toggleSection('history')} style={styles.optionButton}>
             <Text style={styles.optionText}>History ⬇</Text>
           </TouchableOpacity>
