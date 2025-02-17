@@ -58,6 +58,7 @@ import SurvayData from './Screens/ServicePerson/SurveyData'
 import AddSystemSubItem from './Screens/Admin/AddSystemSubItem';
 import NetworkConnectivityCompaintForms from './Screens/ServicePerson/NetworkConnectivityCompaintForms';
 import UserForm from './Screens/ServicePerson/UserForm';
+import NewFormInstallation from './Screens/Warehouse/NewFormInstallation';
 
 
 
@@ -403,6 +404,13 @@ const AppNavigator = () => {
           component={UserForm}
           options={{title: 'UserForm', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="NewFormInstallation"
+          component={NewFormInstallation}
+          options={{title: 'NewFormInstallation', headerShown: false}}
+        />
+
 
 
         
