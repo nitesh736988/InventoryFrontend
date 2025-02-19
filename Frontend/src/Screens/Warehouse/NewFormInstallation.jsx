@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import MultiSelect from 'react-native-multiple-select';
-import {API_URL} from '@env';
-import {Picker} from '@react-native-picker/picker';
+import { API_URL } from '@env';
+import { Picker } from '@react-native-picker/picker';
 
-const NewFormInstallation = () => {
+const NewFormInstallation = ({ route }) => {
+  const { farmerId } = route.params;
+  
   const [servicePersons, setServicePersons] = useState([]);
   const [systems, setSystems] = useState([]);
   const [items, setItems] = useState([]);
@@ -22,16 +24,15 @@ const NewFormInstallation = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [panelNumbers, setPanelNumbers] = useState([]);
-  const [pumpNumber, setPumpNumber] = useState();
-  const [controllerNumber, setControllerNumber] = useState();
-  const [rmuNumber, setRmuNumber] = useState();
+  const [pumpNumber, setPumpNumber] = useState('');
+  const [controllerNumber, setControllerNumber] = useState('');
+  const [rmuNumber, setRmuNumber] = useState('');
+  const [itemQuantities, setItemQuantities] = useState({});
 
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/service-team/all-service-persons`,
-        );
+        const response = await axios.get(`${API_URL}/service-team/all-service-persons`);
         setServicePersons(response.data.data);
       } catch (error) {
         console.log('Failed to fetch service persons:', error);
@@ -44,9 +45,7 @@ const NewFormInstallation = () => {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const {data} = await axios.get(
-          `${API_URL}/warehouse-admin/show-systems`,
-        );
+        const { data } = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
         setSystems(data.data);
       } catch (error) {
         console.log('Error fetching systems:', error);
@@ -63,9 +62,7 @@ const NewFormInstallation = () => {
     const fetchItems = async () => {
       setLoadingItems(true);
       try {
-        const {data} = await axios.get(
-          `${API_URL}/warehouse-admin/show-subItems?systemId=${systemId}`,
-        );
+        const { data } = await axios.get(`${API_URL}/warehouse-admin/show-subItems?systemId=${systemId}`);
         setItems(data.data);
       } catch (error) {
         console.log('Error fetching system items:', error);
@@ -83,10 +80,17 @@ const NewFormInstallation = () => {
     }
   };
 
-  const handlePanelUserChange = (index, value) => {
-    const updatedUsers = [...panelNumbers];
-    updatedUsers[index] = value;
-    setPanelNumbers(updatedUsers);
+  const handlePanelChange = (index, value) => {
+    const updatedPanels = [...panelNumbers];
+    updatedPanels[index] = value;
+    setPanelNumbers(updatedPanels);
+  };
+
+  const handleQuantityChange = (itemId, quantity) => {
+    setItemQuantities(prev => ({
+      ...prev,
+      [itemId]: quantity
+    }));
   };
 
   const handleSubmit = async () => {
@@ -95,52 +99,47 @@ const NewFormInstallation = () => {
       return;
     }
 
+    const formattedItemsList = selectedItems.map(itemId => ({
+      subItemId: itemId,
+      quantity: parseInt(itemQuantities[itemId] || 1, 10), 
+    }));
 
-    const newItems = {
+    const newInstallation = {
       farmerId,
       empId: selectedServicePerson,
       systemId,
-      itemsList: selectedItems,
-      panelNumbers,
-      pumpNumber,
-      controllerNumber,
-      rmuNumber,
-      createdAt: new Date()
+      itemsList: formattedItemsList,
+      panelNumbers: panelNumbers.filter(num => num.trim() !== ''),
+      pumpNumber: pumpNumber.trim(),
+      controllerNumber: controllerNumber.trim(),
+      rmuNumber: rmuNumber.trim(),
+      createdAt: new Date().toISOString(),
     };
 
     try {
-      await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, newItems);
-      Alert.alert('Success', 'Item repair data has been submitted.');
+      const response = await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, newInstallation);
+      console.log("New Installation Response:", response.data);
+      Alert.alert('Success', 'Installation data has been submitted.');
+
       setSelectedServicePerson('');
       setSystemId('');
       setSelectedItems([]);
       setPanelNumbers([]);
+      setPumpNumber('');
+      setControllerNumber('');
+      setRmuNumber('');
+      setItemQuantities({});
     } catch (error) {
-      console.log('Error submitting data:', error);
+      console.error('Error submitting data:', error?.response?.data || error.message);
       Alert.alert('Error', 'Something went wrong while submitting.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Installation Form </Text>
+      <Text style={styles.heading}>Installation Form</Text>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Service Person:</Text>
-        <Picker
-          selectedValue={selectedServicePerson}
-          onValueChange={itemValue => setSelectedServicePerson(itemValue)}
-          style={styles.input}>
-          <Picker.Item label="Select Service Person" value="" />
-          {servicePersons.map(person => (
-            <Picker.Item
-              key={person._id}
-              label={person.name}
-              value={person._id}
-            />
-          ))}
-        </Picker>
-
         <Text style={styles.label}>Select System</Text>
         <Picker
           selectedValue={systemId}
@@ -148,11 +147,7 @@ const NewFormInstallation = () => {
           style={styles.input}>
           <Picker.Item label="Select System" value="" />
           {systems.map(system => (
-            <Picker.Item
-              key={system._id}
-              label={system.systemName}
-              value={system._id}
-            />
+            <Picker.Item key={system._id} label={system.systemName} value={system._id} />
           ))}
         </Picker>
 
@@ -168,47 +163,44 @@ const NewFormInstallation = () => {
             selectedItems={selectedItems}
             selectText="Pick Items"
             searchInputPlaceholderText="Search Items..."
-            tagRemoveIconColor="#070604"
-            tagBorderColor="#070604"
-            tagTextColor="#070604"
-            selectedItemTextColor="#070604"
-            selectedItemIconColor="#070604"
-            itemTextColor="#070604"
             displayKey="subItemName"
-            searchInputStyle={{color: '#070604'}}
-            styleDropdownMenu={{backgroundColor: '#f9f9f9', borderRadius: 8}}
           />
         ) : (
           <Text style={styles.noItemText}>No items available</Text>
         )}
 
-        {/* <Text style={styles.sectionTitle}>Panel</Text>
-        {panelNumbers.map((panel, index) => (
-          <TextInput
-            key={index}
-            style={styles.panelInput}
-            placeholder={`Panel Serial Number ${index + 1}`}
-            value={panel}
-            onChangeText={(value) => handlePanelUserChange(index, value)}
-          />
+        {selectedItems.map(itemId => (
+          <View key={itemId} style={styles.quantityContainer}>
+            <Text>Quantity for {items.find(item => item._id === itemId)?.subItemName}:</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={itemQuantities[itemId]?.toString() || ''}
+              onChangeText={text => handleQuantityChange(itemId, text)}
+            />
+          </View>
         ))}
 
-        {panelNumbers.length < 17 && (
-          <TouchableOpacity style={styles.addButton} onPress={addPanel}>
-            <Text style={styles.addButtonText}>+ Add Panel</Text>
-          </TouchableOpacity>
-        )} */}
+        <Text style={styles.label}>Service Person:</Text>
+        <Picker
+          selectedValue={selectedServicePerson}
+          onValueChange={itemValue => setSelectedServicePerson(itemValue)}
+          style={styles.input}>
+          <Picker.Item label="Select Service Person" value="" />
+          {servicePersons.map(person => (
+            <Picker.Item key={person._id} label={person.name} value={person._id} />
+          ))}
+        </Picker>
 
-        <ScrollView style={{maxHeight: 300}}>
+        <ScrollView style={{ maxHeight: 300 }}>
           <Text style={styles.sectionTitle}>Panel</Text>
-
           {panelNumbers.map((panel, index) => (
             <TextInput
               key={index}
-              style={styles.panelInput}
+              style={styles.input}
               placeholder={`Panel Serial Number ${index + 1}`}
               value={panel}
-              onChangeText={value => handlePanelUserChange(index, value)}
+              onChangeText={value => handlePanelChange(index, value)}
             />
           ))}
 
@@ -217,85 +209,33 @@ const NewFormInstallation = () => {
               <Text style={styles.addButtonText}>+ Add Panel</Text>
             </TouchableOpacity>
           )}
+
+          <Text style={styles.label}>Pump Number</Text>
+          <TextInput value={pumpNumber} onChangeText={setPumpNumber} style={styles.input} />
+
+          <Text style={styles.label}>Controller Number</Text>
+          <TextInput value={controllerNumber} onChangeText={setControllerNumber} style={styles.input} />
+
+          <Text style={styles.label}>RMU Number</Text>
+          <TextInput value={rmuNumber} onChangeText={setRmuNumber} style={styles.input} />
+
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
         </ScrollView>
-
-        <Text style={styles.label}>Pump Number</Text>
-        <TextInput
-          value={pumpNumber}
-          onChangeText={setPumpNumber}
-          style={styles.input}
-        />
-
-        <Text style={styles.label}>Controller Number</Text>
-        <TextInput
-          value={controllerNumber}
-          onChangeText={setControllerNumber}
-          style={styles.input}
-        />
-
-        <Text style={styles.label}>Rmu Number</Text>
-        <TextInput
-          value={rmuNumber}
-          onChangeText={setRmuNumber}
-          style={styles.input}
-        />
-
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, padding: 20, backgroundColor: '#ffffff'},
-  heading: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 20,
-    color: '#070604',
-  },
-  form: {
-    padding: 15,
-    backgroundColor: '#fbd33b',
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  label: {fontSize: 16, fontWeight: '600', marginBottom: 8, color: '#070604'},
-  input: {
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
-  },
-  panelInput: {
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  addButton: {
-    backgroundColor: '#000',
-    padding: 12,
-    marginTop: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  addButtonText: {color: '#fff', fontSize: 16, fontWeight: 'bold'},
-  button: {
-    backgroundColor: '#070604',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {color: '#fbd33b', fontSize: 16, fontWeight: '600'},
+  container: { flex: 1, padding: 20, backgroundColor: '#ffffff' },
+  heading: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginVertical: 20 },
+  form: { padding: 15, backgroundColor: '#fbd33b', borderRadius: 8 },
+  label: { fontSize: 16, fontWeight: '600', marginBottom: 8 },
+  input: { backgroundColor: '#f9f9f9', borderWidth: 1, borderRadius: 8, padding: 10, marginBottom: 15 },
+  button: { backgroundColor: '#070604', padding: 12, borderRadius: 8, alignItems: 'center' },
+  buttonText: { color: '#fbd33b', fontSize: 16, fontWeight: '600' },
 });
 
 export default NewFormInstallation;

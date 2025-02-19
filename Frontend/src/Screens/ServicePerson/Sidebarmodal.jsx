@@ -95,6 +95,11 @@ const Sidebarmodal = () => {
     navigation.navigate('NewInstallation');
   };
 
+  const openApprovalNewInstallation = () => {
+    closeModal();
+    navigation.navigate('ApprovalNewInstallation');
+  };
+
 
 
   useEffect(() => {
@@ -192,6 +197,12 @@ const Sidebarmodal = () => {
             onPress={openNewInstallation}
             style={styles.optionButton}>
             <Text style={styles.optionText}>New Installation</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openApprovalNewInstallation}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Approval NewInstallation</Text>
           </TouchableOpacity>
 
 

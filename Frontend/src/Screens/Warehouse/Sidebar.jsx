@@ -640,9 +640,13 @@ const Sidebar = ({userType}) => {
                 <Text style={styles.optionText}>Item Stock Update</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('NewFormInstallation')} style={styles.optionButton}>
+              {/* <TouchableOpacity onPress={() => navigateAndHighlight('NewFormInstallation')} style={styles.optionButton}>
                 <Text style={styles.optionText}>NewForm Installation</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
+
+              <TouchableOpacity onPress={() => navigateAndHighlight('NewFarmerInstallation')} style={styles.optionButton}>
+                <Text style={styles.optionText}>NewFarmer Installation</Text>
+              </TouchableOpacity> 
 
 
 

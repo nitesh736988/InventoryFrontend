@@ -59,6 +59,8 @@ import AddSystemSubItem from './Screens/Admin/AddSystemSubItem';
 import NetworkConnectivityCompaintForms from './Screens/ServicePerson/NetworkConnectivityCompaintForms';
 import UserForm from './Screens/ServicePerson/UserForm';
 import NewFormInstallation from './Screens/Warehouse/NewFormInstallation';
+import NewFarmerInstallation from './Screens/Warehouse/NewFarmerInstallation';
+import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
 
 
 
@@ -409,6 +411,18 @@ const AppNavigator = () => {
           name="NewFormInstallation"
           component={NewFormInstallation}
           options={{title: 'NewFormInstallation', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="NewFarmerInstallation"
+          component={NewFarmerInstallation}
+          options={{title: 'NewFarmerInstallation', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ApprovalNewInstallation"
+          component={ApprovalNewInstallation}
+          options={{title: 'ApprovalNewInstallation', headerShown: false}}
         />
 
 

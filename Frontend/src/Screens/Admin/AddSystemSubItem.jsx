@@ -28,7 +28,7 @@ const AddSystemSubItem = () => {
         console.log('Fetched Systems:', data.data);
         setSystems(data.data);
       } catch (error) {
-        console.error('Error fetching systems:', error);
+        console.log('Error fetching systems:', error);
         Alert.alert('Error', 'Unable to fetch systems.');
       }
     };
@@ -46,7 +46,7 @@ const AddSystemSubItem = () => {
         console.log('Fetched System Items:', data.data);
         setItems(data.data);
       } catch (error) {
-        console.error('Error fetching system items:', error);
+        console.log('Error fetching system items:', error);
         Alert.alert('Error', 'Unable to fetch system items.');
       }
       setLoadingItems(false);

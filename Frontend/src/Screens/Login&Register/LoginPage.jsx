@@ -269,6 +269,9 @@ const LoginPage = () => {
         await AsyncStorage.setItem("block", JSON.stringify(block));
         navigation.navigate('ServicePersonNavigation');
       } else if (role === 'warehouseAdmin') {
+        const {id} = response.data;
+        console.log("Login Person id", id);
+        await AsyncStorage.setItem("_id", id);
         navigation.navigate('WarehouseNavigation');
       } else if (role === 'admin') {
         navigation.navigate('Navigation');
