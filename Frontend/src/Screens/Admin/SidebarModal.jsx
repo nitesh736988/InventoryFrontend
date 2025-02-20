@@ -410,6 +410,10 @@ const SidebarModal = () => {
               <TouchableOpacity onPress={() => navigation.navigate('InstallationHistory')} style={styles.subOption}>
                 <Text style={styles.optionText}>Installation History</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigation.navigate('Servicepersons')} style={styles.subOption}>
+                <Text style={styles.optionText}>Service Person</Text>
+              </TouchableOpacity>
             </View>
           )}
 

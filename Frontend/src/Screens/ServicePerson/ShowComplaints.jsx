@@ -380,11 +380,12 @@ const ShowComplaints = () => {
         ) : null}   
         {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
           onPress={() =>
-            {navigation.navigate('ShowComplaintData', {
+            {console.log('complaint id from showComplaint page', item?._id)
+              navigation.navigate('ShowComplaintData', {
               complaintId: item?._id,
               farmerName: item?.Farmer[0]?.farmerName,
               farmerContact: item?.Farmer[0]?.contact,
-              fatherOrHusbandName: item?.Farmer[0]?.fatherOrHusbandName,
+              saralId: item?.Farmer[0]?.saralId,
               pump_type: item?.Farmer[0]?.pump_type,
               HP: item?.Farmer[0]?.HP,
               AC_DC: item?.Farmer[0]?.AC_DC, 

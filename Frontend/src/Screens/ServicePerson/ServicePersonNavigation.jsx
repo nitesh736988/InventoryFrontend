@@ -3,7 +3,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ServicePersonDashboard from './ServicePersonDashboard';
 import OrderDetails from './OrderDetails';
-import InOrder from './InOrder';
 import OutStatus from './OutStatus';
 
 const headerColor = '#186cbf';
@@ -32,9 +31,9 @@ const TabNavigator = () => {
             iconName = 'home';
           } else if (route.name === 'OrderDetails') {
             iconName = 'truck-delivery';
-          } else if (route.name === 'InOrder') {
-            iconName = 'sort-ascending';
-          } else if (route.name === 'OutStatus') {
+          } 
+          
+          else if (route.name === 'OutStatus') {
             iconName = 'skip-next-circle-outline';
           } else if (route.name === 'ApprovedData') {
             iconName = 'cube-outline';
@@ -56,12 +55,7 @@ const TabNavigator = () => {
         options={{title: 'Incoming'}}
       />
 
-      <Tab.Screen
-        name="InOrder"
-        component={InOrder}
-        options={{title: 'InOrder'}}
-      />
-
+  
       <Tab.Screen
         name="OutStatus"
         component={OutStatus}

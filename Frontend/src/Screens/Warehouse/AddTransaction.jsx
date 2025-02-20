@@ -13,13 +13,15 @@ import MultiSelect from 'react-native-multiple-select';
 import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {API_URL} from '@env';
+import {useNavigation} from '@react-navigation/native';
 
-const AddTransaction = () => {
-  const [servicePersonName, setServicePersonName] = useState('');
-  const [servicePerContact, setServicePerContact] = useState('');
-  const [farmerName, setFarmerName] = useState('');
-  const [farmerContact, setFarmerContact] = useState('');
-  const [farmerVillageName, setFarmerVillageName] = useState('');
+const AddTransaction = ({route}) => {
+  const {complaintId, farmerContact, saralId} = route.params || {};
+
+
+       
+  const [servicePersons, setServicePersons] = useState([]);
+  const [selectedServicePerson, setSelectedServicePerson] = useState('');
   const [remarks, setRemarks] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
@@ -31,6 +33,24 @@ const AddTransaction = () => {
   const [serialNumber, setSerialNumber] = useState('');
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [farmerSaralId, setFarmerSaralId] = useState('');
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchServicePersons = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/service-team/all-service-persons`,
+        );
+        console.log(response.data.data);
+        setServicePersons(response.data.data);
+      } catch (error) {
+        console.log('Failed to fetch service persons:', error);
+      }
+    };
+
+    fetchServicePersons();
+  }, []);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -95,13 +115,7 @@ const AddTransaction = () => {
   };
 
   const validateInput = () => {
-    if (
-      !servicePersonName ||
-      !servicePerContact ||
-      !farmerName ||
-      !farmerContact ||
-      !farmerVillageName
-    ) {
+    if (!servicePersons || !farmerContact) {
       Alert.alert('Error', 'Please fill in all fields.');
       return false;
     }
@@ -130,22 +144,22 @@ const AddTransaction = () => {
     }));
 
     const data = {
-      servicePersonName,
-      servicePerContact,
-      farmerName,
+      complaintId,
+      servicePersons: selectedServicePerson,
       farmerContact,
-      farmerVillage: farmerVillageName,
       items: itemsData,
       warehouse: selectedWarehouse,
       remark: remarks,
       serialNumber,
       incoming: false,
       pickupDate: new Date(),
+      farmerSaralId: saralId,
     };
 
-    console.log("data sent", data)
+    console.log('data sent', data);
     try {
-      const response = await axios.post(`${API_URL}/warehouse-admin/outgoing-items`,
+      const response = await axios.post(
+        `${API_URL}/warehouse-admin/outgoing-items`,
         data,
         {
           headers: {
@@ -168,11 +182,7 @@ const AddTransaction = () => {
   };
 
   const resetForm = () => {
-    setServicePersonName('');
-    setServicePerContact('');
-    setFarmerName('');
-    setFarmerContact('');
-    setFarmerVillageName('');
+    setServicePersons('');
     setSelectedItems([]);
     setQuantities({});
     setRemarks('');
@@ -210,44 +220,36 @@ const AddTransaction = () => {
         </View>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.form}>
-            <Text style={styles.label}>Service Person Name:</Text>
-            <TextInput
-              value={servicePersonName}
-              onChangeText={setServicePersonName}
-              style={styles.input}
-            />
-            <Text style={styles.label}>Service Person Contact:</Text>
-            <TextInput
-              value={servicePerContact}
-              onChangeText={text => {
-                // Validate and restrict to numeric input of max length 10
-                if (/^\d{0,10}$/.test(text)) {
-                  setServicePerContact(text);
-                }
-              }}
-              keyboardType="numeric" // Brings up numeric keypad
-              style={styles.input}
-            />
+            <Text style={styles.label}>Service Person:</Text>
+            <Picker
+              selectedValue={selectedServicePerson}
+              onValueChange={itemValue => setSelectedServicePerson(itemValue)}
+              style={styles.input}>
+              <Picker.Item label="Select Service Person" value="" />
+              {servicePersons.map(person => (
+                <Picker.Item
+                  key={person._id}
+                  label={person.name}
+                  value={person._id}
+                />
+              ))}
+            </Picker>
 
-            <Text style={styles.label}>Farmer Name:</Text>
-            <TextInput
-              value={farmerName}
-              onChangeText={setFarmerName}
-              style={styles.input}
-            />
             <Text style={styles.label}>Farmer Contact:</Text>
             <TextInput
-              value={farmerContact}
-              onChangeText={setFarmerContact}
-              style={styles.input}
-              maxLength={10}
-            />
-            <Text style={styles.label}>Farmer Village Name:</Text>
+              style={[styles.input, styles.nonEditable]}
+              value={farmerContact?.toString() || 'N/A'}
+              keyboardType="phone-pad"
+              editable={false}
+            /> 
+
+            <Text style={styles.label}>Farmer Saral Id</Text>
             <TextInput
-              value={farmerVillageName}
-              onChangeText={setFarmerVillageName}
-              style={styles.input}
+              style={[styles.input, styles.nonEditable]}
+              value={saralId || 'N/A'}
+              editable={false}
             />
+
             {selectedItems.map(item => (
               <View key={item}>
                 <Text style={styles.label}>Quantity for {item}:</Text>
@@ -287,11 +289,6 @@ const AddTransaction = () => {
             />
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

@@ -46,17 +46,17 @@ const Servicepersons = () => {
     }
   };
 
-  const deleteServicePerson = async id => {
+  const deactivateServicePerson = async id => {
     try {
-      await axios.delete(`${API_URL}/admin/remove-service-person?id=${id}`);
-      Alert.alert('Success', 'Service person deleted successfully');
+      await axios.delete(`${API_URL}/admin/deactivate-service-person?id=${id}`);
+      Alert.alert('Success', 'Service person deactivate successfully');
       setServicepersons(prev => prev.filter(person => person._id !== id));
     } catch (error) {
       Alert.alert(
         'Error',
-        error.response?.data?.message || 'Failed to delete service person',
+        error.response?.data?.message || 'Failed to deactivate Service Person',
       );
-      console.log('Error deleting data:', error);
+      console.log('Error deactivate data:', error);
     }
   };
 
@@ -95,18 +95,18 @@ const Servicepersons = () => {
         Latitude: <Text style={styles.value}>{item.latitude ?? 'NA'}</Text>
       </Text>
       <TouchableOpacity
-        accessibilityLabel={`Delete ${item.name}`}
+        accessibilityLabel={`Deactivate ${item.name}`}
         style={styles.deleteButton}
         onPress={() =>
           Alert.alert(
             'Confirm Deletion',
-            `Are you sure you want to delete ${item.name}?`,
+            `Are you sure you want to deactivate ${item.name}?`,
             [
               {text: 'Cancel', style: 'cancel'},
               {
-                text: 'Delete',
+                text: 'Deactivate',
                 style: 'destructive',
-                onPress: () => deleteServicePerson(item._id),
+                onPress: () => deactivateServicePerson(item._id),
               },
             ],
           )

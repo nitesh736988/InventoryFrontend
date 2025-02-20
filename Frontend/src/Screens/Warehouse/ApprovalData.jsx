@@ -13,6 +13,7 @@ import {
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
+import {useNavigation} from '@react-navigation/native';
 
 const ApprovalData = () => {
   const [orders, setOrders] = useState([]);
@@ -20,6 +21,7 @@ const ApprovalData = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [btnClickedStatus, setBtnClickedStatus] = useState({});
+    const navigation = useNavigation();
 
   const {width} = Dimensions.get('window');
   const cardWidth = width * 0.9;
@@ -45,7 +47,7 @@ const ApprovalData = () => {
     fetchOrders();
   }, []);
 
-  const handleApproveBtn = async (sendTransactionId, incoming) => {
+  const handleApproveBtn = async (sendTransactionId, incoming, complaintId, farmerContact, saralId) => {
     try {
       const response = await axios.put(
         `${API_URL}/warehouse-admin/update-incoming-status`,
@@ -58,7 +60,14 @@ const ApprovalData = () => {
       );
       if (response.status === 200) {
         setBtnClickedStatus(prev => ({...prev, [sendTransactionId]: true}));
-        fetchOrders();
+        fetchOrders().then(() => {
+          console.log('On Navigation Data', complaintId, farmerContact, saralId)
+          navigation.navigate('AddTransaction', {
+            complaintId: complaintId,
+            farmerContact: farmerContact,
+            saralId: saralId,
+          });
+        });
       }
     } catch (error) {
       console.log(error);
@@ -77,10 +86,12 @@ const ApprovalData = () => {
   const filteredOrders = orders.filter(
     order =>
       order.incoming === true &&
-      (order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.servicePerson.name
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase())),
+      (order.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        '' ||
+        order.servicePerson?.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        ''),
   );
 
   const formatDate = dateString => {
@@ -127,13 +138,6 @@ const ApprovalData = () => {
 
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>
-              Farmer Name:{' '}
-              <Text style={styles.dataText}>{item.farmerName}</Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
               Farmer Contact:{' '}
               <Text style={styles.dataText}>{item.farmerContact}</Text>
             </Text>
@@ -141,8 +145,8 @@ const ApprovalData = () => {
 
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>
-              Village Name:{' '}
-              <Text style={styles.dataText}>{item.farmerVillage}</Text>
+              Farmer SaralId:{' '}
+              <Text style={styles.dataText}>{item.farmerSaralId}</Text>
             </Text>
           </Text>
           <Text style={styles.infoText}>
@@ -218,9 +222,14 @@ const ApprovalData = () => {
                 <TouchableOpacity style={styles.declineButton}>
                   <Text style={styles.buttonText}>Decline</Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={styles.approveButton}
-                  onPress={() => handleApproveBtn(item._id, item.incoming)}>
+                  onPress={() => {
+                    console.log(item.farmerComplaintId, item.farmerContact, item.farmerSaralId);
+                    handleApproveBtn(item._id, item.incoming, item.farmerComplaintId,  item.farmerContact, item.farmerSaralId);
+                    
+                  }}>
                   <Text style={styles.buttonText}>Approve</Text>
                 </TouchableOpacity>
               </>
@@ -265,7 +274,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
   },
   searchInput: {
     height: 40,

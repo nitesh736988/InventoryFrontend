@@ -61,6 +61,7 @@ import UserForm from './Screens/ServicePerson/UserForm';
 import NewFormInstallation from './Screens/Warehouse/NewFormInstallation';
 import NewFarmerInstallation from './Screens/Warehouse/NewFarmerInstallation';
 import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
+import InOrder from './Screens/ServicePerson/InOrder';
 
 
 
@@ -424,6 +425,13 @@ const AppNavigator = () => {
           component={ApprovalNewInstallation}
           options={{title: 'ApprovalNewInstallation', headerShown: false}}
         />
+
+        <Stack.Screen
+          name="InOrder"
+          component={InOrder}
+          options={{title: 'InOrder', headerShown: false}}
+        />
+
 
 
 
