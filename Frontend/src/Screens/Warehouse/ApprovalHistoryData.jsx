@@ -1,3 +1,253 @@
+// // import React, {useState, useEffect} from 'react';
+// // import {
+// //   View,
+// //   Text,
+// //   FlatList,
+// //   StyleSheet,
+// //   Alert,
+// //   ActivityIndicator,
+// //   TouchableOpacity,
+// //   Dimensions,
+// //   TextInput,
+// // } from 'react-native';
+// // import axios from 'axios';
+// // import Icon from 'react-native-vector-icons/FontAwesome';
+// // import {API_URL} from '@env';
+
+// // const ApprovalHistoryData = () => {
+// //   const [orders, setOrders] = useState([]);
+// //   const [filteredOrders, setFilteredOrders] = useState([]);
+// //   const [loading, setLoading] = useState(true);
+// //   const [refreshing, setRefreshing] = useState(false);
+// //   const [searchQuery, setSearchQuery] = useState('');
+
+// //   const fetchOrders = async () => {
+// //     setLoading(true);
+// //     try {
+// //       const response = await axios.get(
+// //         `${API_URL}/warehouse-admin/approved-order-history`,
+// //       );
+// //       console.log(response.data.orderHistory);
+// //       setOrders(response.data.orderHistory);
+// //       setFilteredOrders(response.data.orderHistory);
+// //     } catch (error) {
+// //       Alert.alert('Error', 'Unable to fetch orders');
+// //       // console.log('Error fetching orders:', error);
+// //     } finally {
+// //       setLoading(false);
+// //       setRefreshing(false);
+// //     }
+// //   };
+
+// //   useEffect(() => {
+// //     fetchOrders();
+// //   }, []);
+
+// //   // Format date
+// //   const formatDate = dateString => {
+// //     const date = new Date(dateString);
+// //     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+// //   };
+
+// //   // Handle pull-to-refresh
+// //   const handleRefresh = () => {
+// //     setRefreshing(true);
+// //     fetchOrders();
+// //   };
+
+// //   // Search handler
+// //   const handleSearch = query => {
+// //     setSearchQuery(query);
+// //     if (query) {
+// //       const filtered = orders.filter(
+// //         order =>
+// //           order.servicePerson.name
+// //             .toLowerCase()
+// //             .includes(query.toLowerCase()) ||
+// //           order.farmerName.toLowerCase().includes(query.toLowerCase()) ||
+// //           order.serialNumber.toLowerCase().includes(query.toLowerCase()),
+// //       );
+// //       setFilteredOrders(filtered);
+// //     } else {
+// //       setFilteredOrders(orders);
+// //     }
+// //   };
+
+// //   // Render each order item
+// //   const renderOrderItem = ({item}) => (
+// //     <View key={item._id} style={styles.card}>
+// //       <Text
+// //         style={[
+// //           styles.statusText,
+// //           item.incoming ? styles.incoming : styles.outgoing,
+// //         ]}>
+// //         {item.incoming ? 'Incoming' : 'Outgoing'}
+// //       </Text>
+// //       <View style={styles.infoRow}>
+// //         <Text style={styles.infoText}>Name: {item.servicePerson.name}</Text>
+// //         {item.status && (
+// //           <Text style={styles.approvedText}>Approved Success</Text>
+// //         )}
+// //       </View>
+// //       <Text style={styles.infoText}>Contact: {item.servicePerson.contact}</Text>
+// //       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
+// //       <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
+// //       <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
+// //       <View style={styles.itemContainer}>
+// //         {item.items.map(({_id, itemName, quantity}) => (
+// //           <Text key={_id} style={styles.infoText}>
+// //             {itemName}: {quantity}
+// //           </Text>
+// //         ))}
+// //       </View>
+// //       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
+// //       <Text style={styles.infoText}>Remark: {item.remark}</Text>
+// //       {item.incoming && (
+// //         <Text style={styles.infoText}>
+// //           RMU Present:{' '}
+// //           {item?.withoutRMU ? (!item.withoutRMU ? 'YES' : 'NO') : 'N/A'}
+// //         </Text>
+// //       )}
+// //       {item.incoming && (
+// //         <Text style={styles.infoText}>
+// //           RMU Remark: {item?.rmuRemark || 'N/A'}
+// //         </Text>
+// //       )}
+// //       <Text style={styles.infoText}>
+// //         Pickup Date: {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+// //       </Text>
+// //       {item?.approvedBy && (
+// //         <Text style={styles.infoText}>Approved By: {item.approvedBy}</Text>
+// //       )}
+// //       {item?.receivedDate && (
+// //         <Text style={styles.infoText}>
+// //           Received Date: {formatDate(item.receivedDate)}
+// //         </Text>
+// //       )}
+// //     </View>
+// //   );
+
+// //   return (
+// //     <View style={styles.container}>
+// //       <TextInput
+// //         style={styles.searchInput}
+// //         placeholder="Search by name, farmer, or serial number"
+// //         value={searchQuery}
+// //         onChangeText={handleSearch}
+// //       />
+// //       <Text style={styles.header}>Approved Data</Text>
+// //       {loading ? (
+// //         <ActivityIndicator
+// //           size="large"
+// //           color="#0000ff"
+// //           style={styles.loadingIndicator}
+// //         />
+// //       ) : (
+// //         <FlatList
+// //           data={filteredOrders}
+// //           renderItem={renderOrderItem}
+// //           keyExtractor={item => item._id}
+// //           refreshing={refreshing}
+// //           onRefresh={handleRefresh}
+// //           ListEmptyComponent={
+// //             <Text style={styles.emptyText}>No transactions found.</Text>
+// //           }
+// //         />
+// //       )}
+// //       <TouchableOpacity style={styles.refreshIcon} onPress={handleRefresh}>
+// //         <Icon name="refresh" size={30} color="black" />
+// //       </TouchableOpacity>
+// //     </View>
+// //   );
+// // };
+
+// // const {width} = Dimensions.get('window');
+// // const styles = StyleSheet.create({
+// //   container: {
+// //     flex: 1,
+// //     padding: 16,
+// //     backgroundColor: '#fbd33b',
+// //   },
+// //   searchInput: {
+// //     height: 40,
+// //     borderColor: '#ccc',
+// //     borderWidth: 1,
+// //     borderRadius: 8,
+// //     paddingLeft: 10,
+// //     marginBottom: 16,
+// //     fontSize: 16,
+// //   },
+// //   header: {
+// //     fontSize: 24,
+// //     fontWeight: 'bold',
+// //     marginBottom: 16,
+// //     textAlign: 'center',
+// //   },
+// //   card: {
+// //     padding: 16,
+// //     marginVertical: 8,
+// //     backgroundColor: '#f9f9f9',
+// //     borderRadius: 8,
+// //     shadowColor: '#000',
+// //     shadowOffset: {width: 0, height: 2},
+// //     shadowOpacity: 0.1,
+// //     shadowRadius: 4,
+// //   },
+// //   statusText: {
+// //     fontSize: 16,
+// //     fontWeight: 'bold',
+// //     marginBottom: 8,
+// //   },
+// //   incoming: {
+// //     color: 'purple',
+// //   },
+// //   outgoing: {
+// //     color: 'orange',
+// //   },
+// //   infoRow: {
+// //     flexDirection: 'row',
+// //     justifyContent: 'space-between',
+// //     marginBottom: 8,
+// //   },
+// //   infoText: {
+// //     color: '#000',
+// //     marginBottom: 4,
+// //   },
+// //   approvedText: {
+// //     color: 'green',
+// //     fontWeight: 'bold',
+// //   },
+// //   itemContainer: {
+// //     flexDirection: 'row',
+// //     flexWrap: 'wrap',
+// //     marginBottom: 8,
+// //   },
+// //   loadingIndicator: {
+// //     flex: 1,
+// //     justifyContent: 'center',
+// //     alignItems: 'center',
+// //   },
+// //   refreshIcon: {
+// //     position: 'absolute',
+// //     top: 16,
+// //     right: 16,
+// //     backgroundColor: '#fff',
+// //     padding: 8,
+// //     borderRadius: 16,
+// //     elevation: 4,
+// //   },
+// //   emptyText: {
+// //     textAlign: 'center',
+// //     fontSize: 16,
+// //     color: '#555',
+// //     marginTop: 20,
+// //   },
+// // });
+
+// // export default ApprovalHistoryData;
+
+
+
 // import React, {useState, useEffect} from 'react';
 // import {
 //   View,
@@ -84,57 +334,112 @@
 //         {item.incoming ? 'Incoming' : 'Outgoing'}
 //       </Text>
 //       <View style={styles.infoRow}>
-//         <Text style={styles.infoText}>Name: {item.servicePerson.name}</Text>
+//         <Text style={styles.infoText}>
+//           <Text style={styles.titleText}>
+//             ServicePerson Name:{' '}
+//             <Text style={styles.dataText}>{item.servicePerson.name}</Text>
+//           </Text>
+//         </Text>
+
 //         {item.status && (
 //           <Text style={styles.approvedText}>Approved Success</Text>
 //         )}
 //       </View>
-//       <Text style={styles.infoText}>Contact: {item.servicePerson.contact}</Text>
-//       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
-//       <Text style={styles.infoText}>Farmer Contact: {item.farmerContact}</Text>
-//       <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
+
+//       <Text style={styles.infoText}>
+//         <Text style={styles.titleText}>
+//           ServicePerson Contact:{' '}
+//           <Text style={styles.dataText}>{item.servicePerson.contact}</Text>
+//         </Text>
+//       </Text>
+
+//       <Text style={styles.infoText}>
+//         <Text style={styles.titleText}>
+//           Farmer Name: <Text style={styles.dataText}>{item.farmerName}</Text>
+//         </Text>
+//       </Text>
+
+//       <Text style={styles.infoText}>
+//         <Text style={styles.titleText}>
+//           Farmer Contact:
+//           <Text style={styles.dataText}>{item.farmerContact}</Text>
+//         </Text>
+//       </Text>
+
+//       {/* <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text></Text> */}
+
+//       <Text style={styles.infoText}>
+//         <Text style={styles.titleText}>
+//           Village Name:{' '}
+//           <Text style={styles.dataText}>{item.farmerVillage}</Text>
+//         </Text>
+//       </Text>
+
 //       <View style={styles.itemContainer}>
+//         <Text style={styles.titleText}>Product: </Text>
 //         {item.items.map(({_id, itemName, quantity}) => (
 //           <Text key={_id} style={styles.infoText}>
-//             {itemName}: {quantity}
+//             <Text style={styles.dataText}>{itemName}</Text>: {quantity}
 //           </Text>
 //         ))}
 //       </View>
-//       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
-//       <Text style={styles.infoText}>Remark: {item.remark}</Text>
-//       {item.incoming && (
-//         <Text style={styles.infoText}>
-//           RMU Present:{' '}
-//           {item?.withoutRMU ? (!item.withoutRMU ? 'YES' : 'NO') : 'N/A'}
-//         </Text>
-//       )}
-//       {item.incoming && (
-//         <Text style={styles.infoText}>
-//           RMU Remark: {item?.rmuRemark || 'N/A'}
-//         </Text>
-//       )}
+
 //       <Text style={styles.infoText}>
-//         Pickup Date: {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+//         <Text style={styles.titleText}>
+//           Serial Number:{' '}
+//           <Text style={styles.dataText}>{item.serialNumber}</Text>
+//         </Text>
 //       </Text>
-//       {item?.approvedBy && (
-//         <Text style={styles.infoText}>Approved By: {item.approvedBy}</Text>
-//       )}
-//       {item?.receivedDate && (
+
+//       <Text style={styles.infoText}>
+//         <Text style={styles.titleText}>
+//           Remark: <Text style={styles.dataText}>{item.remark}</Text>
+//         </Text>
+//       </Text>
+
+//       {item.incoming && (
 //         <Text style={styles.infoText}>
-//           Received Date: {formatDate(item.receivedDate)}
+//           <Text style={styles.titleText}>
+//             RMU Present:{' '}
+//             <Text style={styles.dataText}>
+//               {item?.withoutRMU ? (!item.withoutRMU ? 'YES' : 'NO') : 'N/A'}
+//             </Text>
+//           </Text>
 //         </Text>
 //       )}
+
+//       {item.incoming && (
+//         <Text style={styles.infoText}>
+//           <Text style={styles.titleText}>
+//             RMU Remark:{' '}
+//             <Text style={styles.dataText}>{item?.rmuRemark || 'N/A'}</Text>
+//           </Text>
+//         </Text>
+//       )}
+
+//       <Text style={styles.infoText}>
+//         <Text style={styles.titleText}>
+//           Pickup Date:{' '}
+//           <Text style={styles.dataText}>
+//             {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+//           </Text>
+//         </Text>
+//       </Text>
+
+//       {item?.approvedBy && (
+//         <Text style={styles.infoText}>
+//           <Text style={styles.titleText}>
+//             Approved By: <Text style={styles.dataText}>{item.approvedBy}</Text>
+//           </Text>
+//         </Text>
+//       )}
+
+     
 //     </View>
 //   );
 
 //   return (
 //     <View style={styles.container}>
-//       <TextInput
-//         style={styles.searchInput}
-//         placeholder="Search by name, farmer, or serial number"
-//         value={searchQuery}
-//         onChangeText={handleSearch}
-//       />
 //       <Text style={styles.header}>Approved Data</Text>
 //       {loading ? (
 //         <ActivityIndicator
@@ -143,6 +448,16 @@
 //           style={styles.loadingIndicator}
 //         />
 //       ) : (
+
+//         <>
+//       <TextInput
+//         style={styles.searchInput}
+//         placeholder="Search by name, farmer, or serial number"
+//         value={searchQuery}
+//         onChangeText={handleSearch}
+//         placeholderTextColor={'#000'}
+//       />
+       
 //         <FlatList
 //           data={filteredOrders}
 //           renderItem={renderOrderItem}
@@ -152,11 +467,11 @@
 //           ListEmptyComponent={
 //             <Text style={styles.emptyText}>No transactions found.</Text>
 //           }
+          
 //         />
+//         </>
 //       )}
-//       <TouchableOpacity style={styles.refreshIcon} onPress={handleRefresh}>
-//         <Icon name="refresh" size={30} color="black" />
-//       </TouchableOpacity>
+      
 //     </View>
 //   );
 // };
@@ -170,18 +485,20 @@
 //   },
 //   searchInput: {
 //     height: 40,
-//     borderColor: '#ccc',
+//     borderColor: 'black',
 //     borderWidth: 1,
 //     borderRadius: 8,
 //     paddingLeft: 10,
 //     marginBottom: 16,
 //     fontSize: 16,
+    
 //   },
 //   header: {
 //     fontSize: 24,
 //     fontWeight: 'bold',
 //     marginBottom: 16,
 //     textAlign: 'center',
+//     color: "black"
 //   },
 //   card: {
 //     padding: 16,
@@ -196,7 +513,6 @@
 //   statusText: {
 //     fontSize: 16,
 //     fontWeight: 'bold',
-//     marginBottom: 8,
 //   },
 //   incoming: {
 //     color: 'purple',
@@ -207,11 +523,18 @@
 //   infoRow: {
 //     flexDirection: 'row',
 //     justifyContent: 'space-between',
-//     marginBottom: 8,
 //   },
 //   infoText: {
 //     color: '#000',
-//     marginBottom: 4,
+//   },
+//   dataText: {
+//     fontWeight: 'normal',
+//     color: '#000',
+//   },
+
+//   titleText: {
+//     fontWeight: 'bold',
+//     color: '#000',
 //   },
 //   approvedText: {
 //     color: 'green',
@@ -220,7 +543,6 @@
 //   itemContainer: {
 //     flexDirection: 'row',
 //     flexWrap: 'wrap',
-//     marginBottom: 8,
 //   },
 //   loadingIndicator: {
 //     flex: 1,
@@ -263,6 +585,7 @@ import {
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
+import {useNavigation} from '@react-navigation/native';
 
 const ApprovalHistoryData = () => {
   const [orders, setOrders] = useState([]);
@@ -270,6 +593,7 @@ const ApprovalHistoryData = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const navigation = useNavigation();
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -282,7 +606,6 @@ const ApprovalHistoryData = () => {
       setFilteredOrders(response.data.orderHistory);
     } catch (error) {
       Alert.alert('Error', 'Unable to fetch orders');
-      // console.log('Error fetching orders:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -293,19 +616,16 @@ const ApprovalHistoryData = () => {
     fetchOrders();
   }, []);
 
-  // Format date
   const formatDate = dateString => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
 
-  // Handle pull-to-refresh
   const handleRefresh = () => {
     setRefreshing(true);
     fetchOrders();
   };
 
-  // Search handler
   const handleSearch = query => {
     setSearchQuery(query);
     if (query) {
@@ -323,7 +643,6 @@ const ApprovalHistoryData = () => {
     }
   };
 
-  // Render each order item
   const renderOrderItem = ({item}) => (
     <View key={item._id} style={styles.card}>
       <Text
@@ -332,6 +651,8 @@ const ApprovalHistoryData = () => {
           item.incoming ? styles.incoming : styles.outgoing,
         ]}>
         {item.incoming ? 'Incoming' : 'Outgoing'}
+
+       
       </Text>
       <View style={styles.infoRow}>
         <Text style={styles.infoText}>
@@ -366,7 +687,6 @@ const ApprovalHistoryData = () => {
         </Text>
       </Text>
 
-      {/* <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text></Text> */}
 
       <Text style={styles.infoText}>
         <Text style={styles.titleText}>
@@ -433,8 +753,6 @@ const ApprovalHistoryData = () => {
           </Text>
         </Text>
       )}
-
-     
     </View>
   );
 
@@ -448,30 +766,27 @@ const ApprovalHistoryData = () => {
           style={styles.loadingIndicator}
         />
       ) : (
-
         <>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search by name, farmer, or serial number"
-        value={searchQuery}
-        onChangeText={handleSearch}
-        placeholderTextColor={'#000'}
-      />
-       
-        <FlatList
-          data={filteredOrders}
-          renderItem={renderOrderItem}
-          keyExtractor={item => item._id}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>No transactions found.</Text>
-          }
-          
-        />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name, farmer, or serial number"
+            value={searchQuery}
+            onChangeText={handleSearch}
+            placeholderTextColor={'#000'}
+          />
+
+          <FlatList
+            data={filteredOrders}
+            renderItem={renderOrderItem}
+            keyExtractor={item => item._id}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No transactions found.</Text>
+            }
+          />
         </>
       )}
-      
     </View>
   );
 };
@@ -491,14 +806,13 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: 16,
     fontSize: 16,
-    
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: "black"
+    color: 'black',
   },
   card: {
     padding: 16,

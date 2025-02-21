@@ -16,10 +16,8 @@ import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
 
 const AddTransaction = ({route}) => {
-  const {complaintId, farmerContact, saralId} = route.params || {};
+  const {farmerComplaintId, farmerContact, farmerSaralId} = route.params || {};
 
-
-       
   const [servicePersons, setServicePersons] = useState([]);
   const [selectedServicePerson, setSelectedServicePerson] = useState('');
   const [remarks, setRemarks] = useState('');
@@ -33,7 +31,6 @@ const AddTransaction = ({route}) => {
   const [serialNumber, setSerialNumber] = useState('');
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [farmerSaralId, setFarmerSaralId] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -144,7 +141,7 @@ const AddTransaction = ({route}) => {
     }));
 
     const data = {
-      complaintId,
+      farmerComplaintId,
       servicePersons: selectedServicePerson,
       farmerContact,
       items: itemsData,
@@ -153,7 +150,7 @@ const AddTransaction = ({route}) => {
       serialNumber,
       incoming: false,
       pickupDate: new Date(),
-      farmerSaralId: saralId,
+      farmerSaralId,
     };
 
     console.log('data sent', data);
@@ -246,7 +243,7 @@ const AddTransaction = ({route}) => {
             <Text style={styles.label}>Farmer Saral Id</Text>
             <TextInput
               style={[styles.input, styles.nonEditable]}
-              value={saralId || 'N/A'}
+              value={farmerSaralId || 'N/A'}
               editable={false}
             />
 

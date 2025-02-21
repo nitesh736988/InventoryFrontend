@@ -411,7 +411,6 @@ import {
   TextInput,
   Alert,
   StyleSheet,
-  Modal,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -420,20 +419,21 @@ import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {API_URL} from '@env';
 import {RadioButton} from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
-const InOrder = ({route, navigation}) => {
+const InOrder = ({route}) => {
   const {id, name, farmerContact, saralId} = route.params;
   // console.log('complaint Id md', id);
   const [items, setItems] = useState([{}]);
   const [warehouses, setWarehouses] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const navigation = useNavigation();
   const [formData, setFormData] = useState({
   
     remarks: '',
     selectedItems: [],
     quantities: {},
     status: '',
-    modalVisible: false,
     serialNumber: '',
     selectedWarehouse: 'Bhiwani',
     controllerSelected: false,
@@ -441,13 +441,13 @@ const InOrder = ({route, navigation}) => {
     rmuRemark: '',
     farmerSaralId: '',
   });
+  
 
   const {
     remarks,
     selectedItems,
     quantities,
     status,
-    modalVisible,
     serialNumber,
     selectedWarehouse,
     controllerSelected,
@@ -580,6 +580,7 @@ const InOrder = ({route, navigation}) => {
       resetForm();
       setFormData(prevState => ({...prevState, modalVisible: false}));
       Alert.alert('Success', 'Transaction saved successfully');
+      navigation.goBack();
       
     } catch (error) {
       Alert.alert(error?.response?.data?.message);
@@ -602,21 +603,7 @@ const InOrder = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          setFormData(prevState => ({...prevState, modalVisible: true}))
-        }>
-        <Text style={styles.buttonText}>Request Item</Text>
-      </TouchableOpacity>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() =>
-          setFormData(prevState => ({...prevState, modalVisible: false}))
-        }>
+      
         <View
           style={{
             paddingHorizontal: 20,
@@ -776,7 +763,6 @@ const InOrder = ({route, navigation}) => {
             </TouchableOpacity>
           </View>
         </ScrollView>
-      </Modal>
     </View>
   );
 };
@@ -785,6 +771,7 @@ const styles = StyleSheet.create({
   container: {
     height: 200,
     padding: 20,
+    flex: 1,
   },
   listContainer: {
     backgroundColor: '#fbd33b',
