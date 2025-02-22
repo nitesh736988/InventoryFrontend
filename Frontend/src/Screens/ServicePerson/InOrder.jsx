@@ -551,6 +551,7 @@ const InOrder = ({route}) => {
 
     const data = {
       farmerComplaintId: id,
+      name,
       farmerContact,         
       items: itemSelected,
       warehouse: selectedWarehouse,
@@ -560,6 +561,7 @@ const InOrder = ({route}) => {
       pickupDate: new Date(),
       withoutRMU,
       rmuRemark,
+      
       farmerSaralId: saralId,
     };
 

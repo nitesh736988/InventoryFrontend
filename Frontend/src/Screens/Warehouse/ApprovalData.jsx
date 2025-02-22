@@ -228,7 +228,7 @@
 //                   onPress={() => {
 //                     console.log(item.farmerComplaintId, item.farmerContact, item.farmerSaralId);
 //                     handleApproveBtn(item._id, item.incoming, item.farmerComplaintId,  item.farmerContact, item.farmerSaralId);
-                    
+
 //                   }}>
 //                   <Text style={styles.buttonText}>Approve</Text>
 //                 </TouchableOpacity>
@@ -361,7 +361,6 @@
 
 // export default ApprovalData;
 
-
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -468,7 +467,7 @@ const ApprovalData = () => {
 
   const renderOrderItem = ({item}) => (
     <>
-      {!item.status && (
+      {/* {!item.status && ( */}
         <View key={item._id} style={[styles.card, {width: cardWidth}]}>
           <Text
             style={[
@@ -483,19 +482,21 @@ const ApprovalData = () => {
               <Text style={styles.dataText}>{item.servicePerson.name}</Text>
             </Text>
             {item.status && (
-              <Text style={styles.approvedText}>Approved Success</Text>
+              <>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('AddTransaction', {
+                      farmerComplaintId: item?.pickupItems?.farmerComplaintId,
+                      farmerContact: item?.pickupItems?.farmerContact,
+                      farmerSaralId: item?.pickupItems?.farmerSaralId,
+                    })
+                  }>
+                  <Text style={styles.approvedText}>Fill Form</Text>
+                </TouchableOpacity>
+              {/* 
+                <Text style={styles.approvedText}>Approved Success</Text> */}
+              </>
             )}
-
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('AddTransaction', {
-                  farmerComplaintId: item?.pickupItems?.farmerComplaintId,
-                  farmerContact: item?.pickupItems?.farmerContact,
-                  farmerSaralId: item?.pickupItems?.farmerSaralId,
-                })
-              }>
-              <Text style={styles.approvedText}>Fill Form</Text>
-            </TouchableOpacity>
           </View>
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>
@@ -602,7 +603,7 @@ const ApprovalData = () => {
             )}
           </View>
         </View>
-      )}
+      {/* )} */}
     </>
   );
 

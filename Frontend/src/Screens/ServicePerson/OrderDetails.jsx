@@ -76,19 +76,18 @@ const OrderDetails = () => {
           {item.incoming ? 'Incoming' : 'Outgoing'}
         </Text>
         <View style={styles.detailsContainer}>
+          
           <View style={styles.detailRow}>
-            <Text style={styles.detailText}>
-              Farmer Name: {item.farmerName}
-            </Text>
+          <Text style={styles.detailText}>
+            Farmer Contact: {item.farmerContact}
+          </Text>
             <Text style={{color: item.status ? 'green' : 'red'}}>
               {item.status ? 'Completed' : 'Pending'}
             </Text>
           </View>
+          
           <Text style={styles.detailText}>
-            Farmer Contact: {item.farmerContact}
-          </Text>
-          <Text style={styles.detailText}>
-            Village Name: {item.farmerVillage}
+            Saral Id: {item.farmerSaralId}
           </Text>
           <View style={styles.itemList}>
             {item.items.map(({_id, itemName, quantity}) => (

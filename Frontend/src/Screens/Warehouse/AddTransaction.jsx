@@ -5,7 +5,6 @@ import {
   TextInput,
   Alert,
   StyleSheet,
-  Modal,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -27,7 +26,6 @@ const AddTransaction = ({route}) => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [allWarehouses, setAllWarehouses] = useState([]);
   const [status, setStatus] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
   const [serialNumber, setSerialNumber] = useState('');
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -168,7 +166,6 @@ const AddTransaction = ({route}) => {
       if (response.status === 200) {
         Alert.alert('Success', 'Transaction saved successfully');
         resetForm();
-        setModalVisible(false);
       } else {
         Alert.alert('Error', 'Failed to save transaction');
       }
@@ -189,16 +186,7 @@ const AddTransaction = ({route}) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => setModalVisible(true)}>
-        <Text style={styles.buttonText}>Out Order</Text>
-      </TouchableOpacity>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
+      
         <View style={styles.modalHeader}>
           <Text style={styles.label}>Select Items:</Text>
           <MultiSelect
@@ -289,7 +277,6 @@ const AddTransaction = ({route}) => {
             </TouchableOpacity>
           </View>
         </ScrollView>
-      </Modal>
     </View>
   );
 };

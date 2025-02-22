@@ -88,11 +88,9 @@
 //   const [selected, setSelected] = useState(null);
 //   const [ isPendingSelected, setPendingSelected ] = useState(false);
 
-
 //   // useEffect(())
 
 //   console.log(stageOptions)
-
 
 //   useEffect(() => {
 //     const initialize = async () => {
@@ -256,10 +254,8 @@
 //     if (option === 'Yes') {
 
 //       navigation.navigate('InOrder', { id: complaintId, name: farmerName, farmerContact, saralId});
-//     } 
+//     }
 //   };
-
-
 
 //   const handleSubmit = async () => {
 //     const serviceId = await AsyncStorage.getItem('_id');
@@ -483,7 +479,7 @@
 //           />
 //         </>
 //       )}
-      
+
 //       {isPendingSelected && <View style={styles.optionsContainer}>
 //         <Text style={styles.label}>Collected Defective Material:</Text>
 //         <TouchableOpacity
@@ -494,7 +490,7 @@
 //           />
 //           <Text style={styles.optionText}>Yes</Text>
 //         </TouchableOpacity>
-        
+
 //         <TouchableOpacity
 //           onPress={() => handleSelection('No')}
 //           style={styles.option}>
@@ -504,7 +500,6 @@
 //           <Text style={styles.optionText}>No</Text>
 //         </TouchableOpacity>
 //       </View>}
-      
 
 //       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
 //         <Text style={styles.buttonText}>Submit</Text>
@@ -643,8 +638,6 @@
 
 // export default ShowComplaintData;
 
-
-
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -669,7 +662,6 @@ import {PermissionsAndroid} from 'react-native';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 
 const requestCameraPermission = async () => {
   try {
@@ -734,19 +726,22 @@ const ShowComplaintData = ({route}) => {
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
   const [selected, setSelected] = useState(null);
-  const [isPendingSelected, setPendingSelected ] = useState(false);
+  const [isPendingSelected, setPendingSelected] = useState(false);
   const [farmerItemRemarks, setFarmerItemRemarks] = useState('');
 
   const [photos, setPhotos] = useState({
-      finalFoundation: [],
-      panelPhotograph: [],
-      photographwithwater: [],
-      photographwithController: [],
-});
+    finalFoundation: [],
+    panelPhotograph: [],
+    photographwithwater: [],
+    photographwithController: [],
+  });
 
-const filesNameList = [
-  'finalFoundation', 'panelPhotograph', 'photographwithwater', 'photographwithController']
-
+  const filesNameList = [
+    'finalFoundation',
+    'panelPhotograph',
+    'photographwithwater',
+    'photographwithController',
+  ];
 
   useEffect(() => {
     const initialize = async () => {
@@ -842,7 +837,7 @@ const filesNameList = [
     );
   };
 
-  const openGeneralCamera = async (category) => {
+  const openGeneralCamera = async category => {
     const hasPermission = await requestCameraPermission();
     if (!hasPermission) {
       Alert.alert('Permission Denied', 'Camera access is required.');
@@ -856,7 +851,7 @@ const filesNameList = [
         quality: 1,
         includeBase64: true,
       },
-      async (response) => {
+      async response => {
         if (response.didCancel) {
           console.log('User cancelled camera picker');
         } else if (response.errorCode) {
@@ -871,7 +866,7 @@ const filesNameList = [
               'JPEG',
               80,
               0,
-              null
+              null,
             );
 
             const resizedPhoto = {
@@ -880,7 +875,7 @@ const filesNameList = [
               base64: resizedImage.base64 || originalPhoto.base64,
             };
 
-            setPhotos((prevFiles) => ({
+            setPhotos(prevFiles => ({
               ...prevFiles,
               [category]: [...prevFiles[category], resizedPhoto],
             }));
@@ -889,46 +884,40 @@ const filesNameList = [
             Alert.alert('Error', 'Failed to resize the image.');
           }
         }
-      }
+      },
     );
   };
-
-
 
   const handleStageChange = itemValue => {
     setSelectedStage(itemValue);
     setShowRemarks(itemValue !== '');
-    if(itemValue === '675be30222ae6f63bf772dcf'){
+    if (itemValue === '675be30222ae6f63bf772dcf') {
       setPendingSelected(true);
-    }
-    else{
+    } else {
       setPendingSelected(false);
     }
   };
 
-  const handleSelection = (option) => {
+  const handleSelection = option => {
     setSelected(option);
-    
+
     if (option === 'Yes') {
-      navigation.navigate('InOrder', { 
-        id: complaintId, 
-        name: farmerName, 
-        farmerContact, 
-        saralId 
+      navigation.navigate('InOrder', {
+        id: complaintId,
+        name: farmerName,
+        farmerContact,
+        saralId,
       });
     } else {
       setFarmerItemRemarks(true);
     }
   };
-  
-
 
   const fileLabels = {
     finalFoundation: 'Final Foundation Image With Farmer',
     panelPhotograph: 'Photograph With Panel + Structure',
     photographwithwater: 'Photograph With Water Discharge',
     photographwithController: 'Photograph with Controller',
-   
   };
 
   const handleSubmit = async () => {
@@ -964,24 +953,22 @@ const filesNameList = [
       )
       .filter(Boolean);
 
-      const photosBase64 = {
-        finalFoundation: photos.finalFoundation?.[0]?.base64
-          ? `data:${photos.finalFoundation[0].type};base64,${photos.finalFoundation[0].base64}`
-          : null,
-      
-        panelPhotograph: photos.panelPhotograph?.[0]?.base64
-          ? `data:${photos.panelPhotograph[0].type};base64,${photos.panelPhotograph[0].base64}`
-          : null,
-      
-        photographWithWater: photos.photographwithwater?.[0]?.base64
-          ? `data:${photos.photographwithwater[0].type};base64,${photos.photographwithwater[0].base64}`
-          : null,
-      
-        photographWithController: photos.photographwithController?.[0]?.base64
-          ? `data:${photos.photographwithController[0].type};base64,${photos.photographwithController[0].base64}`
-          : null,
-      };
+    const finalFoundationBase64 = photos.finalFoundation?.[0]?.base64
+      ? `data:${photos.finalFoundation[0].type};base64,${photos.finalFoundation[0].base64}`
+      : null;
 
+    const panelPhotographBase64 = photos.panelPhotograph?.[0]?.base64
+      ? `data:${photos.panelPhotograph[0].type};base64,${photos.panelPhotograph[0].base64}`
+      : null;
+
+    const photographwithwaterBase64 = photos.photographwithwater?.[0]?.base64
+      ? `data:${photos.photographwithwater[0].type};base64,${photos.photographwithwater[0].base64}`
+      : null;
+
+    const photographwithControllerBase64 = photos.photographwithController?.[0]
+      ?.base64
+      ? `data:${photos.photographwithController[0].type};base64,${photos.photographwithController[0].base64}`
+      : null;
 
     const requestData = {
       fieldEmpID: serviceId,
@@ -992,12 +979,15 @@ const filesNameList = [
       controllerNumber,
       simNumber,
       simPhoto: simPhotoBase64,
-      photos: photosBase64,
+      finalFoundation: finalFoundationBase64,
+      panelPhotograph: panelPhotographBase64,
+      photographwithwater: photographwithwaterBase64,
+      photographwithController: photographwithControllerBase64,
       longitude,
       latitude,
     };
 
-    console.log("request data", requestData)
+    console.log('request data', requestData);
     try {
       setLoading(true);
       const response = await axios.put(
@@ -1122,22 +1112,24 @@ const filesNameList = [
         <View key={key} style={styles.fileContainer}>
           <Text style={styles.label}>{fileLabels[key]}</Text>
 
-      <TouchableOpacity onPress={() => openGeneralCamera(filesNameList[index])} style={styles.imageButton}>
-      <MaterialIcon name="camera-plus" size={28} color="#000" />
-      <Text style={styles.title}>Camera</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => openGeneralCamera(filesNameList[index])}
+            style={styles.imageButton}>
+            <MaterialIcon name="camera-plus" size={28} color="#000" />
+            <Text style={styles.title}>Camera</Text>
+          </TouchableOpacity>
 
-      {photos[key]?.length > 0 && (
-        <ScrollView horizontal style={styles.imagePreviewContainer}>
-          {photos[key].map((file, index) => (
-            <View key={index} style={styles.imageWrapper}>
-              <Image source={{ uri: file.uri }} style={styles.imagePreview} />
-              </View>
+          {photos[key]?.length > 0 && (
+            <ScrollView horizontal style={styles.imagePreviewContainer}>
+              {photos[key].map((file, index) => (
+                <View key={index} style={styles.imageWrapper}>
+                  <Image source={{uri: file.uri}} style={styles.imagePreview} />
+                </View>
               ))}
             </ScrollView>
           )}
-          </View>
-          ))}
+        </View>
+      ))}
 
       <Text style={styles.label}>Status:</Text>
       <View style={styles.pickerContainer}>
@@ -1163,43 +1155,50 @@ const filesNameList = [
           />
         </>
       )}
-      
-  {isPendingSelected && (
-  <>
-  <View style={styles.optionsContainer}>
-    <Text style={styles.label}>Collected Defective Material:</Text>
-    
-    <TouchableOpacity
-      onPress={() => handleSelection('Yes')}
-      style={styles.option}>
-      <View style={[styles.checkbox, selected === 'Yes' && styles.checkedBox]}>
-        {selected === 'Yes' && <Text style={styles.checkmark}>✔️</Text>} 
-      </View>
-      <Text style={styles.optionText}>Yes</Text>
-    </TouchableOpacity>
-    
-    
-    <TouchableOpacity
-      onPress={() => handleSelection('No')}
-      style={styles.option}>
-      <View style={[styles.checkbox, selected === 'No' && styles.checkedBox]} >
-      {selected === 'No' && <Text style={styles.checkmark}>✔️</Text>} 
-      </View>
-      <Text style={styles.optionText}>No</Text>
-    </TouchableOpacity>
-    </View>
+
+      {isPendingSelected && (
+        <>
+          <View style={styles.optionsContainer}>
+            <Text style={styles.label}>Collected Defective Material:</Text>
+
+            <TouchableOpacity
+              onPress={() => handleSelection('Yes')}
+              style={styles.option}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selected === 'Yes' && styles.checkedBox,
+                ]}>
+                {selected === 'Yes' && <Text style={styles.checkmark}>✔️</Text>}
+              </View>
+              <Text style={styles.optionText}>Yes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleSelection('No')}
+              style={styles.option}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selected === 'No' && styles.checkedBox,
+                ]}>
+                {selected === 'No' && <Text style={styles.checkmark}>✔️</Text>}
+              </View>
+              <Text style={styles.optionText}>No</Text>
+            </TouchableOpacity>
+          </View>
           <View>
-          {selected === 'No' && (
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Service Remarks"
-            multiline={true}
-            numberOfLines={4}
-          />
-        )}
-    </View>
-    </>
-)}
+            {selected === 'No' && (
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Service Remarks"
+                multiline={true}
+                numberOfLines={4}
+              />
+            )}
+          </View>
+        </>
+      )}
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
@@ -1221,7 +1220,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: 10,
     fontWeight: 'bold',
-},
+  },
   input: {
     borderWidth: 1,
     borderColor: '#000',
@@ -1235,25 +1234,25 @@ const styles = StyleSheet.create({
   optionsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-},
-option: {
+  },
+  option: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 20,
-},
+  },
 
-fileContainer: {
-  backgroundColor: '#fff',
-  padding: 12,
-  marginBottom: 15,
-  borderRadius: 10,
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.2,
-  shadowRadius: 4,
-  elevation: 3,
-},
-checkbox: {
+  fileContainer: {
+    backgroundColor: '#fff',
+    padding: 12,
+    marginBottom: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  checkbox: {
     width: 20,
     height: 20,
     borderRadius: 5,
@@ -1262,14 +1261,14 @@ checkbox: {
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 5,
-},
-checkedBox: {
+  },
+  checkedBox: {
     backgroundColor: '#FFFFFF',
-},
+  },
 
-optionText: {
-  fontSize: 16,
-},
+  optionText: {
+    fontSize: 16,
+  },
 
   card: {
     padding: 10,
@@ -1341,7 +1340,7 @@ optionText: {
     padding: 12,
     marginBottom: 40,
     alignItems: 'center',
-    marginTop: 30
+    marginTop: 30,
   },
   buttonText: {color: '#fff', fontSize: 16},
   loaderContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
