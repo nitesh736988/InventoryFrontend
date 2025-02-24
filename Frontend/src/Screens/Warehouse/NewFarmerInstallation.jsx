@@ -29,7 +29,7 @@ const NewFarmerInstallation = () => {
       const response = await axios.get(
         `http://88.222.214.93:8001/warehouse/newFarmerList?warehouseId=${warehouseId}`,
       );
-a
+
       if (!response.data?.data) throw new Error('Invalid data format');
 
       setNewInstallation(response.data.data);
