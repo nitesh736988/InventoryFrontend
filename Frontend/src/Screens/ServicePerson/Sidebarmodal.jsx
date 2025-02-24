@@ -90,10 +90,10 @@ const Sidebarmodal = () => {
     navigation.navigate('UserForm');
   };
 
-  const openNewInstallation = () => {
-    closeModal();
-    navigation.navigate('NewInstallation');
-  };
+  // const openNewInstallation = () => {
+  //   closeModal();
+  //   navigation.navigate('NewInstallation');
+  // };
 
   const openApprovalNewInstallation = () => {
     closeModal();
@@ -192,12 +192,12 @@ const Sidebarmodal = () => {
             style={styles.optionButton}>
             <Text style={styles.optionText}>User Form</Text>
           </TouchableOpacity>
-
+{/* 
           <TouchableOpacity
             onPress={openNewInstallation}
             style={styles.optionButton}>
             <Text style={styles.optionText}>New Installation</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             onPress={openApprovalNewInstallation}

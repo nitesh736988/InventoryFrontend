@@ -431,11 +431,7 @@ const AppNavigator = () => {
           component={InOrder}
           options={{title: 'InOrder', headerShown: false}}
         />
-
-
-
-
-        
+      
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -137,7 +137,7 @@ const Dashboard = () => {
         style={styles.picker}
         onValueChange={(value) => setSelectedWarehouse(value)}
       >
-        <Picker.Item label="Total Items" value="Total Items" style= {{color: '#000'}}/>
+        {/* <Picker.Item label="Total Items" value="Total Items" style= {{color: '#000'}}/> */}
         {allWarehouses.map((warehouse) => (
           <Picker.Item
             key={warehouse._id}

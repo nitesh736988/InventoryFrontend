@@ -638,7 +638,7 @@
 
 // export default ShowComplaintData;
 
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -651,14 +651,14 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {launchCamera} from 'react-native-image-picker';
+import { launchCamera } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
-import {PermissionsAndroid} from 'react-native';
+import { PermissionsAndroid } from 'react-native';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -701,7 +701,7 @@ const requestLocationPermission = async () => {
   }
 };
 
-const ShowComplaintData = ({route}) => {
+const ShowComplaintData = ({ route }) => {
   const {
     complaintId,
     farmerName,
@@ -721,7 +721,7 @@ const ShowComplaintData = ({route}) => {
   const [rmuNumber, setRmuNumber] = useState('');
   const [controllerNumber, setControllerNumber] = useState('');
   const [simNumber, setSimNumber] = useState('');
-  const [simPhoto, setSimPhoto] = useState([]);
+  const [photos, setPhotos] = useState([]); // All photos stored in a single array
   const navigation = useNavigation();
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
@@ -729,19 +729,21 @@ const ShowComplaintData = ({route}) => {
   const [isPendingSelected, setPendingSelected] = useState(false);
   const [farmerItemRemarks, setFarmerItemRemarks] = useState('');
 
-  const [photos, setPhotos] = useState({
-    finalFoundation: [],
-    panelPhotograph: [],
-    photographwithwater: [],
-    photographwithController: [],
-  });
-
   const filesNameList = [
     'finalFoundation',
-    'panelPhotograph',
-    'photographwithwater',
-    'photographwithController',
+    'panelPhoto',
+    'photoWithWater',
+    'photoWithController',
+    'simPhoto', // Add SIM photo category
   ];
+
+  const fileLabels = {
+    finalFoundation: 'Final Foundation Image With Farmer',
+    panelPhoto: 'Photograph With Panel + Structure',
+    photoWithWater: 'Photograph With Water Discharge',
+    photoWithController: 'Photograph with Controller',
+    simPhoto: 'SIM Photo',
+  };
 
   useEffect(() => {
     const initialize = async () => {
@@ -749,11 +751,11 @@ const ShowComplaintData = ({route}) => {
         const locationGranted = await requestLocationPermission();
         if (locationGranted) {
           Geolocation.getCurrentPosition(
-            position => {
+            (position) => {
               setLongitude(position.coords.longitude);
               setLatitude(position.coords.latitude);
             },
-            error => {
+            (error) => {
               console.log('Error getting location:', error.message);
               Alert.alert('Error', 'Unable to fetch location.');
             },
@@ -767,11 +769,13 @@ const ShowComplaintData = ({route}) => {
           `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
         );
         setInstallationData(response.data.data);
+        console.log('Installation Data:', response.data.data);
 
         const stageResponse = await axios.get(
           `http://88.222.214.93:8001/filedService/showStage`,
         );
         setStageOptions(stageResponse.data?.stages || []);
+        console.log('Stage Options:', stageResponse.data?.stages);
       } catch (error) {
         console.log(
           'Error fetching data:',
@@ -785,7 +789,7 @@ const ShowComplaintData = ({route}) => {
     initialize();
   }, []);
 
-  const openCamera = async () => {
+  const openGeneralCamera = async (category) => {
     const hasPermission = await requestCameraPermission();
     if (!hasPermission) {
       Alert.alert('Permission Denied', 'Camera access is required.');
@@ -799,59 +803,7 @@ const ShowComplaintData = ({route}) => {
         quality: 1,
         includeBase64: true,
       },
-      async response => {
-        if (response.didCancel) {
-          console.log('User cancelled camera picker');
-        } else if (response.errorCode) {
-          console.log('Camera Error:', response.errorMessage);
-        } else if (response.assets && response.assets.length > 0) {
-          try {
-            const originalPhoto = response.assets[0];
-            const resizedImage = await ImageResizer.createResizedImage(
-              originalPhoto.uri,
-              800,
-              800,
-              'JPEG',
-              80,
-              0,
-              null,
-            );
-
-            const fileStats = await RNFS.stat(resizedImage.uri);
-            const fileSizeInKB = (fileStats.size / 1024).toFixed(2);
-
-            console.log(`Resized image size: ${fileSizeInKB} KB`);
-
-            const resizedPhoto = {
-              ...originalPhoto,
-              uri: resizedImage.uri,
-              base64: resizedImage.base64 || originalPhoto.base64,
-            };
-            setSimPhoto([resizedPhoto]);
-          } catch (error) {
-            console.log('Error resizing image:', error.message);
-            Alert.alert('Error', 'Failed to resize the image.');
-          }
-        }
-      },
-    );
-  };
-
-  const openGeneralCamera = async category => {
-    const hasPermission = await requestCameraPermission();
-    if (!hasPermission) {
-      Alert.alert('Permission Denied', 'Camera access is required.');
-      return;
-    }
-
-    launchCamera(
-      {
-        mediaType: 'photo',
-        cameraType: 'back',
-        quality: 1,
-        includeBase64: true,
-      },
-      async response => {
+      async (response) => {
         if (response.didCancel) {
           console.log('User cancelled camera picker');
         } else if (response.errorCode) {
@@ -870,15 +822,13 @@ const ShowComplaintData = ({route}) => {
             );
 
             const resizedPhoto = {
-              ...originalPhoto,
               uri: resizedImage.uri,
               base64: resizedImage.base64 || originalPhoto.base64,
+              type: originalPhoto.type,
+              category, // Add the category to identify the photo type
             };
 
-            setPhotos(prevFiles => ({
-              ...prevFiles,
-              [category]: [...prevFiles[category], resizedPhoto],
-            }));
+            setPhotos((prevPhotos) => [...prevPhotos, resizedPhoto]);
           } catch (error) {
             console.log('Error resizing image:', error.message);
             Alert.alert('Error', 'Failed to resize the image.');
@@ -888,7 +838,7 @@ const ShowComplaintData = ({route}) => {
     );
   };
 
-  const handleStageChange = itemValue => {
+  const handleStageChange = (itemValue) => {
     setSelectedStage(itemValue);
     setShowRemarks(itemValue !== '');
     if (itemValue === '675be30222ae6f63bf772dcf') {
@@ -898,7 +848,7 @@ const ShowComplaintData = ({route}) => {
     }
   };
 
-  const handleSelection = option => {
+  const handleSelection = (option) => {
     setSelected(option);
 
     if (option === 'Yes') {
@@ -911,13 +861,6 @@ const ShowComplaintData = ({route}) => {
     } else {
       setFarmerItemRemarks(true);
     }
-  };
-
-  const fileLabels = {
-    finalFoundation: 'Final Foundation Image With Farmer',
-    panelPhotograph: 'Photograph With Panel + Structure',
-    photographwithwater: 'Photograph With Water Discharge',
-    photographwithController: 'Photograph with Controller',
   };
 
   const handleSubmit = async () => {
@@ -947,28 +890,14 @@ const ShowComplaintData = ({route}) => {
       return;
     }
 
-    const simPhotoBase64 = simPhoto
-      .map(photo =>
-        photo.base64 ? `data:${photo.type};base64,${photo.base64}` : null,
-      )
-      .filter(Boolean);
-
-    const finalFoundationBase64 = photos.finalFoundation?.[0]?.base64
-      ? `data:${photos.finalFoundation[0].type};base64,${photos.finalFoundation[0].base64}`
-      : null;
-
-    const panelPhotographBase64 = photos.panelPhotograph?.[0]?.base64
-      ? `data:${photos.panelPhotograph[0].type};base64,${photos.panelPhotograph[0].base64}`
-      : null;
-
-    const photographwithwaterBase64 = photos.photographwithwater?.[0]?.base64
-      ? `data:${photos.photographwithwater[0].type};base64,${photos.photographwithwater[0].base64}`
-      : null;
-
-    const photographwithControllerBase64 = photos.photographwithController?.[0]
-      ?.base64
-      ? `data:${photos.photographwithController[0].type};base64,${photos.photographwithController[0].base64}`
-      : null;
+    // Group photos by category and convert to base64
+    const groupedPhotos = photos.reduce((acc, photo) => {
+      if (!acc[photo.category]) {
+        acc[photo.category] = [];
+      }
+      acc[photo.category].push(`data:${photo.type};base64,${photo.base64}`);
+      return acc;
+    }, {});
 
     const requestData = {
       fieldEmpID: serviceId,
@@ -978,16 +907,17 @@ const ShowComplaintData = ({route}) => {
       rmuNumber,
       controllerNumber,
       simNumber,
-      simPhoto: simPhotoBase64,
-      finalFoundation: finalFoundationBase64,
-      panelPhotograph: panelPhotographBase64,
-      photographwithwater: photographwithwaterBase64,
-      photographwithController: photographwithControllerBase64,
+      simPhoto: groupedPhotos.simPhoto || [],
+      finalFoundation: groupedPhotos.finalFoundation || [],
+      panelPhoto: groupedPhotos.panelPhoto || [],
+      photoWithWater: groupedPhotos.photoWithWater || [],
+      photoWithController: groupedPhotos.photoWithController || [],
       longitude,
       latitude,
     };
 
-    console.log('request data', requestData);
+    console.log('Request Data:', requestData);
+
     try {
       setLoading(true);
       const response = await axios.put(
@@ -1092,42 +1022,26 @@ const ShowComplaintData = ({route}) => {
         placeholderTextColor={'#000'}
       />
 
-      <Text style={styles.label}>Sim Photo:</Text>
-      <TouchableOpacity onPress={openCamera} style={styles.imageButton}>
-        <Icon name="camera-plus" size={28} color="#000" />
-      </TouchableOpacity>
-
-      <ScrollView horizontal style={styles.imagePreviewContainer}>
-        <View style={styles.imageWrapper}>
-          {simPhoto.length !== 0 && (
-            <Image
-              source={{uri: simPhoto[0]?.uri}}
-              style={styles.imagePreview}
-            />
-          )}
-        </View>
-      </ScrollView>
-
-      {filesNameList.map((key, index) => (
-        <View key={key} style={styles.fileContainer}>
-          <Text style={styles.label}>{fileLabels[key]}</Text>
+      {filesNameList.map((category, index) => (
+        <View key={category} style={styles.fileContainer}>
+          <Text style={styles.label}>{fileLabels[category]}</Text>
 
           <TouchableOpacity
-            onPress={() => openGeneralCamera(filesNameList[index])}
+            onPress={() => openGeneralCamera(category)}
             style={styles.imageButton}>
             <MaterialIcon name="camera-plus" size={28} color="#000" />
             <Text style={styles.title}>Camera</Text>
           </TouchableOpacity>
 
-          {photos[key]?.length > 0 && (
-            <ScrollView horizontal style={styles.imagePreviewContainer}>
-              {photos[key].map((file, index) => (
+          <ScrollView horizontal style={styles.imagePreviewContainer}>
+            {photos
+              .filter((photo) => photo.category === category)
+              .map((photo, index) => (
                 <View key={index} style={styles.imageWrapper}>
-                  <Image source={{uri: file.uri}} style={styles.imagePreview} />
+                  <Image source={{ uri: photo.uri }} style={styles.imagePreview} />
                 </View>
               ))}
-            </ScrollView>
-          )}
+          </ScrollView>
         </View>
       ))}
 
@@ -1135,7 +1049,7 @@ const ShowComplaintData = ({route}) => {
       <View style={styles.pickerContainer}>
         <Picker selectedValue={selectedStage} onValueChange={handleStageChange}>
           <Picker.Item label="Select a Status" value="" />
-          {stageOptions.map(({_id, stage}) => (
+          {stageOptions.map(({ _id, stage }) => (
             <Picker.Item key={_id} label={stage} value={_id} />
           ))}
         </Picker>
@@ -1208,7 +1122,7 @@ const ShowComplaintData = ({route}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
+   container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -1220,7 +1134,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: 10,
     fontWeight: 'bold',
-  },
+},
   input: {
     borderWidth: 1,
     borderColor: '#000',
@@ -1234,25 +1148,13 @@ const styles = StyleSheet.create({
   optionsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  option: {
+},
+option: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 20,
-  },
-
-  fileContainer: {
-    backgroundColor: '#fff',
-    padding: 12,
-    marginBottom: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  checkbox: {
+},
+checkbox: {
     width: 20,
     height: 20,
     borderRadius: 5,
@@ -1261,14 +1163,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 5,
-  },
-  checkedBox: {
-    backgroundColor: '#FFFFFF',
-  },
+},
+checkedBox: {
+    backgroundColor: '#007BFF',
+},
 
-  optionText: {
-    fontSize: 16,
-  },
+optionText: {
+  fontSize: 16,
+},
 
   card: {
     padding: 10,
@@ -1324,13 +1226,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   imageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#dff9fb',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 50,
   },
   imagePreviewContainer: {flexDirection: 'row', marginBottom: 16},
   imagePreview: {width: 100, height: 100, marginRight: 8, borderRadius: 8},
@@ -1340,7 +1240,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 40,
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 30
   },
   buttonText: {color: '#fff', fontSize: 16},
   loaderContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
@@ -1348,5 +1248,6 @@ const styles = StyleSheet.create({
 
   nonEditable: {backgroundColor: '#e9ecef', color: '#000'},
 });
+
 
 export default ShowComplaintData;

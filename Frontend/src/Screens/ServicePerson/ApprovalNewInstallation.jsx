@@ -23,7 +23,7 @@
 //         <Text>Survey Person: {item.empId.name}</Text>
 //         <Text>Accepted: {item.accepted ? "Yes" : "No"}</Text>
 //         <Text>Installation Done: {item.installationDone ? "Yes" : "No"}</Text>
-        
+
 //         {isExpanded && (
 //           <View>
 //             <Text>Pump Number: {item.pumpNumber}</Text>
@@ -84,115 +84,364 @@
 
 // export default ApprovalNewInstallation;
 
+// import React, { useState, useEffect } from 'react';
+// import { View, Text, Button, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+// import {API_URL} from '@env';
+// import axios from 'axios';
+
+// const ApprovalNewInstallation = () => {
+//     const [data, setData] = useState([]);
+//     const [loading, setLoading] = useState(true);
+//     const [expanded, setExpanded] = useState({});
+
+//     useEffect(() => {
+//         fetchData();
+//     }, []);
+
+//     const fetchData = async () => {
+//         try {
+//             const response = await axios.get(`${API_URL}/service-person/show-new-install-data`);
+//             console.log("response data", response.data.data)
+//             const result = await response.json();
+//             setData(result);
+//         } catch (error) {
+//             console.log('Error fetching data:', error);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const toggleExpand = (id) => {
+//         setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+//     };
+
+//     const renderItem = ({ item }) => (
+//         <View style={styles.card}>
+//             <Text>Farmer Name: {item.farmerName}</Text>
+//             <Text>Saral ID: {item.SaralId}</Text>
+//             <Text>Contact: {item.contact}</Text>
+//             <Text>State: {item.state}</Text>
+//             <Text>District: {item.district}</Text>
+//             {expanded[item.SaralId] && (
+//                 <>
+//                     <Text>Block: {item.block}</Text>
+//                     <Text>Village: {item.village}</Text>
+//                     <Text>Warehouse Name: {item.WarehouseName}</Text>
+//                     <Text>Sub Item Name: {item.subItemName}</Text>
+//                     <Text>Quantity: {item.Quantity}</Text>
+//                     <Text>Pump Number: {item.PumpNumber}</Text>
+//                     <Text>Controller Number: {item.ControllerNumber}</Text>
+//                     <Text>RMU Number: {item.rmuNumber}</Text>
+//                 </>
+//             )}
+//             <Button title={expanded[item.SaralId] ? 'Show Less' : 'Show More'} onPress={() => toggleExpand(item.SaralId)} />
+//         </View>
+//     );
+
+//     if (loading) {
+//         return <ActivityIndicator size="large" color="#0000ff" />;
+//     }
+
+//     return (
+//         <FlatList
+//             data={data}
+//             keyExtractor={(item) => item.SaralId.toString()}
+//             renderItem={renderItem}
+//         />
+//     );
+// };
+
+// const styles = StyleSheet.create({
+//     card: {
+//         backgroundColor: '#fff',
+//         padding: 10,
+//         margin: 10,
+//         borderRadius: 5,
+//         elevation: 2,
+//     }
+// });
+
+// export default ApprovalNewInstallation;
+
+// import React, { useState, useEffect } from 'react';
+// import { View, Text, Button, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+// import {API_URL} from '@env';
+// import axios from 'axios';
+
+// const ApprovalNewInstallation = () => {
+//     const [data, setData] = useState([]);
+//     const [loading, setLoading] = useState(true);
+//     const [expanded, setExpanded] = useState({});
+
+//     useEffect(() => {
+//         fetchData();
+//     }, []);
+
+//     const fetchData = async () => {
+//         try {
+//             const response = await axios.get(`${API_URL}/service-person/show-new-install-data`);
+//             console.log(" response data", response.data.data)
+//             setData(response.data.data);
+//         } catch (error) {
+//             console.log('Error fetching data:', error);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const toggleExpand = (id) => {
+//         setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+//     };
+
+//     const renderItem = ({ item }) => (
+//         <View style={styles.card}>
+//             <Text>Farmer Name: {item.farmerDetails.farmerName}</Text>
+//             <Text>Saral ID: {item.farmerDetails.saralId}</Text>
+//             <Text>Contact: {item.farmerDetails.contact}</Text>
+//             <Text>State: {item.farmerDetails.state}</Text>
+//             <Text>District: {item.farmerDetails.district}</Text>
+//             {expanded[item._id] && (
+//                 <>
+//                     <Text>Block: {item.farmerDetails.block}</Text>
+//                     <Text>Village: {item.farmerDetails.village}</Text>
+//                     <Text>Warehouse Name: {item.warehouseId.warehouseName}</Text>
+//                     <Text>Sub Item Name: {item.itemsList[0]?.subItemId.subItemName}</Text>
+//                     <Text>Quantity: {item.itemsList[0]?.quantity}</Text>
+//                     <Text>Pump Number: {item.pumpNumber}</Text>
+//                     <Text>Controller Number: {item.controllerNumber}</Text>
+//                     <Text>RMU Number: {item.rmuNumber}</Text>
+//                 </>
+//             )}
+//             <Button title={expanded[item._id] ? 'Show Less' : 'Show More'} onPress={() => toggleExpand(item._id)} />
+//         </View>
+//     );
+
+//     if (loading) {
+//         return <ActivityIndicator size="large" color="#0000ff" />;
+//     }
+
+//     return (
+//         <FlatList
+//             data={data}
+//             keyExtractor={(item) => item._id.toString()}
+//             renderItem={renderItem}
+//         />
+//     );
+// };
+
+// const styles = StyleSheet.create({
+//   card: {
+//     padding: 16,
+//     marginVertical: 8,
+//     backgroundColor: '#f9f9f9',
+//     borderRadius: 8,
+//     shadowColor: '#000',
+//     shadowOffset: {width: 0, height: 2},
+//     shadowOpacity: 0.1,
+//     shadowRadius: 4,
+//     elevation: 2,
+//   },
+// });
+
+// export default ApprovalNewInstallation;
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { API_URL } from '@env';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+
+const { width } = Dimensions.get('window');
 
 const ApprovalNewInstallation = () => {
-  const [installationData, setInstallationData] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [expanded, setExpanded] = useState({});
+  const navigation = useNavigation();
+  const [btnClickedStatus, setBtnClickedStatus] = useState({});
 
   useEffect(() => {
-    axios
-      .get('http://88.222.214.93:5000/service-person/show-new-install-data')
-      .then((response) => {
-        setInstallationData(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError('Failed to fetch data');
-        setLoading(false);
-      });
+    fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/service-person/show-new-install-data`);
+      setData(response.data.data);
+    } catch (error) {
+      console.log('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Render error if API call fails
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text>{error}</Text>
-      </View>
-    );
-  }
+  const handleApproveBtn = async (installationId, farmerId, empId) => {
+    try {
+      const response = await axios.post(`${API_URL}/service-person/update-incoming-item-status`, {
+        accepted: true,
+        installationId,
+        farmerId,
+        empId,
+      });
+  
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+  
+      if (response.status === 200) {
+        setBtnClickedStatus(prev => ({ ...prev, [installationId]: true }));
+        fetchData(); 
+      }
+    } catch (error) {
+      console.log("Error approving installation:", error);
+  
+      if (error.response) {
 
-  // Render the data if successfully fetched
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Approval New Installation</Text>
-      <FlatList
-        data={installationData}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            {/* Warehouse Name */}
-            <Text>Warehouse Name: {item.warehouseId?.warehouseName}</Text>
-            
-            {/* Sub Item Name & Quantity */}
-            {item.itemsList.map((subItem, index) => (
-              <Text key={index}>
-                Sub Item: {subItem.subItemId?.subItemName}, Quantity: {subItem.quantity}
-              </Text>
-            ))}
-            
-            {/* Pump and Controller Numbers */}
-            <Text>Pump Number: {item.pumpNumber}</Text>
-            <Text>Controller Number: {item.controllerNumber}</Text>
-            <Text>RMU Number: {item.rmuNumber}</Text>
+        console.log("Error data:", error.response.data);
+        console.log("Error status:", error.response.status);
+        console.log("Error headers:", error.response.headers);
+        Alert.alert('Error', `Failed to approve the installation. Server responded with status: ${error.response.status}`);
+      } else if (error.request) {
 
-            {/* Farmer Details */}
-            <Text>Farmer Name: {item.farmerDetails?.farmerName}</Text>
-            <Text>Saral ID: {item.farmerDetails?.saralId}</Text>
-            <Text>Contact: {item.farmerDetails?.contact}</Text>
-            <Text>State: {item.farmerDetails?.state}</Text>
-            <Text>District: {item.farmerDetails?.district}</Text>
-            <Text>Village: {item.farmerDetails?.village}</Text>
-            <Text>Block: {item.farmerDetails?.block}</Text>
-            <Text>Installation Date: {item.farmerDetails?.installationDate}</Text>
+        console.log("Error request:", error.request);
+        Alert.alert('Error', 'No response received from the server. Please check your network connection.');
+      } else {
 
-            {/* Additional Fields */}
-            <Text>Product: {item.farmerDetails?.product}</Text>
-            <Text>HP: {item.farmerDetails?.HP}</Text>
-            <Text>AC/DC: {item.farmerDetails?.AC_DC}</Text>
-            <Text>Pump Type: {item.farmerDetails?.pump_type}</Text>
-          </View>
+        console.log("Error message:", error.message);
+        Alert.alert('Error', `Failed to approve the installation. Error: ${error.message}`);
+      }
+    }
+  };
+  const toggleExpand = id => {
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <Text style={styles.title}>Farmer Name: {item.farmerDetails.farmerName}</Text>
+      <Text style={styles.text}>Saral ID: {item.farmerDetails.saralId}</Text>
+      <Text style={styles.text}>Contact: {item.farmerDetails.contact}</Text>
+      <Text style={styles.text}>State: {item.farmerDetails.state}</Text>
+      <Text style={styles.text}>District: {item.farmerDetails.district}</Text>
+
+      {expanded[item._id] && (
+        <>
+          <Text style={styles.text}>Block: {item.farmerDetails.block}</Text>
+          <Text style={styles.text}>Village: {item.farmerDetails.village}</Text>
+          <Text style={styles.text}>Warehouse Name: {item.warehouseId.warehouseName}</Text>
+          <Text style={styles.text}>Sub Item Name: {item.itemsList[0]?.subItemId.subItemName}</Text>
+          <Text style={styles.text}>Quantity: {item.itemsList[0]?.quantity}</Text>
+          <Text style={styles.text}>Pump Number: {item.pumpNumber}</Text>
+          <Text style={styles.text}>Controller Number: {item.controllerNumber}</Text>
+          <Text style={styles.text}>RMU Number: {item.rmuNumber}</Text>
+        </>
+      )}
+
+      <View style={styles.footer}>
+        <Button title={expanded[item._id] ? 'Show Less' : 'Show More'} onPress={() => toggleExpand(item._id)} />
+        {item.accepted && (
+          <TouchableOpacity
+            style={styles.fillFormButton}
+            onPress={() => navigation.navigate('NewInstallation', { pickupItemId: item._id })}
+          >
+            <Text style={styles.fillFormText}>Fill Form</Text>
+          </TouchableOpacity>
         )}
-      />
+        {!item.accepted && (
+          <TouchableOpacity
+            style={styles.approveButton}
+            onPress={() => handleApproveBtn(item._id, item.farmerDetails._id, item.empId)}
+          >
+            <Text style={styles.buttonText}>Approve</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
+  );
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;
+  }
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={item => item._id.toString()}
+      renderItem={renderItem}
+      contentContainerStyle={styles.listContainer}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  listContainer: {
+    padding: 10,
+    backgroundColor: '#fbd33b',
     flex: 1,
-    padding: 16,
+  },
+  card: {
+    backgroundColor: '#fff',
+    padding: 15,
+    marginVertical: 8,
+    marginHorizontal: width * 0.05,
+    borderRadius: 10,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   title: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 5,
+    color: '#000',
   },
-  item: {
-    padding: 10,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: '#ccc',
+  text: {
+    fontSize: 14,
+    marginBottom: 3,
+    color: '#333',
   },
-  center: {
+  loader: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  fillFormButton: {
+    backgroundColor: 'green',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  fillFormText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  approveButton: {
+    backgroundColor: 'blue',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
 
 export default ApprovalNewInstallation;
-

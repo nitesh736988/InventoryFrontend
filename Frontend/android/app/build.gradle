@@ -90,14 +90,14 @@ android {
         versionName "1.0"
     }
     
-    splits {
-        abi {
-            reset()
-            enable true
-            universalApk false
-            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-        }
-    }
+    // splits {
+    //     abi {
+    //         reset()
+    //         enable true
+    //         universalApk true
+    //         include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+    //     }
+    // }
     
     signingConfigs {
          
@@ -125,8 +125,8 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             // signingConfig signingConfigs.debug
             signingConfig signingConfigs.release
-            minifyEnabled enableProguardInReleaseBuilds
-            // minifyEnabled false
+            // minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled false
             shrinkResources false
             // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -147,5 +147,5 @@ dependencies {
 }
 
 project.ext.react = [
-  enableHermes: true  // Set this to true to enable Hermes
+  enableHermes: true  
 ]

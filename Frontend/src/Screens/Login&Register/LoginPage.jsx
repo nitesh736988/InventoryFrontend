@@ -273,6 +273,7 @@ const LoginPage = () => {
         console.log("Login Person id", id);
         await AsyncStorage.setItem("_id", id);
         navigation.navigate('WarehouseNavigation');
+        
       } else if (role === 'admin') {
         navigation.navigate('Navigation');
       }
