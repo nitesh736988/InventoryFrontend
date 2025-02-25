@@ -4,7 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Outgoing from './Outgoing';
 import WarehouseDashboard from './WarehouseDashboard';
 import ApprovalData from './ApprovalData';
-import AddTransaction from './AddTransaction';
+// import AddTransaction from './AddTransaction';
 
 
 const headerColor = '#186cbf';
@@ -36,9 +36,9 @@ const TabNavigator = () => {
           } else if (route.name === 'ApprovalData') {
             iconName = 'cube-outline';
           }
-           else if (route.name === 'AddTransaction') {
-            iconName = 'cube-outline';
-          }
+          //  else if (route.name === 'AddTransaction') {
+          //   iconName = 'cube-outline';
+          // }
 
           return (
             <MaterialCommunityIcons name={iconName} color={color} size={size} />
@@ -61,11 +61,11 @@ const TabNavigator = () => {
         component={ApprovalData}
         options={{title: 'InData'}}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="AddTransaction"
         component={AddTransaction}
         options={{title: 'Outgoing'}}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

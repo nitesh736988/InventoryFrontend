@@ -44,10 +44,7 @@ const Sidebarmodal = () => {
     navigation.navigate('OrderDetails');
   };
 
-  const openInOrder = () => {
-    closeModal();
-    navigation.navigate('InOrder');
-  };
+ 
 
   const openOutStatus = () => {
     closeModal();
@@ -89,11 +86,6 @@ const Sidebarmodal = () => {
     closeModal();
     navigation.navigate('UserForm');
   };
-
-  // const openNewInstallation = () => {
-  //   closeModal();
-  //   navigation.navigate('NewInstallation');
-  // };
 
   const openApprovalNewInstallation = () => {
     closeModal();
@@ -139,10 +131,6 @@ const Sidebarmodal = () => {
             onPress={openOrderDetails}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Incoming Data</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={openInOrder} style={styles.optionButton}>
-            <Text style={styles.optionText}>In Order</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

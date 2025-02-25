@@ -17,7 +17,11 @@ import {useNavigation} from '@react-navigation/native';
 const AddTransaction = ({route}) => {
   const {farmerComplaintId, farmerContact, farmerSaralId} = route.params || {};
 
-  const [servicePersons, setServicePersons] = useState([]);
+  console.log("farmerComplaintId", farmerComplaintId)
+  console.log("farmerContact", farmerContact)
+  console.log("farmerSaralId", farmerSaralId)
+
+  const [servicePerson, setServicePerson] = useState([]);
   const [selectedServicePerson, setSelectedServicePerson] = useState('');
   const [remarks, setRemarks] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
@@ -37,8 +41,8 @@ const AddTransaction = ({route}) => {
         const response = await axios.get(
           `${API_URL}/service-team/all-service-persons`,
         );
-        console.log(response.data.data);
-        setServicePersons(response.data.data);
+        console.log(response?.data.data);
+        setServicePerson(response?.data?.data);
       } catch (error) {
         console.log('Failed to fetch service persons:', error);
       }
@@ -53,7 +57,7 @@ const AddTransaction = ({route}) => {
         const response = await axios.get(
           `${API_URL}/warehouse-admin/view-items`,
         );
-        const items = response.data.items.map((item, index) => ({
+        const items = response?.data?.items?.map((item, index) => ({
           _id: index + 1,
           itemName: item,
         }));
@@ -69,7 +73,7 @@ const AddTransaction = ({route}) => {
         const response = await axios.get(
           `${API_URL}/warehouse-admin/get-warehouse`,
         );
-        setAllWarehouses(response.data.warehouseName);
+        setAllWarehouses(response?.data?.warehouseName);
       } catch (error) {
         console.log('Failed to fetch warehouse names:', error);
         setAllWarehouses([]);
@@ -110,7 +114,7 @@ const AddTransaction = ({route}) => {
   };
 
   const validateInput = () => {
-    if (!servicePersons || !farmerContact) {
+    if (!servicePerson || !farmerContact) {
       Alert.alert('Error', 'Please fill in all fields.');
       return false;
     }
@@ -140,7 +144,7 @@ const AddTransaction = ({route}) => {
 
     const data = {
       farmerComplaintId,
-      servicePersons: selectedServicePerson,
+      servicePerson: selectedServicePerson,
       farmerContact,
       items: itemsData,
       warehouse: selectedWarehouse,
@@ -150,7 +154,6 @@ const AddTransaction = ({route}) => {
       pickupDate: new Date(),
       farmerSaralId,
     };
-
     console.log('data sent', data);
     try {
       const response = await axios.post(
@@ -176,7 +179,7 @@ const AddTransaction = ({route}) => {
   };
 
   const resetForm = () => {
-    setServicePersons('');
+    setServicePerson('');
     setSelectedItems([]);
     setQuantities({});
     setRemarks('');
@@ -206,19 +209,20 @@ const AddTransaction = ({route}) => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.form}>
             <Text style={styles.label}>Service Person:</Text>
+            {
+              console.log("all service person" , servicePerson)
+            }
             <Picker
               selectedValue={selectedServicePerson}
               onValueChange={itemValue => setSelectedServicePerson(itemValue)}
-              style={styles.input}>
+              style={styles.input}
+            >
               <Picker.Item label="Select Service Person" value="" />
-              {servicePersons.map(person => (
-                <Picker.Item
-                  key={person._id}
-                  label={person.name}
-                  value={person._id}
-                />
+              {(Array.isArray(servicePerson) ? servicePerson : []).map((person) => (
+                <Picker.Item key={person._id} label={person.name} value={person._id} />
               ))}
             </Picker>
+
 
             <Text style={styles.label}>Farmer Contact:</Text>
             <TextInput

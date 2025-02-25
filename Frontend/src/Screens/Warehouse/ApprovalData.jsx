@@ -467,142 +467,142 @@ const ApprovalData = () => {
 
   const renderOrderItem = ({item}) => (
     <>
-      {/* {!item.status && ( */}
-        <View key={item._id} style={[styles.card, {width: cardWidth}]}>
-          <Text
-            style={[
-              styles.statusText,
-              item.incoming ? styles.incoming : styles.outgoing,
-            ]}>
-            {item.incoming ? 'Incoming' : 'Outgoing'}
-          </Text>
-          <View style={styles.infoRow}>
-            <Text style={styles.titleText}>
-              ServicePerson Name:{' '}
-              <Text style={styles.dataText}>{item.servicePerson.name}</Text>
-            </Text>
-            {item.status && (
-              <>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('AddTransaction', {
-                      farmerComplaintId: item?.pickupItems?.farmerComplaintId,
-                      farmerContact: item?.pickupItems?.farmerContact,
-                      farmerSaralId: item?.pickupItems?.farmerSaralId,
-                    })
-                  }>
-                  <Text style={styles.approvedText}>Fill Form</Text>
-                </TouchableOpacity>
-              {/* 
-                <Text style={styles.approvedText}>Approved Success</Text> */}
-              </>
-            )}
-          </View>
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              ServicePerson Contact:{' '}
-              <Text style={styles.dataText}>{item.servicePerson.contact}</Text>
-            </Text>
-          </Text>
 
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Farmer Contact:{' '}
-              <Text style={styles.dataText}>{item.farmerContact}</Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Farmer SaralId:{' '}
-              <Text style={styles.dataText}>{item.farmerSaralId}</Text>
-            </Text>
-          </Text>
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Selected Warehouse:{' '}
-              <Text style={styles.dataText}>{item.warehouse}</Text>
-            </Text>
-          </Text>
-          <View style={styles.itemContainer}>
-            <Text style={styles.infoText}>
-              <Text style={styles.titleText}>Product: </Text>
-            </Text>
-            {item.items.map(({_id, itemName, quantity}) => (
-              <Text key={_id} style={styles.dataText}>
-                {itemName}: {quantity + ' '}
-              </Text>
-            ))}
-          </View>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Serial Number:{' '}
-              <Text style={styles.dataText}>{item.serialNumber}</Text>
-            </Text>
-          </Text>
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Remark: <Text style={styles.dataText}>{item.remark}</Text>
-            </Text>
-          </Text>
-
-          {item.incoming && (
-            <Text style={styles.infoText}>
-              <Text style={styles.titleText}>
-                RMU Present:{' '}
-                <Text style={styles.dataText}>
-                  {item?.withoutRMU === true
-                    ? 'NO'
-                    : item?.withoutRMU === false
-                    ? 'YES'
-                    : 'N/A'}
-                </Text>
-              </Text>
-            </Text>
-          )}
-
-          {item?.incoming && (
-            <Text style={styles.infoText}>
-              <Text style={styles.titleText}>RMU Remark: </Text>
-              <Text style={styles.dataText}>{item?.rmuRemark || 'N/A'}</Text>
-            </Text>
-          )}
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>Pickup Date: </Text>
+      <View key={item._id} style={[styles.card, {width: cardWidth}]}>
+        <Text
+          style={[
+            styles.statusText,
+            item.incoming ? styles.incoming : styles.outgoing,
+          ]}>
+          {item.incoming ? 'Incoming' : 'Outgoing'}
+        </Text>
+        <View style={styles.infoRow}>
+          <Text style={styles.titleText}>
+            ServicePerson Name:{' '}
             <Text style={styles.dataText}>
-              {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+              {item.servicePerson?.name || 'N/A'}
             </Text>
           </Text>
-
-          {item?.arrivedDate && (
-            <Text style={styles.infoText}>
-              <Text style={styles.titleText}>Approved Date: </Text>
+          {item.status && !item.itemResend ? (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('AddTransaction', {
+                farmerComplaintId: item?.farmerComplaintId,
+                farmerContact: item?.farmerContact,
+                farmerSaralId: item?.farmerSaralId,
+              })
+            }>
+            <Text style={styles.approvedText}>Fill Form</Text>
+          </TouchableOpacity>
+        ) : (
+          item.itemResend && <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
+        )}
+        </View>
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            ServicePerson Contact:{' '}
+            <Text style={styles.dataText}>
+              {item.servicePerson?.contact || 'N/A'}
+            </Text>
+          </Text>
+        </Text>
+  
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Farmer Contact:{' '}
+            <Text style={styles.dataText}>{item.farmerContact}</Text>
+          </Text>
+        </Text>
+  
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Farmer SaralId:{' '}
+            <Text style={styles.dataText}>{item.farmerSaralId}</Text>
+          </Text>
+        </Text>
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Selected Warehouse:{' '}
+            <Text style={styles.dataText}>{item.warehouse}</Text>
+          </Text>
+        </Text>
+        <View style={styles.itemContainer}>
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>Product: </Text>
+          </Text>
+          {item.items.map(({_id, itemName, quantity}) => (
+            <Text key={_id} style={styles.dataText}>
+              {itemName}: {quantity + ' '}
+            </Text>
+          ))}
+        </View>
+  
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Serial Number:{' '}
+            <Text style={styles.dataText}>{item.serialNumber}</Text>
+          </Text>
+        </Text>
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Remark: <Text style={styles.dataText}>{item.remark}</Text>
+          </Text>
+        </Text>
+  
+        {item.incoming && (
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>
+              RMU Present:{' '}
               <Text style={styles.dataText}>
-                {formatDate(item.arrivedDate)}
+                {item?.withoutRMU === true
+                  ? 'NO'
+                  : item?.withoutRMU === false
+                  ? 'YES'
+                  : 'N/A'}
               </Text>
             </Text>
+          </Text>
+        )}
+  
+        {item?.incoming && (
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>RMU Remark: </Text>
+            <Text style={styles.dataText}>{item?.rmuRemark || 'N/A'}</Text>
+          </Text>
+        )}
+  
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Pickup Date: </Text>
+          <Text style={styles.dataText}>
+            {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
+          </Text>
+        </Text>
+  
+        {item?.arrivedDate && (
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>Approved Date: </Text>
+            <Text style={styles.dataText}>{formatDate(item.arrivedDate)}</Text>
+          </Text>
+        )}
+  
+        <View style={styles.actionContainer}>
+          {!item.status && (
+            <>
+              <TouchableOpacity style={styles.declineButton}>
+                <Text style={styles.buttonText}>Decline</Text>
+              </TouchableOpacity>
+  
+              <TouchableOpacity
+                style={styles.approveButton}
+                onPress={() => {
+                  handleApproveBtn(item._id, item.incoming);
+                }}>
+                <Text style={styles.buttonText}>Approve</Text>
+              </TouchableOpacity>
+            </>
           )}
-
-          <View style={styles.actionContainer}>
-            {!item.status && (
-              <>
-                <TouchableOpacity style={styles.declineButton}>
-                  <Text style={styles.buttonText}>Decline</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.approveButton}
-                  onPress={() => {
-                    handleApproveBtn(item._id, item.incoming);
-                  }}>
-                  <Text style={styles.buttonText}>Approve</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
         </View>
+      </View>
       {/* )} */}
     </>
   );

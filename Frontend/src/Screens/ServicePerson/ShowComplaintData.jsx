@@ -914,6 +914,7 @@ const ShowComplaintData = ({ route }) => {
       photoWithController: groupedPhotos.photoWithController || [],
       longitude,
       latitude,
+      farmerItemRemarks,
     };
 
     console.log('Request Data:', requestData);
