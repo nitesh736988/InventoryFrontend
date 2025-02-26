@@ -56,8 +56,8 @@ import SurveyDashboard from './Screens/Survey/SurveyDashboard';
 import SurveyAssignData from './Screens/ServicePerson/SurveyAssignData'
 import SurvayData from './Screens/ServicePerson/SurveyData'
 import AddSystemSubItem from './Screens/Admin/AddSystemSubItem';
-import NetworkConnectivityCompaintForms from './Screens/ServicePerson/NetworkConnectivityCompaintForms';
-import UserForm from './Screens/ServicePerson/UserForm';
+// import NetworkConnectivityCompaintForms from './Screens/ServicePerson/NetworkConnectivityCompaintForms';
+// import UserForm from './Screens/ServicePerson/UserForm';
 import NewFormInstallation from './Screens/Warehouse/NewFormInstallation';
 import NewFarmerInstallation from './Screens/Warehouse/NewFarmerInstallation';
 import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
@@ -395,7 +395,7 @@ const AppNavigator = () => {
           component={AddSystemSubItem}
           options={{title: 'AddSystemSubItem', headerShown: false}}
         />
-
+{/* 
         <Stack.Screen
           name="NetworkConnectivityCompaintForms"
           component={NetworkConnectivityCompaintForms}
@@ -406,7 +406,7 @@ const AppNavigator = () => {
           name="UserForm"
           component={UserForm}
           options={{title: 'UserForm', headerShown: false}}
-        />
+        /> */}
 
         <Stack.Screen
           name="NewFormInstallation"

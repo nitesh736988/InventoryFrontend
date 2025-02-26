@@ -55,7 +55,7 @@ const OrderDetails = () => {
     if (query) {
       const filtered = orders.filter(
         order =>
-          order.farmerName.toLowerCase().includes(query.toLowerCase()) ||
+          order.farmerSaralId.toLowerCase().includes(query.toLowerCase()) ||
           order.serialNumber.toLowerCase().includes(query.toLowerCase()),
       );
       setFilteredOrders(filtered);
@@ -131,7 +131,7 @@ const OrderDetails = () => {
       {/* Search Bar */}
       <TextInput
         style={styles.searchInput}
-        placeholder="Search by Farmer Name or Serial Number"
+        placeholder="Search by Farmer Saral Id or Serial Number"
         value={searchQuery}
         onChangeText={handleSearch}
         placeholderTextColor={'#000'}

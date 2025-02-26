@@ -279,7 +279,7 @@ const ApprovedData = () => {
       </Text>
       <View style={styles.infoRow}>
         <Text style={styles.infoText}>Name: {item.servicePersonName}</Text>
-        {item?.installationDone === false ? (
+        {/* {item?.installationDone === false ? (
           <TouchableOpacity
             onPress={() => navigation.navigate('InstallationPart', { pickupItemId: item._id })}
           >
@@ -287,7 +287,7 @@ const ApprovedData = () => {
           </TouchableOpacity>
         ) : (
           <Text style={[styles.approvedText, { color: 'green' }]}>Resolved</Text>
-        )}
+        )} */}
       </View>
       <Text style={styles.infoText}>Contact: {item.servicePerContact}</Text>
       <Text style={styles.infoText}>Farmer Name: {item.farmerName}</Text>
