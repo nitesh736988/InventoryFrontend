@@ -162,7 +162,7 @@ const InstallationData = () => {
           refreshing={refreshing}
           onRefresh={handleRefresh}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No transactions found.</Text>
+            <Text style={styles.emptyText}>No Data found.</Text>
           }
         />
       )}
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     fontSize: 16,
-    color: '#555',
+    color: 'red',
     marginTop: 20,
   },
   searchBar: {

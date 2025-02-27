@@ -238,7 +238,6 @@
 //               </Text>
 //             </TouchableOpacity>
 
-        
 //             <TouchableOpacity
 //               onPress={() => navigateAndHighlight('W2WData')}
 //               style={[
@@ -341,7 +340,6 @@
 //               </Text>
 //             </TouchableOpacity>
 
-
 //             <TouchableOpacity
 //               onPress={() => navigateAndHighlight('Logout')}
 //               style={[
@@ -376,7 +374,6 @@
 //               </Text>
 //             </TouchableOpacity>
 
-
 //           </>
 //         </Animated.View>
 //       </Modal>
@@ -394,7 +391,7 @@
 //     top: 20,
 //     left: 15,
 //     zIndex: 10,
-    
+
 //   },
 //   overlay: {
 //     flex: 1,
@@ -436,12 +433,11 @@
 //   },
 //   activeOptionText: {
 //     color: '#000',
-//     fontWeight: 'bold',              
+//     fontWeight: 'bold',
 //   },
 // });
 
-// export default Sidebar;                            
-
+// export default Sidebar;
 
 import React, {useState, useRef, useEffect} from 'react';
 import {
@@ -454,7 +450,6 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { ScrollView } from 'react-native-gesture-handler';
 
 const Sidebar = ({userType}) => {
   const [visible, setVisible] = useState(false);
@@ -463,6 +458,7 @@ const Sidebar = ({userType}) => {
     w2w: false,
     history: false,
     formFill: false,
+    System: false,
   });
   const slideAnim = useRef(new Animated.Value(-300)).current;
 
@@ -487,11 +483,17 @@ const Sidebar = ({userType}) => {
     });
   };
 
-  const toggleSection = (section) => {
-    setExpandedSections(prevState => ({
-      ...prevState,
-      [section]: !prevState[section],
-    }));
+  const toggleSection = section => {
+    setExpandedSections(prevState => {
+      const newState = {
+        w2w: false,
+        history: false,
+        formFill: false,
+        System: false,
+      };
+      newState[section] = !prevState[section];
+      return newState;
+    });
   };
 
   const navigateAndHighlight = screenName => {
@@ -507,7 +509,7 @@ const Sidebar = ({userType}) => {
   }, [visible]);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TouchableOpacity onPress={openModal} style={styles.menuIcon}>
         <Icon name="bars" size={28} color="#000" />
       </TouchableOpacity>
@@ -526,36 +528,48 @@ const Sidebar = ({userType}) => {
         <Animated.View
           style={[styles.sidebar, {transform: [{translateX: slideAnim}]}]}>
           <Text style={styles.sidebarText}>Galo Inventory System</Text>
-            <TouchableOpacity
-              onPress={() => toggleSection('w2w')}
-              style={styles.optionButton}>
-              <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <View>
-                  <Text style={styles.optionText}>Warehouse To Warehouse</Text>
-                </View>
-            
-                  <Icon
-                    name={expandedSections.w2w ? 'chevron-down' : 'chevron-right'}
-                    size={16}
-                    color="#333"
-                  
-                  />
-                </View>
-            </TouchableOpacity>
-     
-          
+          <TouchableOpacity
+            onPress={() => toggleSection('w2w')}
+            style={styles.optionButton}>
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View>
+                <Text style={styles.optionText}>Warehouse To Warehouse</Text>
+              </View>
+
+              <Icon
+                name={expandedSections.w2w ? 'chevron-down' : 'chevron-right'}
+                size={16}
+                color="#333"
+              />
+            </View>
+          </TouchableOpacity>
+
           {expandedSections.w2w && (
             <>
-              <TouchableOpacity onPress={() => navigateAndHighlight('W2W')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('W2W')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>W2W</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('W2WApproveHistory')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('W2WApproveHistory')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>W2W Approved History</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('W2Wapproval')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('W2Wapproval')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>W2W Approval</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('W2WData')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('W2WData')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>W2W Data</Text>
               </TouchableOpacity>
             </>
@@ -564,98 +578,151 @@ const Sidebar = ({userType}) => {
           <TouchableOpacity
             onPress={() => toggleSection('history')}
             style={styles.optionButton}>
-            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <View>
-                  <Text style={styles.optionText}>History</Text>
-                </View>
-            <Icon
-              name={expandedSections.history ? 'chevron-down' : 'chevron-right'}
-              size={16}
-              color="#333"
-            />
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View>
+                <Text style={styles.optionText}>History</Text>
+              </View>
+              <Icon
+                name={
+                  expandedSections.history ? 'chevron-down' : 'chevron-right'
+                }
+                size={16}
+                color="#333"
+              />
             </View>
-            
           </TouchableOpacity>
           {expandedSections.history && (
             <>
-
-              <TouchableOpacity onPress={() => navigateAndHighlight('UpperHistory')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('UpperHistory')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>Upper History</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('InstallationHistoryData')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('InstallationHistoryData')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>Installation Data</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('RepairHistory')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('RepairHistory')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>Repair History</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('RejectedHistory')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('RejectedHistory')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>Reject History</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('ApprovalData')} style={styles.optionButton}>
+              {/* <TouchableOpacity onPress={() => navigateAndHighlight('ApprovalData')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Approval Data</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('ApprovalHistoryData')} style={styles.optionButton}>
+              {/* <TouchableOpacity onPress={() => navigateAndHighlight('ApprovalHistoryData')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Approval History Data</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </>
           )}
 
           <TouchableOpacity
             onPress={() => toggleSection('formFill')}
             style={styles.optionButton}>
-            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <View>
-                  <Text style={styles.optionText}>Form Fill</Text>
-                </View>
-            <Icon
-              name={expandedSections.formFill ? 'chevron-down' : 'chevron-right'}
-              size={16}
-              color="#333"
-            />
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View>
+                <Text style={styles.optionText}>Form Fill</Text>
+              </View>
+              <Icon
+                name={
+                  expandedSections.formFill ? 'chevron-down' : 'chevron-right'
+                }
+                size={16}
+                color="#333"
+              />
             </View>
-            
           </TouchableOpacity>
           {expandedSections.formFill && (
             <>
-              <TouchableOpacity onPress={() => navigateAndHighlight('AddTransaction')} style={styles.optionButton}>
-                <Text style={styles.optionText}>Add Transaction</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigateAndHighlight('ServicePersonRegistration')
+                }
+                style={styles.optionButton}>
+                <Text style={styles.optionText}>
+                  Service Person Registration
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('ServicePersonRegistration')} style={styles.optionButton}>
-                <Text style={styles.optionText}>Service Person Registration</Text>
-              </TouchableOpacity>
-             
-              <TouchableOpacity onPress={() => navigateAndHighlight('AddSystemData')} style={styles.optionButton}>
+
+              {/* <TouchableOpacity onPress={() => navigateAndHighlight('AddSystemData')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Add System Data</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('Repaired')} style={styles.optionButton}>
+              </TouchableOpacity> */}
+
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('Repaired')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>Repair</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigateAndHighlight('Reject')} style={styles.optionButton}>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('Reject')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>Reject</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('ItemStockUpdate')} style={styles.optionButton}>
+              {/* <TouchableOpacity onPress={() => navigateAndHighlight('ItemStockUpdate')} style={styles.optionButton}>
                 <Text style={styles.optionText}>Item Stock Update</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               {/* <TouchableOpacity onPress={() => navigateAndHighlight('NewFormInstallation')} style={styles.optionButton}>
                 <Text style={styles.optionText}>NewForm Installation</Text>
               </TouchableOpacity> */}
+            </>
+          )}
 
-              <TouchableOpacity onPress={() => navigateAndHighlight('NewFarmerInstallation')} style={styles.optionButton}>
+          <TouchableOpacity
+            onPress={() => toggleSection('System')}
+            style={styles.optionButton}>
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View>
+                <Text style={styles.optionText}>System</Text>
+              </View>
+              <Icon
+                name={
+                  expandedSections.System ? 'chevron-down' : 'chevron-right'
+                }
+                size={16}
+                color="#333"
+              />
+            </View>
+          </TouchableOpacity>
+          {expandedSections.System && (
+            <>
+              <TouchableOpacity
+                onPress={() => navigateAndHighlight('NewFarmerInstallation')}
+                style={styles.optionButton}>
                 <Text style={styles.optionText}>NewFarmer Installation</Text>
-              </TouchableOpacity> 
-
-
-
-              
+              </TouchableOpacity>
             </>
           )}
         </Animated.View>
       </Modal>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -683,13 +750,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
 
-  arrow:{
+  arrow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -698,7 +765,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: 'black',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   optionButton: {
     paddingVertical: 10,

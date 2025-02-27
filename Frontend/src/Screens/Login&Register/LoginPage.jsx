@@ -262,11 +262,15 @@ const LoginPage = () => {
       const response = await axios.post(`${API_URL}/user/login`, { email, password, role });
       Alert.alert('Success', 'Login successful!');
       if (role === 'serviceperson') {
-        const { id, block } = response.data;
+        const { id, block,latitude,longitude } = response.data;
         console.log("Login Person id", id);
         console.log("Login Person block", block);
+        console.log("latitude", latitude)
+        console.log("longitude", longitude)
         await AsyncStorage.setItem("_id", id);
         await AsyncStorage.setItem("block", JSON.stringify(block));
+        await AsyncStorage.setItem("latitude", JSON.stringify(latitude));
+        await AsyncStorage.setItem("longitude", JSON.stringify(longitude));
         navigation.navigate('ServicePersonNavigation');
       } else if (role === 'warehouseAdmin') {
         const {id} = response.data;

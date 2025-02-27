@@ -415,7 +415,7 @@ import {
   TextInput,
   Alert,
   StyleSheet,
-  Modal,
+  // Modal,
   TouchableOpacity,
   ScrollView,
   Dimensions,
@@ -441,7 +441,7 @@ const W2W = () => {
     isDefective: null,
     fromWarehouse: '',
     toWarehouse: '',
-    modalVisible: false,
+    // modalVisible: false,
   });
 
   useEffect(() => {
@@ -594,7 +594,7 @@ const W2W = () => {
       if (response.status === 200) {
         resetForm();
         Alert.alert('Success', 'Transaction saved successfully');
-        setFormData(prevData => ({...prevData, modalVisible: false}));
+        
       } else {
         Alert.alert('Error', 'Failed to save transaction');
       }
@@ -613,27 +613,12 @@ const W2W = () => {
       isDefective: '',
       fromWarehouse: '',
       toWarehouse: '',
-      modalVisible: false,
+      // modalVisible: false,
     });
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          setFormData(prevData => ({...prevData, modalVisible: true}))
-        }>
-        <Text style={styles.buttonText}>Outgoing Order</Text>
-      </TouchableOpacity>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={formData.modalVisible}
-        onRequestClose={() =>
-          setFormData(prevData => ({...prevData, modalVisible: false}))
-        }>
         <View
           style={{
             paddingHorizontal: 20,
@@ -657,8 +642,6 @@ const W2W = () => {
           />
         </View>
 
-        
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.modalContainer}>
 
           {formData.selectedItems.map(item => (
@@ -674,6 +657,8 @@ const W2W = () => {
             />
           </View>
         ))}
+        
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
             <Text style={styles.label}>Driver Name:</Text>
             <TextInput
               value={formData.driverName}
@@ -743,28 +728,21 @@ const W2W = () => {
             <TouchableOpacity
               style={styles.button}
               onPress={handleDataOnSubmit}>
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                setFormData(prevData => ({...prevData, modalVisible: false}))
-              }>
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
+           </ScrollView>
           </View>
-        </ScrollView>
-      </Modal>
+          
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 12,
+
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#fbd33b',
   },
   button: {
     backgroundColor: '#070604',

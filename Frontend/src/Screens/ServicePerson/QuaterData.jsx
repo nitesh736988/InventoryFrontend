@@ -208,6 +208,7 @@ import {
   FlatList,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -236,6 +237,7 @@ const QuaterData = () => {
       );
       setData(response.data.data);
       setFilteredData(response.data.data); 
+
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch data');
       console.log(JSON.stringify(error.response));
@@ -329,7 +331,9 @@ const QuaterData = () => {
       />
 
       {loading && !refreshing ? (
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="blue" />
+      ) : filteredData.length === 0 ? (
+        <Text style={styles.noDataText}>No Data Available</Text>
       ) : (
         <FlatList
           data={filteredData}
@@ -385,6 +389,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginVertical: 2,
     color: '#444',
+  },
+  noDataText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'red',
+    marginTop: 20,
   },
 });
 

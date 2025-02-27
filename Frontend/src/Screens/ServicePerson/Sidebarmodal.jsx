@@ -77,19 +77,15 @@ const Sidebarmodal = () => {
     navigation.navigate('SurveyAssignData');
   };
 
-  const openNetworkConnectivityCompaintForms = () => {
-    closeModal();
-    navigation.navigate('NetworkConnectivityCompaintForms');
-  };
-
-  const openUserForm = () => {
-    closeModal();
-    navigation.navigate('UserForm');
-  };
 
   const openApprovalNewInstallation = () => {
     closeModal();
     navigation.navigate('ApprovalNewInstallation');
+  };
+
+  const openLocationTracker = () => {
+    closeModal();
+    navigation.navigate('LocationTracker');
   };
 
 
@@ -122,24 +118,6 @@ const Sidebarmodal = () => {
           <Text style={styles.sidebarText}>Galo Inventory System</Text>
 
           <TouchableOpacity
-            onPress={openServicePersonDashboard}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>Dashboard</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={openOrderDetails}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>Incoming Data</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={openOutStatus}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>Out Status</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
             onPress={openApprovedData}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Approved Data</Text>
@@ -160,7 +138,7 @@ const Sidebarmodal = () => {
           <TouchableOpacity
             onPress={openShowQuaterData}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Quater Data</Text>
+            <Text style={styles.optionText}>Quaterly Data</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -169,17 +147,6 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>Survey Assign Data</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={openNetworkConnectivityCompaintForms}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>Network Connectivity CompaintForms</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={openUserForm}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>User Form</Text>
-          </TouchableOpacity>
 {/* 
           <TouchableOpacity
             onPress={openNewInstallation}
@@ -191,6 +158,12 @@ const Sidebarmodal = () => {
             onPress={openApprovalNewInstallation}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Approval NewInstallation</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openLocationTracker}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Location Tracker</Text>
           </TouchableOpacity>
 
 
