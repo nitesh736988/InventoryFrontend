@@ -721,7 +721,7 @@ const ShowComplaintData = ({ route }) => {
   const [rmuNumber, setRmuNumber] = useState('');
   const [controllerNumber, setControllerNumber] = useState('');
   const [simNumber, setSimNumber] = useState('');
-  const [photos, setPhotos] = useState([]); // All photos stored in a single array
+  const [photos, setPhotos] = useState([]);
   const navigation = useNavigation();
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');

@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isRefreshClicked, setIsRefreshClicked] = useState(false);
-  const [selectedWarehouse, setSelectedWarehouse] = useState('Total Items');
+  const [selectedWarehouse, setSelectedWarehouse] = useState('Bhiwani');
   const [allWarehouses, setAllWarehouses] = useState([]);
   const [responseData, setResponseData] = useState([]);
   const navigation = useNavigation();
@@ -137,7 +137,6 @@ const Dashboard = () => {
         style={styles.picker}
         onValueChange={(value) => setSelectedWarehouse(value)}
       >
-        {/* <Picker.Item label="Total Items" value="Total Items" style= {{color: '#000'}}/> */}
         {allWarehouses.map((warehouse) => (
           <Picker.Item
             key={warehouse._id}

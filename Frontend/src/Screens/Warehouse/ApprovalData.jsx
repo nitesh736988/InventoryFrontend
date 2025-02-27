@@ -495,7 +495,7 @@ const ApprovalData = () => {
             <Text style={styles.approvedText}>Fill Form</Text>
           </TouchableOpacity>
         ) : (
-          item.itemResend && <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
+          item.status && item.itemResend && <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
         )}
         </View>
         <Text style={styles.infoText}>
