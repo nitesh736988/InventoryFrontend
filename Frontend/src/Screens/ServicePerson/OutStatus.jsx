@@ -391,8 +391,8 @@ const OutStatus = () => {
     if (searchQuery) {
       const filteredData = orders.filter(
         order =>
-          order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()),
+          order?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order?.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredOrders(filteredData);
     } else {

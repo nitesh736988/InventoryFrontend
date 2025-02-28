@@ -13,6 +13,7 @@ import axios from 'axios';
 import { API_URL } from '@env';
 import Icon from 'react-native-vector-icons/Feather';
 
+
 const ServicePersonRegistration = ({ navigation }) => {
   const [formData, setFormData] = useState({
     name: '',

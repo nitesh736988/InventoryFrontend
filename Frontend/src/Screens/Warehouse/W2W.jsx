@@ -415,7 +415,6 @@ import {
   TextInput,
   Alert,
   StyleSheet,
-  // Modal,
   TouchableOpacity,
   ScrollView,
   Dimensions,
@@ -441,7 +440,7 @@ const W2W = () => {
     isDefective: null,
     fromWarehouse: '',
     toWarehouse: '',
-    // modalVisible: false,
+
   });
 
   useEffect(() => {
@@ -511,7 +510,7 @@ const W2W = () => {
       ...prevData,
       selectedItems: validItems,
       quantities: validItems.reduce((acc, item) => {
-        acc[item] = prevData.quantities[item] || ''; // Retain existing quantities or set to empty
+        acc[item] = prevData.quantities[item] || '';
         return acc;
       }, {}),
     }));
@@ -613,7 +612,6 @@ const W2W = () => {
       isDefective: '',
       fromWarehouse: '',
       toWarehouse: '',
-      // modalVisible: false,
     });
   };
 
@@ -800,4 +798,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default W2W;
+export default W2W;      

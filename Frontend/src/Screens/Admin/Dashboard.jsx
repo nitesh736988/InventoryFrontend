@@ -132,7 +132,7 @@ const Dashboard = () => {
         </TouchableOpacity>
       </View>
 
-      <Picker
+      <Picker     
         selectedValue={selectedWarehouse}
         style={styles.picker}
         onValueChange={(value) => setSelectedWarehouse(value)}

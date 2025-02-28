@@ -442,7 +442,7 @@ const ApprovalData = () => {
   const filteredOrders = orders.filter(
     order =>
       order.incoming === true &&
-      (order.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.farmerSaralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         '' ||
         order.servicePerson?.name
           ?.toLowerCase()
@@ -517,7 +517,8 @@ const ApprovalData = () => {
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>
             Farmer SaralId:{' '}
-            <Text style={styles.dataText}>{item.farmerSaralId}</Text>
+            <Text style={styles.dataText}>{item.farmerSaralId ? item.farmerSaralId : 'N/A'}</Text>
+            {/* {item.farmerSaralId ? item.farmerSaralId : 'N/A'} */}
           </Text>
         </Text>
         <Text style={styles.infoText}>
@@ -612,7 +613,7 @@ const ApprovalData = () => {
       <Text style={styles.header}>Incoming Item</Text>
       <TextInput
         style={styles.searchInput}
-        placeholder="Search by Farmer or Serviceperson Name"
+        placeholder="Search by farmer SaralId or Serviceperson Name"
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}

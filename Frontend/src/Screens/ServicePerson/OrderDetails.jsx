@@ -55,8 +55,8 @@ const OrderDetails = () => {
     if (query) {
       const filtered = orders.filter(
         order =>
-          order.farmerSaralId.toLowerCase().includes(query.toLowerCase()) ||
-          order.serialNumber.toLowerCase().includes(query.toLowerCase()),
+          order?.farmerSaralId?.toLowerCase().includes(query.toLowerCase()) ||
+          order?.serialNumber?.toLowerCase().includes(query.toLowerCase()),
       );
       setFilteredOrders(filtered);
     } else {
@@ -87,7 +87,7 @@ const OrderDetails = () => {
           </View>
           
           <Text style={styles.detailText}>
-            Saral Id: {item.farmerSaralId}
+            Saral Id: {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
           </Text>
           <View style={styles.itemList}>
             {item.items.map(({_id, itemName, quantity}) => (

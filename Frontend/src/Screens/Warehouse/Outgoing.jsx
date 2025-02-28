@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const Outgoing = () => {
   const [orders, setOrders] = useState([]);
@@ -41,31 +41,40 @@ const Outgoing = () => {
   }, []);
 
   useEffect(() => {
+    const lowercasedQuery = searchQuery.toLowerCase();
+  
     const filtered = orders.filter(order => {
-      const lowercasedQuery = searchQuery.toLowerCase();
+      const servicePersonName = order.servicePerson?.name
+        ? order.servicePerson.name.toLowerCase()
+        : '';
+      const farmerSaralId = order.farmerSaralId ? String(order.farmerSaralId).toLowerCase() : '';
+      const farmerContact = order.farmerContact ? String(order.farmerContact).toLowerCase() : '';
+  
       return (
-        (order.servicePerson &&
-          (order.servicePerson.name.toLowerCase().includes(lowercasedQuery) ||
-            order.farmerName.toLowerCase().includes(lowercasedQuery) ||
-            order.serialNumber.toLowerCase().includes(lowercasedQuery))) ||
-        order.farmerName.toLowerCase().includes(lowercasedQuery) ||
-        order.serialNumber.toLowerCase().includes(lowercasedQuery)
+        servicePersonName.includes(lowercasedQuery) ||
+        farmerSaralId.includes(lowercasedQuery) ||
+        farmerContact.includes(lowercasedQuery)
       );
     });
+  
     setFilteredOrders(filtered);
   }, [searchQuery, orders]);
+  
 
   const handleRefresh = () => {
     setRefreshing(true);
     fetchOrders();
   };
 
-  const renderOrderItem = ({ item }) => (
+  const renderOrderItem = ({item}) => (
     <>
       {!item.incoming && (
         <View key={item._id} style={styles.card}>
           <Text
-            style={[styles.statusText, item.incoming ? styles.incoming : styles.outgoing]}>
+            style={[
+              styles.statusText,
+              item.incoming ? styles.incoming : styles.outgoing,
+            ]}>
             Outgoing
           </Text>
 
@@ -78,9 +87,12 @@ const Outgoing = () => {
                 </Text>
               </Text>
             </Text>
-            
+
             <Text
-              style={[styles.approvedText, { color: item.status ? 'green' : 'red' }]}>
+              style={[
+                styles.approvedText,
+                {color: item.status ? 'green' : 'red'},
+              ]}>
               {item.status ? 'Completed' : 'Pending'}
             </Text>
           </View>
@@ -94,8 +106,10 @@ const Outgoing = () => {
 
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>
-              Farmer Name:{' '}
-              <Text style={styles.dataText}>{item.farmerName}</Text>
+              Farmer SaralId:{' '}
+              <Text style={styles.dataText}>
+                {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
+              </Text>
             </Text>
           </Text>
 
@@ -106,24 +120,17 @@ const Outgoing = () => {
             </Text>
           </Text>
 
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Village Name:{' '}
-              <Text style={styles.dataText}>{item.farmerVillage}</Text>
-            </Text>
-          </Text>
-
           <View style={styles.itemContainer}>
             <Text style={styles.infoText}>
               <Text style={styles.titleText}>Product: </Text>
             </Text>
-            {item.items.map(({ _id, itemName, quantity }) => (
+            {item.items.map(({_id, itemName, quantity}) => (
               <Text key={_id} style={styles.dataText}>
-                {itemName}: {quantity + ' '} 
+                {itemName}: {quantity + ' '}
               </Text>
             ))}
           </View>
-          
+
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>
               Serial Number:{' '}
@@ -157,10 +164,11 @@ const Outgoing = () => {
 
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by name, serial number, or farmer"
+        placeholder="Search by servicePersonName, farmerSaralId"
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}
+
       />
 
       <FlatList
@@ -176,7 +184,7 @@ const Outgoing = () => {
   );
 };
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -189,7 +197,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
   },
   searchBar: {
     height: 40,
@@ -205,7 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
@@ -240,7 +248,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',  
+    flexWrap: 'wrap',
   },
   loadingIndicator: {
     flex: 1,
@@ -251,4 +259,3 @@ const styles = StyleSheet.create({
 });
 
 export default Outgoing;
-
