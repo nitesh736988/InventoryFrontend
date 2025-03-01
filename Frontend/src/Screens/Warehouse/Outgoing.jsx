@@ -42,24 +42,27 @@ const Outgoing = () => {
 
   useEffect(() => {
     const lowercasedQuery = searchQuery.toLowerCase();
-  
+
     const filtered = orders.filter(order => {
       const servicePersonName = order.servicePerson?.name
         ? order.servicePerson.name.toLowerCase()
         : '';
-      const farmerSaralId = order.farmerSaralId ? String(order.farmerSaralId).toLowerCase() : '';
-      const farmerContact = order.farmerContact ? String(order.farmerContact).toLowerCase() : '';
-  
+      const farmerSaralId = order.farmerSaralId
+        ? String(order.farmerSaralId).toLowerCase()
+        : '';
+      const farmerContact = order.farmerContact
+        ? String(order.farmerContact).toLowerCase()
+        : '';
+
       return (
         servicePersonName.includes(lowercasedQuery) ||
         farmerSaralId.includes(lowercasedQuery) ||
         farmerContact.includes(lowercasedQuery)
       );
     });
-  
+
     setFilteredOrders(filtered);
   }, [searchQuery, orders]);
-  
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -109,6 +112,24 @@ const Outgoing = () => {
               Farmer SaralId:{' '}
               <Text style={styles.dataText}>
                 {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
+              </Text>
+            </Text>
+          </Text>
+
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>
+              Farmer Name:{' '}
+              <Text style={styles.dataText}>
+                {item.farmerName ? item.farmerName : 'N/A'}
+              </Text>
+            </Text>
+          </Text>
+
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>
+              Farmer Village:{' '}
+              <Text style={styles.dataText}>
+                {item.farmerVillage ? item.farmerVillage : 'N/A'}
               </Text>
             </Text>
           </Text>
@@ -168,7 +189,6 @@ const Outgoing = () => {
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}
-
       />
 
       <FlatList

@@ -19,6 +19,7 @@ const Repaired = () => {
   const [remark, setRemark] = useState('');
   const [items, setItems] = useState([]);  
   const [repaired, setRepaired] = useState(''); 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -30,7 +31,8 @@ const Repaired = () => {
         }));
         setItems(items);
       } catch (error) {
-        console.log('Failed to fetch items:', error);
+        console.log('Error fetching items:', error.response?.data || error.message);
+        Alert.alert('Error', error.response?.data?.message || 'Failed to fetch items.');
       }
     };
 
@@ -53,9 +55,10 @@ const Repaired = () => {
     };
 
     try {
-      console.log(newItem)
+      // console.log(newItem)
+      setLoading(true); 
       const response = await axios.post(`${API_URL}/warehouse-admin/repair-item`, newItem);
-      console.log(response.data.data)
+      // console.log(response.data.data)
       
         Alert.alert('Success', 'Item repaired data has been submitted.');
         setItemName('');
@@ -66,8 +69,11 @@ const Repaired = () => {
 
       
     } catch (error) {
-      console.log('Error submitting data:', error);
-      Alert.alert('Error', 'Something went wrong while submitting.');
+      console.log('Error submitting data:', error.response?.data || error.message);
+    Alert.alert('Error', error.response?.data?.message || 'Something went wrong while submitting.');
+    }
+    finally {
+      setLoading(false); 
     }
   };
 
@@ -117,9 +123,10 @@ const Repaired = () => {
           multiline
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+<TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+  <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'Submit'}</Text>
+</TouchableOpacity>
+
       </View>
     </ScrollView>
   );

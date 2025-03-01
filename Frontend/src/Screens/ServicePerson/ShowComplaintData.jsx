@@ -638,7 +638,7 @@
 
 // export default ShowComplaintData;
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -651,14 +651,14 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { launchCamera } from 'react-native-image-picker';
+import {launchCamera} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Geolocation from '@react-native-community/geolocation';
-import { PermissionsAndroid } from 'react-native';
+import {PermissionsAndroid} from 'react-native';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -701,7 +701,7 @@ const requestLocationPermission = async () => {
   }
 };
 
-const ShowComplaintData = ({ route }) => {
+const ShowComplaintData = ({route}) => {
   const {
     complaintId,
     farmerName,
@@ -710,6 +710,7 @@ const ShowComplaintData = ({ route }) => {
     pump_type,
     HP,
     AC_DC,
+    village,
   } = route.params;
 
   const [installationData, setInstallationData] = useState(null);
@@ -728,6 +729,7 @@ const ShowComplaintData = ({ route }) => {
   const [selected, setSelected] = useState(null);
   const [isPendingSelected, setPendingSelected] = useState(false);
   const [farmerItemRemarks, setFarmerItemRemarks] = useState('');
+  const [isButtonHidden, setIsButtonHidden] = useState(false);
 
   const filesNameList = [
     'finalFoundation',
@@ -751,11 +753,11 @@ const ShowComplaintData = ({ route }) => {
         const locationGranted = await requestLocationPermission();
         if (locationGranted) {
           Geolocation.getCurrentPosition(
-            (position) => {
+            position => {
               setLongitude(position.coords.longitude);
               setLatitude(position.coords.latitude);
             },
-            (error) => {
+            error => {
               console.log('Error getting location:', error.message);
               Alert.alert('Error', 'Unable to fetch location.');
             },
@@ -789,7 +791,7 @@ const ShowComplaintData = ({ route }) => {
     initialize();
   }, []);
 
-  const openGeneralCamera = async (category) => {
+  const openGeneralCamera = async category => {
     const hasPermission = await requestCameraPermission();
     if (!hasPermission) {
       Alert.alert('Permission Denied', 'Camera access is required.');
@@ -803,7 +805,7 @@ const ShowComplaintData = ({ route }) => {
         quality: 1,
         includeBase64: true,
       },
-      async (response) => {
+      async response => {
         if (response.didCancel) {
           console.log('User cancelled camera picker');
         } else if (response.errorCode) {
@@ -828,7 +830,7 @@ const ShowComplaintData = ({ route }) => {
               category, // Add the category to identify the photo type
             };
 
-            setPhotos((prevPhotos) => [...prevPhotos, resizedPhoto]);
+            setPhotos(prevPhotos => [...prevPhotos, resizedPhoto]);
           } catch (error) {
             console.log('Error resizing image:', error.message);
             Alert.alert('Error', 'Failed to resize the image.');
@@ -838,7 +840,7 @@ const ShowComplaintData = ({ route }) => {
     );
   };
 
-  const handleStageChange = (itemValue) => {
+  const handleStageChange = itemValue => {
     setSelectedStage(itemValue);
     setShowRemarks(itemValue !== '');
     if (itemValue === '675be30222ae6f63bf772dcf') {
@@ -848,7 +850,7 @@ const ShowComplaintData = ({ route }) => {
     }
   };
 
-  const handleSelection = (option) => {
+  const handleSelection = option => {
     setSelected(option);
 
     if (option === 'Yes') {
@@ -857,6 +859,8 @@ const ShowComplaintData = ({ route }) => {
         name: farmerName,
         farmerContact,
         saralId,
+        farmerName,
+        village
       });
     } else {
       setFarmerItemRemarks(true);
@@ -866,27 +870,27 @@ const ShowComplaintData = ({ route }) => {
   const handleSubmit = async () => {
     const serviceId = await AsyncStorage.getItem('_id');
 
-    if (!simNumber.trim()) {
-      Alert.alert('Error', 'Please enter a SIM number.');
-      return;
-    }
     if (!selectedStage) {
       Alert.alert('Error', 'Please select a stage.');
+      setIsButtonHidden(false);
       return;
     }
 
     if (showRemarks && !remarks.trim()) {
       Alert.alert('Error', 'Remarks are required.');
+      setIsButtonHidden(false);
       return;
     }
 
     if (!rmuNumber.trim()) {
       Alert.alert('Error', 'RMU Number is required.');
+      setIsButtonHidden(false);
       return;
     }
 
     if (!simNumber.trim()) {
       Alert.alert('Error', 'SIM Number is required.');
+      setIsButtonHidden(false);
       return;
     }
 
@@ -936,6 +940,7 @@ const ShowComplaintData = ({ route }) => {
         error.response?.data || error.message,
       );
       Alert.alert('Error', 'Failed to submit form.');
+      setIsButtonHidden(false);
     } finally {
       setLoading(false);
     }
@@ -1036,10 +1041,13 @@ const ShowComplaintData = ({ route }) => {
 
           <ScrollView horizontal style={styles.imagePreviewContainer}>
             {photos
-              .filter((photo) => photo.category === category)
+              .filter(photo => photo.category === category)
               .map((photo, index) => (
                 <View key={index} style={styles.imageWrapper}>
-                  <Image source={{ uri: photo.uri }} style={styles.imagePreview} />
+                  <Image
+                    source={{uri: photo.uri}}
+                    style={styles.imagePreview}
+                  />
                 </View>
               ))}
           </ScrollView>
@@ -1050,7 +1058,7 @@ const ShowComplaintData = ({ route }) => {
       <View style={styles.pickerContainer}>
         <Picker selectedValue={selectedStage} onValueChange={handleStageChange}>
           <Picker.Item label="Select a Status" value="" />
-          {stageOptions.map(({ _id, stage }) => (
+          {stageOptions.map(({_id, stage}) => (
             <Picker.Item key={_id} label={stage} value={_id} />
           ))}
         </Picker>
@@ -1115,15 +1123,21 @@ const ShowComplaintData = ({ route }) => {
         </>
       )}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+      {/* <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+
+      {!isButtonHidden && (
+        <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-   container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
+  container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -1135,7 +1149,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginRight: 10,
     fontWeight: 'bold',
-},
+  },
   input: {
     borderWidth: 1,
     borderColor: '#000',
@@ -1149,13 +1163,13 @@ const styles = StyleSheet.create({
   optionsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-},
-option: {
+  },
+  option: {
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 20,
-},
-checkbox: {
+  },
+  checkbox: {
     width: 20,
     height: 20,
     borderRadius: 5,
@@ -1164,14 +1178,14 @@ checkbox: {
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 5,
-},
-checkedBox: {
+  },
+  checkedBox: {
     backgroundColor: '#007BFF',
-},
+  },
 
-optionText: {
-  fontSize: 16,
-},
+  optionText: {
+    fontSize: 16,
+  },
 
   card: {
     padding: 10,
@@ -1241,7 +1255,7 @@ optionText: {
     padding: 12,
     marginBottom: 40,
     alignItems: 'center',
-    marginTop: 30
+    marginTop: 30,
   },
   buttonText: {color: '#fff', fontSize: 16},
   loaderContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
@@ -1249,6 +1263,5 @@ optionText: {
 
   nonEditable: {backgroundColor: '#e9ecef', color: '#000'},
 });
-
 
 export default ShowComplaintData;

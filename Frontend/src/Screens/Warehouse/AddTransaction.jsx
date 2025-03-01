@@ -33,6 +33,7 @@ const AddTransaction = ({route}) => {
   const [serialNumber, setSerialNumber] = useState('');
   const [selectedWarehouse, setSelectedWarehouse] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -156,6 +157,7 @@ const AddTransaction = ({route}) => {
     };
     console.log('data sent', data);
     try {
+      setLoading(true); 
       const response = await axios.post(
         `${API_URL}/warehouse-admin/outgoing-items`,
         data,
@@ -175,6 +177,9 @@ const AddTransaction = ({route}) => {
     } catch (error) {
       console.log(error);
       Alert.alert('Error', 'An error occurred while saving the transaction');
+    }
+    finally {
+      setLoading(false); 
     }
   };
 
@@ -276,8 +281,12 @@ const AddTransaction = ({route}) => {
               style={styles.textArea}
               multiline
             />
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity> */}
+
+            <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+              <Text style={styles.buttonText}>{loading ? 'Submitting...' : 'Submit'}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

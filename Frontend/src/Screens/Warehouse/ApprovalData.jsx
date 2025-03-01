@@ -398,7 +398,8 @@ const ApprovalData = () => {
 
       setOrders(response.data.pickupItems);
     } catch (error) {
-      console.log(error);
+      console.log('Error Response:', error.response?.data);
+
       Alert.alert('Error', 'Unable to fetch orders');
     } finally {
       setLoading(false);
@@ -426,8 +427,12 @@ const ApprovalData = () => {
         fetchOrders();
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Error', 'Somethings is missing Please Check Product Name');
+      console.error('Approval Error:', error.response?.data || error.message);
+      Alert.alert(
+        'Error',
+        error.response?.data?.message ||
+          'Something went wrong. Please try again.',
+      );
     }
   };
 
@@ -467,7 +472,6 @@ const ApprovalData = () => {
 
   const renderOrderItem = ({item}) => (
     <>
-
       <View key={item._id} style={[styles.card, {width: cardWidth}]}>
         <Text
           style={[
@@ -484,19 +488,22 @@ const ApprovalData = () => {
             </Text>
           </Text>
           {item.status && !item.itemResend ? (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('AddTransaction', {
-                farmerComplaintId: item?.farmerComplaintId,
-                farmerContact: item?.farmerContact,
-                farmerSaralId: item?.farmerSaralId,
-              })
-            }>
-            <Text style={styles.approvedText}>Fill Form</Text>
-          </TouchableOpacity>
-        ) : (
-          item.status && item.itemResend && <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
-        )}
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('AddTransaction', {
+                  farmerComplaintId: item?.farmerComplaintId,
+                  farmerContact: item?.farmerContact,
+                  farmerSaralId: item?.farmerSaralId,
+                })
+              }>
+              <Text style={styles.approvedText}>Fill Form</Text>
+            </TouchableOpacity>
+          ) : (
+            item.status &&
+            item.itemResend && (
+              <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
+            )
+          )}
         </View>
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>
@@ -506,18 +513,38 @@ const ApprovalData = () => {
             </Text>
           </Text>
         </Text>
-  
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Farmer Name:{' '}
+            <Text style={styles.dataText}>
+              {item.farmerName ? item.farmerName : 'N/A'}
+            </Text>
+          </Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>
+            Farmer Village:{' '}
+            <Text style={styles.dataText}>
+              {item.farmerVillage ? item.farmerVillage : 'N/A'}
+            </Text>
+          </Text>
+        </Text>
+
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>
             Farmer Contact:{' '}
             <Text style={styles.dataText}>{item.farmerContact}</Text>
           </Text>
         </Text>
-  
+
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>
             Farmer SaralId:{' '}
-            <Text style={styles.dataText}>{item.farmerSaralId ? item.farmerSaralId : 'N/A'}</Text>
+            <Text style={styles.dataText}>
+              {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
+            </Text>
             {/* {item.farmerSaralId ? item.farmerSaralId : 'N/A'} */}
           </Text>
         </Text>
@@ -537,7 +564,7 @@ const ApprovalData = () => {
             </Text>
           ))}
         </View>
-  
+
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>
             Serial Number:{' '}
@@ -549,7 +576,7 @@ const ApprovalData = () => {
             Remark: <Text style={styles.dataText}>{item.remark}</Text>
           </Text>
         </Text>
-  
+
         {item.incoming && (
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>
@@ -564,35 +591,35 @@ const ApprovalData = () => {
             </Text>
           </Text>
         )}
-  
+
         {item?.incoming && (
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>RMU Remark: </Text>
             <Text style={styles.dataText}>{item?.rmuRemark || 'N/A'}</Text>
           </Text>
         )}
-  
+
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>Pickup Date: </Text>
           <Text style={styles.dataText}>
             {item?.pickupDate ? formatDate(item.pickupDate) : 'N/A'}
           </Text>
         </Text>
-  
+
         {item?.arrivedDate && (
           <Text style={styles.infoText}>
             <Text style={styles.titleText}>Approved Date: </Text>
             <Text style={styles.dataText}>{formatDate(item.arrivedDate)}</Text>
           </Text>
         )}
-  
+
         <View style={styles.actionContainer}>
           {!item.status && (
             <>
               <TouchableOpacity style={styles.declineButton}>
                 <Text style={styles.buttonText}>Decline</Text>
               </TouchableOpacity>
-  
+
               <TouchableOpacity
                 style={styles.approveButton}
                 onPress={() => {

@@ -419,17 +419,20 @@ import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {API_URL} from '@env';
 import {RadioButton} from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const InOrder = ({route}) => {
-  const {id, name, farmerContact, saralId} = route.params;
-  // console.log('complaint Id md', id);
+  const {id, name, farmerContact, saralId, farmerName, village} = route.params;
+  console.log('complaint Id md', farmerName);
+  console.log('complaint Id md', village);
   const [items, setItems] = useState([{}]);
   const [warehouses, setWarehouses] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
+  const [buttonVisible, setButtonVisible] = useState(true);
+
   const [formData, setFormData] = useState({
-  
     remarks: '',
     selectedItems: [],
     quantities: {},
@@ -441,7 +444,6 @@ const InOrder = ({route}) => {
     rmuRemark: '',
     farmerSaralId: '',
   });
-  
 
   const {
     remarks,
@@ -544,6 +546,8 @@ const InOrder = ({route}) => {
   const handleSubmit = async () => {
     if (!validateInput()) return;
 
+    setButtonVisible(false); 
+
     const itemSelected = selectedItems.map(item => ({
       itemName: item,
       quantity: parseInt(quantities[item]),
@@ -552,7 +556,7 @@ const InOrder = ({route}) => {
     const data = {
       farmerComplaintId: id,
       name,
-      farmerContact,         
+      farmerContact,
       items: itemSelected,
       warehouse: selectedWarehouse,
       remark: remarks,
@@ -561,15 +565,18 @@ const InOrder = ({route}) => {
       pickupDate: new Date(),
       withoutRMU,
       rmuRemark,
-      
       farmerSaralId: saralId,
+      farmerName, 
+      farmerVillage: village
     };
+    console.log("Form Data", data)
 
     if (!controllerSelected) {
       data.withoutRMU = null;
     }
 
     try {
+      setLoading(true);
       const response = await axios.post(
         `${API_URL}/service-person/incoming-items`,
         data,
@@ -579,13 +586,15 @@ const InOrder = ({route}) => {
           },
         },
       );
+      console.log("Form Data",data)
       resetForm();
       setFormData(prevState => ({...prevState, modalVisible: false}));
       Alert.alert('Success', 'Transaction saved successfully');
       navigation.goBack();
-      
     } catch (error) {
       Alert.alert(error?.response?.data?.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -605,166 +614,176 @@ const InOrder = ({route}) => {
 
   return (
     <View style={styles.container}>
-      
-        <View
-          style={{
-            paddingHorizontal: 20,
-            backgroundColor: '#fbd33b',
-            paddingTop: 30,
-          }}>
-          <Text style={{color: 'black'}}>Select Items:</Text>
-          <MultiSelect
-            items={filteredItems}
-            uniqueKey="itemName"
-            onSelectedItemsChange={handleItemSelect}
-            selectedItems={selectedItems}
-            selectText="Pick Items"
-            searchInputPlaceholderText="Search Items..."
-            displayKey="itemName"
-            hideSubmitButton
-            styleListContainer={styles.listContainer}
-            textColor="#000"
+      <View
+        style={{
+          paddingHorizontal: 20,
+          backgroundColor: '#fbd33b',
+          paddingTop: 30,
+        }}>
+        <Text style={{color: 'black'}}>Select Items:</Text>
+        <MultiSelect
+          items={filteredItems}
+          uniqueKey="itemName"
+          onSelectedItemsChange={handleItemSelect}
+          selectedItems={selectedItems}
+          selectText="Pick Items"
+          searchInputPlaceholderText="Search Items..."
+          displayKey="itemName"
+          hideSubmitButton
+          styleListContainer={styles.listContainer}
+          textColor="#000"
+        />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.modalContainer}>
+          <Text style={{color: 'black'}}>Farmer Saral Id:</Text>
+          <TextInput
+            value={saralId}
+            onChangeText={text =>
+              setFormData(prevState => ({...prevState, saralId: text}))
+            }
+            placeholder="Enter Saral Id"
+            style={styles.input}
+            placeholderTextColor={'#000'}
           />
-        </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.modalContainer}>
-            <Text style={{color: 'black'}}>Farmer Saral Id:</Text>
-            <TextInput
-              value={saralId}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, saralId: text}))
-              }
-              placeholder="Enter Saral Id"
-              style={styles.input}
-              placeholderTextColor={'#000'}
-            />
+          <Text style={styles.label}>Farmer Name:</Text>
+          <TextInput
+            style={[styles.input, styles.nonEditable]}
+            value={name || 'N/A'}
+            editable={false}
+          />
 
-            <Text style={styles.label}>Farmer Name:</Text>
-            <TextInput
-              style={[styles.input, styles.nonEditable]}
-              value={name || 'N/A'}
-              editable={false}
-            />
+          <Text style={styles.label}>Farmer Contact:</Text>
+          <TextInput
+            style={[styles.input, styles.nonEditable]}
+            value={farmerContact?.toString() || 'N/A'}
+            keyboardType="phone-pad"
+            editable={false}
+          />
 
-            <Text style={styles.label}>Farmer Contact:</Text>
-            <TextInput
-              style={[styles.input, styles.nonEditable]}
-              value={farmerContact?.toString() || 'N/A'}
-              keyboardType="phone-pad"
-              editable={false}
-            />
+          {selectedItems.map((item, index) => (
+            <View key={index}>
+              <Text style={{color: 'black'}}>
+                Quantity for <Text style={styles.itemText}>{item}</Text>:
+              </Text>
+              <TextInput
+                value={quantities[item]}
+                onChangeText={value => handleQuantityChange(item, value)}
+                keyboardType="numeric"
+                placeholder="Enter Quantity"
+                style={styles.input}
+                placeholderTextColor={'#000'}
+              />
+            </View>
+          ))}
 
-            {selectedItems.map((item, index) => (
-              <View key={index}>
-                <Text style={{color: 'black'}}>
-                  Quantity for <Text style={styles.itemText}>{item}</Text>:
-                </Text>
-                <TextInput
-                  value={quantities[item]}
-                  onChangeText={value => handleQuantityChange(item, value)}
-                  keyboardType="numeric"
-                  placeholder="Enter Quantity"
-                  style={styles.input}
-                  placeholderTextColor={'#000'}
-                />
-              </View>
+          <Text style={{color: 'black'}}>Serial Number:</Text>
+          <TextInput
+            value={serialNumber}
+            onChangeText={text =>
+              setFormData(prevState => ({...prevState, serialNumber: text}))
+            }
+            placeholder="Enter Serial Number"
+            style={styles.input}
+            placeholderTextColor={'#000'}
+          />
+
+          <Text style={{color: 'black'}}>Warehouse:</Text>
+          <Picker
+            selectedValue={selectedWarehouse}
+            style={styles.picker}
+            onValueChange={value =>
+              setFormData(prevState => ({
+                ...prevState,
+                selectedWarehouse: value,
+              }))
+            }>
+            {warehouses.map(warehouse => (
+              <Picker.Item
+                key={warehouse._id}
+                label={warehouse.warehouseName}
+                value={warehouse.warehouseName}
+              />
             ))}
+          </Picker>
 
-            <Text style={{color: 'black'}}>Serial Number:</Text>
-            <TextInput
-              value={serialNumber}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, serialNumber: text}))
-              }
-              placeholder="Enter Serial Number"
-              style={styles.input}
-              placeholderTextColor={'#000'}
-            />
-
-            <Text style={{color: 'black'}}>Warehouse:</Text>
-            <Picker
-              selectedValue={selectedWarehouse}
-              style={styles.picker}
-              onValueChange={value =>
-                setFormData(prevState => ({
-                  ...prevState,
-                  selectedWarehouse: value,
-                }))
-              }>
-              {warehouses.map(warehouse => (
-                <Picker.Item
-                  key={warehouse._id}
-                  label={warehouse.warehouseName}
-                  value={warehouse.warehouseName}
-                />
-              ))}
-            </Picker>
-
-            {controllerSelected && (
-              <View>
-                <Text>Select RMU or Without RMU:</Text>
-                <RadioButton.Group
-                  onValueChange={value =>
-                    setFormData(prevState => ({
-                      ...prevState,
-                      withoutRMU: value,
-                    }))
-                  }
-                  value={withoutRMU}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-around',
-                      marginVertical: 10,
-                    }}>
-                    <View style={{alignItems: 'center'}}>
-                      <Text>RMU</Text>
-                      <RadioButton value={false} />
-                    </View>
-                    <View style={{alignItems: 'center'}}>
-                      <Text>Without RMU</Text>
-                      <RadioButton value={true} />
-                    </View>
+          {controllerSelected && (
+            <View>
+              <Text>Select RMU or Without RMU:</Text>
+              <RadioButton.Group
+                onValueChange={value =>
+                  setFormData(prevState => ({
+                    ...prevState,
+                    withoutRMU: value,
+                  }))
+                }
+                value={withoutRMU}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    marginVertical: 10,
+                  }}>
+                  <View style={{alignItems: 'center'}}>
+                    <Text>RMU</Text>
+                    <RadioButton value={false} />
                   </View>
-                </RadioButton.Group>
-
-                {withoutRMU && (
-                  <View>
-                    <Text>Reason for Without RMU:</Text>
-                    <TextInput
-                      value={rmuRemark}
-                      onChangeText={text =>
-                        setFormData(prevState => ({
-                          ...prevState,
-                          rmuRemark: text,
-                        }))
-                      }
-                      placeholder="Enter Reason"
-                      style={styles.input}
-                      placeholderTextColor={'#000'}
-                    />
+                  <View style={{alignItems: 'center'}}>
+                    <Text>Without RMU</Text>
+                    <RadioButton value={true} />
                   </View>
-                )}
-              </View>
-            )}
+                </View>
+              </RadioButton.Group>
 
-            <Text style={{color: 'black'}}>Remarks:</Text>
-            <TextInput
-              value={remarks}
-              onChangeText={text =>
-                setFormData(prevState => ({...prevState, remarks: text}))
-              }
-              placeholder="Enter Remarks"
-              style={styles.input}
-              placeholderTextColor={'#000'}
-            />
+              {withoutRMU && (
+                <View>
+                  <Text>Reason for Without RMU:</Text>
+                  <TextInput
+                    value={rmuRemark}
+                    onChangeText={text =>
+                      setFormData(prevState => ({
+                        ...prevState,
+                        rmuRemark: text,
+                      }))
+                    }
+                    placeholder="Enter Reason"
+                    style={styles.input}
+                    placeholderTextColor={'#000'}
+                  />
+                </View>
+              )}
+            </View>
+          )}
 
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={{color: 'black'}}>Remarks:</Text>
+          <TextInput
+            value={remarks}
+            onChangeText={text =>
+              setFormData(prevState => ({...prevState, remarks: text}))
+            }
+            placeholder="Enter Remarks"
+            style={styles.input}
+            placeholderTextColor={'#000'}
+          />
+
+          {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
               <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+            </TouchableOpacity> */}
+
+         {buttonVisible && (
+          <TouchableOpacity
+            style={[styles.button, loading && styles.disabledButton]}
+            onPress={handleSubmit}
+            disabled={loading}>
+            <Text style={styles.buttonText}>
+              {loading ? 'Submitting...' : 'Submit'}
+            </Text>
+          </TouchableOpacity>
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 };

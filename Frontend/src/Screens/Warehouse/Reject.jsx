@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {API_URL} from '@env';
 
@@ -16,13 +16,16 @@ const Repaired = () => {
   const [itemName, setItemName] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
   const [remark, setRemark] = useState('');
-  const [items, setItems] = useState([]);  
-  const [rejected, setRejected] = useState(''); 
+  const [items, setItems] = useState([]);
+  const [rejected, setRejected] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/view-items`,
+        );
         const items = response.data.items.map((item, index) => ({
           _id: index + 1,
           itemName: item,
@@ -33,11 +36,11 @@ const Repaired = () => {
       }
     };
 
-    fetchItems(); 
+    fetchItems();
   }, []);
 
   const handleSubmit = async () => {
-    if (!itemName || !serialNumber || !rejected  || !remark) {
+    if (!itemName || !serialNumber || !rejected || !remark) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
     }
@@ -51,20 +54,24 @@ const Repaired = () => {
     };
 
     try {
-      console.log(newItem)
-      const response = await axios.post(`${API_URL}/warehouse-admin/reject-item`, newItem);
-      console.log(response.data.data)
-      
-        Alert.alert('Success', 'Item repaired data has been submitted.');
-        setItemName('');
-        setSerialNumber('');
-        setRejected('');
-        setRemark('');
+      // console.log(newItem)
+      setLoading(true);
+      const response = await axios.post(
+        `${API_URL}/warehouse-admin/reject-item`,
+        newItem,
+      );
+      console.log(response.data.data);
 
-      
+      Alert.alert('Success', 'Item repaired data has been submitted.');
+      setItemName('');
+      setSerialNumber('');
+      setRejected('');
+      setRemark('');
     } catch (error) {
       console.log('Error submitting data:', error);
       Alert.alert('Error', 'Something went wrong while submitting.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,12 +83,15 @@ const Repaired = () => {
         <Text style={styles.label}>Item Name:</Text>
         <Picker
           selectedValue={itemName}
-          onValueChange={(itemValue) => setItemName(itemValue)}
-          style={styles.input}
-        >
+          onValueChange={itemValue => setItemName(itemValue)}
+          style={styles.input}>
           <Picker.Item label="Select Item" value="" />
-          {items.map((item) => (
-            <Picker.Item key={item._id} label={item.itemName} value={item.itemName} />
+          {items.map(item => (
+            <Picker.Item
+              key={item._id}
+              label={item.itemName}
+              value={item.itemName}
+            />
           ))}
         </Picker>
 
@@ -107,8 +117,17 @@ const Repaired = () => {
           multiline
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity> */}
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+          disabled={loading}>
+          <Text style={styles.buttonText}>
+            {loading ? 'Submitting...' : 'Submit'}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -134,7 +153,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,

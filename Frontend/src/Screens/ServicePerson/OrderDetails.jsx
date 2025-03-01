@@ -25,9 +25,10 @@ const OrderDetails = () => {
       const response = await axios.get(
         `${API_URL}/service-person/pickedup-items`,
       );
+      console.log("response data", response.data)
       setOrders(response.data.pickupItemsDetail);
-      setFilteredOrders(response.data.pickupItemsDetail); 
-      setError(''); 
+      setFilteredOrders(response.data.pickupItemsDetail);
+      setError('');
     } catch (error) {
       console.error(error);
       setError('Unable to fetch orders. Please try again later.');
@@ -76,16 +77,23 @@ const OrderDetails = () => {
           {item.incoming ? 'Incoming' : 'Outgoing'}
         </Text>
         <View style={styles.detailsContainer}>
-          
           <View style={styles.detailRow}>
-          <Text style={styles.detailText}>
-            Farmer Contact: {item.farmerContact}
-          </Text>
+            <Text style={styles.detailText}>
+              Farmer Contact: {item.farmerContact}
+            </Text>
             <Text style={{color: item.status ? 'green' : 'red'}}>
               {item.status ? 'Completed' : 'Pending'}
             </Text>
           </View>
-          
+
+          <Text style={styles.detailText}>
+            Farmer Name: {item.farmerName ? item.farmerName : 'N/A'}
+          </Text>
+
+          <Text style={styles.detailText}>
+            Farmer Village: {item.farmerVillage ? item.farmerVillage : 'N/A'}
+          </Text>
+
           <Text style={styles.detailText}>
             Saral Id: {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
           </Text>
@@ -148,8 +156,6 @@ const OrderDetails = () => {
       <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
         <Icon name="refresh" size={30} color="black" />
       </TouchableOpacity>
-
-      
     </View>
   );
 };
@@ -164,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: 'black'
+    color: 'black',
   },
   card: {
     padding: 16,

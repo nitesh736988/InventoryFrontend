@@ -385,6 +385,7 @@ const ShowComplaints = () => {
               complaintId: item?._id,
               farmerName: item?.Farmer[0]?.farmerName,
               farmerContact: item?.Farmer[0]?.contact,
+              village: item?.Farmer[0]?.village,
               saralId: item?.Farmer[0]?.saralId,
               pump_type: item?.Farmer[0]?.pump_type,
               HP: item?.Farmer[0]?.HP,
