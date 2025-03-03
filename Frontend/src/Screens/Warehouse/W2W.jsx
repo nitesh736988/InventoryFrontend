@@ -424,7 +424,7 @@ import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {API_URL} from '@env';
 
-const {width} = Dimensions.get('window');
+// const {width} = Dimensions.get('window');
 
 const W2W = () => {
   const [items, setItems] = useState([]);
@@ -626,6 +626,7 @@ const W2W = () => {
           <Text style={styles.heading}>Warehouse to Warehouse Transfer</Text>
           <Text style={styles.label}>Select Items:</Text>
           <MultiSelect
+            hideTags
             items={filteredItems}
             uniqueKey="itemName"
             onSelectedItemsChange={handleItemSelect}
@@ -640,7 +641,8 @@ const W2W = () => {
           />
         </View>
 
-          <View style={styles.modalContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* <View style={styles.modalContainer}> */}
 
           {formData.selectedItems.map(item => (
           <View key={item} style={styles.itemQuantityContainer}>
@@ -656,7 +658,7 @@ const W2W = () => {
           </View>
         ))}
         
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        
             <Text style={styles.label}>Driver Name:</Text>
             <TextInput
               value={formData.driverName}
@@ -731,70 +733,142 @@ const W2W = () => {
            </ScrollView>
           </View>
           
-    </View>
   );
 };
 
+// const styles = StyleSheet.create({
+//   container: {
+//     flexGrow: 1,
+//     padding: 20,
+//     backgroundColor: '#fbd33b',
+//   },
+//   button: {
+//     backgroundColor: '#070604',
+//     padding: 10,
+//     borderRadius: 5,
+//     marginVertical: 10,
+//     alignItems: 'center',
+//   },
+//   label: {
+//     fontWeight: 'bold',
+//     fontSize: 16,
+//     marginBottom: 5,
+//     color: '#000',
+//   },
+//   heading: {
+//     fontSize: 22,
+//     fontWeight: 'bold',
+//     marginBottom: 20,
+//     textAlign: 'center',
+//     color: 'black',
+//   },
+//   buttonText: {
+//     color: '#fbd33b',
+//     fontSize: 16,
+//     marginBottom: 150
+//   },
+//   scrollContainer: {
+//     flexGrow: 1,
+//   },
+
+//   input: {
+//     backgroundColor: '#fbd33b',
+//     borderWidth: 1,
+//     borderColor: '#070604',
+//     borderRadius: 5,
+//     padding: 10,
+//     marginBottom: 20,
+//     color: '#070604',
+//   },
+//   picker: {
+//     backgroundColor: '#fbd33b',
+//     color: '#070604',
+//     marginBottom: 20,
+//   },
+//   itemQuantityContainer: {
+//     paddingHorizontal: 16,
+//     backgroundColor: '#fbd33b'
+//   },
+//   listContainer: {
+//     maxHeight: 250,
+//   },
+// });
+
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
-
     flexGrow: 1,
-    padding: 20,
+    padding: width * 0.05,
     backgroundColor: '#fbd33b',
   },
   button: {
     backgroundColor: '#070604',
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.2,
+    borderRadius: 8,
+    marginVertical: height * 0.02,
     alignItems: 'center',
-  },
-  label: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#000',
-  },
-  heading: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: 'black',
+    marginBottom: 140
   },
   buttonText: {
     color: '#fbd33b',
-    fontSize: 16,
+    fontSize: width * 0.045,
+    fontWeight: 'bold',
+  },
+  label: {
+    fontWeight: 'bold',
+    fontSize: width * 0.045,
+    marginBottom: height * 0.005,
+    color: '#000',
+  },
+  heading: {
+    fontSize: width * 0.06,
+    fontWeight: 'bold',
+    marginBottom: height * 0.02,
+    textAlign: 'center',
+    color: 'black',
   },
   scrollContainer: {
     flexGrow: 1,
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#fbd33b',
+    paddingBottom: height * 0.05,
   },
   input: {
     backgroundColor: '#fbd33b',
     borderWidth: 1,
     borderColor: '#070604',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: 8,
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.04,
+    marginBottom: height * 0.02,
+    fontSize: width * 0.04,
     color: '#070604',
   },
   picker: {
     backgroundColor: '#fbd33b',
     color: '#070604',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
+    fontSize: width * 0.04,
   },
   itemQuantityContainer: {
-    paddingHorizontal: 16,
-    backgroundColor: '#fbd33b'
+    paddingHorizontal: width * 0.04,
+    backgroundColor: '#fbd33b',
   },
   listContainer: {
-    maxHeight: 250,
+    maxHeight: height * 0.3,
+  },
+  multiSelectContainer: {
+    width: '100%',
+    minHeight: height * 0.08,
+  },
+  multiSelectText: {
+    color: '#000',
+    fontSize: width * 0.04,
+  },
+  multiSelectDropdown: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: width * 0.02,
   },
 });
 

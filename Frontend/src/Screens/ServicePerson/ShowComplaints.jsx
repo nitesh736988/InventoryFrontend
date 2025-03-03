@@ -317,13 +317,23 @@ const ShowComplaints = () => {
     }
   };
 
+  // const filterComplaints = () => {
+  //   return complaints.filter(
+  //     complaint =>
+  //       complaint.complainantName
+  //         .toLowerCase()
+  //         .includes(searchQuery.toLowerCase()) ||
+  //       complaint.trackingId.toLowerCase().includes(searchQuery.toLowerCase()),
+  //   );
+  // };
+
   const filterComplaints = () => {
-    return complaints.filter(
-      complaint =>
-        complaint.complainantName
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        complaint.trackingId.toLowerCase().includes(searchQuery.toLowerCase()),
+    return complaints.filter(item =>
+      item?.Farmer[0]?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.Farmer[0]?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.Farmer[0]?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.Farmer[0]?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.Farmer[0]?.saralId?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
@@ -456,7 +466,13 @@ const ShowComplaints = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Complaints</Text>
+      <Text style={styles.header}>All Complaints</Text>
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search by Village, Block, Farmer Name, Contact, Saral ID"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
       <FlatList
         data={filterComplaints()}
         renderItem={renderComplaintItem}
@@ -546,7 +562,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
-    // marginBottom: 16,
+    marginBottom: 16,
     paddingHorizontal: 10,
     fontSize: 16,
     backgroundColor: '#fff',

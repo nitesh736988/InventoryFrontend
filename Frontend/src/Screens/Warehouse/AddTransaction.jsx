@@ -17,9 +17,9 @@ import {useNavigation} from '@react-navigation/native';
 const AddTransaction = ({route}) => {
   const {farmerComplaintId, farmerContact, farmerSaralId} = route.params || {};
 
-  console.log("farmerComplaintId", farmerComplaintId)
-  console.log("farmerContact", farmerContact)
-  console.log("farmerSaralId", farmerSaralId)
+  // console.log("farmerComplaintId", farmerComplaintId)
+  // console.log("farmerContact", farmerContact)
+  // console.log("farmerSaralId", farmerSaralId)
 
   const [servicePerson, setServicePerson] = useState([]);
   const [selectedServicePerson, setSelectedServicePerson] = useState('');
