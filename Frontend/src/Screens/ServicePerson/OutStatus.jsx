@@ -306,8 +306,6 @@
 
 // export default OutStatus;
 
-
-
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -334,7 +332,9 @@ const OutStatus = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/service-person/pickedup-items`);
+      const response = await axios.get(
+        `${API_URL}/service-person/pickedup-items`,
+      );
       console.log(response.data.pickupItemsDetail);
       setOrders(response.data.pickupItemsDetail);
     } catch (error) {
@@ -391,8 +391,12 @@ const OutStatus = () => {
     if (searchQuery) {
       const filteredData = orders.filter(
         order =>
-          order?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          order?.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase()),
+          order?.farmerName
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          order?.serialNumber
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()),
       );
       setFilteredOrders(filteredData);
     } else {
@@ -426,22 +430,32 @@ const OutStatus = () => {
             Outgoing
           </Text>
           <View style={styles.infoRow}>
-            <Text style={styles.infoText}>
+            {/* <Text style={styles.infoText}>
               Farmer SaralId:{' '}
               {item?.farmerSaralId}
+            </Text> */}
+
+            <Text style={styles.infoText}>
+            Farmer SaralId: {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
             </Text>
             {item.status && (
               <Text style={styles.approvedText}>Approved Success</Text>
             )}
           </View>
+
           <Text style={styles.infoText}>
-            Farmer Contact:{' '}
-            {item?.farmerContact}
-          </Text>
-          
+            Farmer Name: {item.farmerName ? item.farmerName : 'N/A'}
+            </Text>
+
+            <Text style={styles.infoText}>
+            Farmer Village: {item.farmerVillage ? item.farmerVillage : 'N/A'}
+            </Text>
+
           <Text style={styles.infoText}>
-            Warehouse: {item.warehouse}
+            Farmer Contact: {item?.farmerContact}
           </Text>
+
+          <Text style={styles.infoText}>Warehouse: {item.warehouse}</Text>
           <View style={styles.itemContainer}>
             {item.items.map(({_id, itemName, quantity}) => (
               <Text key={_id} style={styles.infoText}>
@@ -530,7 +544,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
   },
   searchBar: {
     height: 40,

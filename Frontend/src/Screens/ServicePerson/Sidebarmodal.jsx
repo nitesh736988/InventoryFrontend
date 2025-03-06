@@ -83,10 +83,10 @@ const Sidebarmodal = () => {
     navigation.navigate('ApprovalNewInstallation');
   };
 
-  const openLocationTracker = () => {
-    closeModal();
-    navigation.navigate('LocationTracker');
-  };
+  // const openLocationTracker = () => {
+  //   closeModal();
+  //   navigation.navigate('LocationTracker');
+  // };
 
 
 
@@ -160,11 +160,11 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>Approval NewInstallation</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={openLocationTracker}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Location Tracker</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
 
 

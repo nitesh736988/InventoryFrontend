@@ -1,5 +1,5 @@
-import {View, Text} from 'react-native';
-import React from 'react';
+import {View, Text, ActivityIndicator} from 'react-native';
+import React, { useState, useEffect } from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import LoginPage from './Screens/Login&Register/LoginPage';
@@ -56,21 +56,55 @@ import SurveyDashboard from './Screens/Survey/SurveyDashboard';
 import SurveyAssignData from './Screens/ServicePerson/SurveyAssignData'
 import SurvayData from './Screens/ServicePerson/SurveyData'
 import AddSystemSubItem from './Screens/Admin/AddSystemSubItem';
-// import NetworkConnectivityCompaintForms from './Screens/ServicePerson/NetworkConnectivityCompaintForms';
-// import UserForm from './Screens/ServicePerson/UserForm';
 import NewFormInstallation from './Screens/Warehouse/NewFormInstallation';
 import NewFarmerInstallation from './Screens/Warehouse/NewFarmerInstallation';
 import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
 import InOrder from './Screens/ServicePerson/InOrder';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
+
+  const [loading, setLoading] = useState(true);
+  const [initialRoute, setInitialRoute] = useState('LoginPage');
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const role = await AsyncStorage.getItem('role');
+        if (role) {
+          if (role === 'serviceperson') {
+            setInitialRoute('ServicePersonNavigation');
+          } else if (role === 'warehouseAdmin') {
+            setInitialRoute('WarehouseNavigation');
+          } else if (role === 'admin') {
+            setInitialRoute('Navigation');
+          } else if (role === 'surveyperson') {
+            setInitialRoute('SurvayNavigation');
+          }
+        }
+      } catch (error) {
+        console.log('Error checking token:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkToken();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName={initialRoute} >
         <Stack.Screen
           name="LoginPage"
           component={LoginPage}

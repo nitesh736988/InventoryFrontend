@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import axios from 'axios';
-import {API_URL} from '@env';
+import { API_URL } from '@env';
 
 const Outgoing = () => {
   const [orders, setOrders] = useState([]);
@@ -22,13 +22,16 @@ const Outgoing = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}/warehouse-admin/warehouse-in-out-orders`,
-      );
-      setOrders(response.data.pickupItems);
-      setFilteredOrders(response.data.pickupItems);
+      console.log("Fetching orders from:", API_URL);
+      const response = await axios.get(`${API_URL}/warehouse-admin/warehouse-in-out-orders`);
+
+      console.log("API Response:", response.data);
+
+      const items = response.data.pickupItems || []; // Ensure array
+      setOrders(items);
+      setFilteredOrders(items);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching data:", error);
       Alert.alert('Error', 'Failed to fetch data');
     } finally {
       setLoading(false);
@@ -44,20 +47,18 @@ const Outgoing = () => {
     const lowercasedQuery = searchQuery.toLowerCase();
 
     const filtered = orders.filter(order => {
-      const servicePersonName = order.servicePerson?.name
-        ? order.servicePerson.name.toLowerCase()
-        : '';
-      const farmerSaralId = order.farmerSaralId
-        ? String(order.farmerSaralId).toLowerCase()
-        : '';
-      const farmerContact = order.farmerContact
-        ? String(order.farmerContact).toLowerCase()
-        : '';
+      const servicePersonName = order?.servicePerson?.name?.toLowerCase() || '';
+      const farmerSaralId = String(order.farmerSaralId || '').toLowerCase();
+      const farmerContact = String(order.farmerContact || '').toLowerCase();
+      const farmerName = String(order.farmerName || '').toLowerCase();
+      const farmerVillage = String(order.farmerVillage || '').toLowerCase();
 
       return (
         servicePersonName.includes(lowercasedQuery) ||
         farmerSaralId.includes(lowercasedQuery) ||
-        farmerContact.includes(lowercasedQuery)
+        farmerContact.includes(lowercasedQuery) ||
+        farmerName.includes(lowercasedQuery) ||
+        farmerVillage.includes(lowercasedQuery) 
       );
     });
 
@@ -69,105 +70,76 @@ const Outgoing = () => {
     fetchOrders();
   };
 
-  const renderOrderItem = ({item}) => (
-    <>
-      {!item.incoming && (
-        <View key={item._id} style={styles.card}>
+  const renderOrderItem = ({ item }) => {
+    console.log("Rendering item:", item);
+
+    return (
+      <View key={item._id} style={styles.card}>
+        <Text style={[styles.statusText, styles.outgoing]}>Outgoing</Text>
+
+        <View style={styles.infoRow}>
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>ServicePerson Name: </Text>
+            <Text style={styles.dataText}>{item.servicePerson?.name || 'N/A'}</Text>
+          </Text>
+
           <Text
             style={[
-              styles.statusText,
-              item.incoming ? styles.incoming : styles.outgoing,
+              styles.approvedText,
+              { color: item.status ? 'green' : 'red' },
             ]}>
-            Outgoing
-          </Text>
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoText}>
-              <Text style={styles.titleText}>
-                ServicePerson Name:{' '}
-                <Text style={styles.dataText}>
-                  {item.servicePerson ? item.servicePerson.name : 'N/A'}
-                </Text>
-              </Text>
-            </Text>
-
-            <Text
-              style={[
-                styles.approvedText,
-                {color: item.status ? 'green' : 'red'},
-              ]}>
-              {item.status ? 'Completed' : 'Pending'}
-            </Text>
-          </View>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              ServicePerson Contact:{' '}
-              <Text style={styles.dataText}>{item.servicePerson?.contact}</Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Farmer SaralId:{' '}
-              <Text style={styles.dataText}>
-                {item.farmerSaralId ? item.farmerSaralId : 'N/A'}
-              </Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Farmer Name:{' '}
-              <Text style={styles.dataText}>
-                {item.farmerName ? item.farmerName : 'N/A'}
-              </Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Farmer Village:{' '}
-              <Text style={styles.dataText}>
-                {item.farmerVillage ? item.farmerVillage : 'N/A'}
-              </Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Farmer Contact:{' '}
-              <Text style={styles.dataText}>{item.farmerContact}</Text>
-            </Text>
-          </Text>
-
-          <View style={styles.itemContainer}>
-            <Text style={styles.infoText}>
-              <Text style={styles.titleText}>Product: </Text>
-            </Text>
-            {item.items.map(({_id, itemName, quantity}) => (
-              <Text key={_id} style={styles.dataText}>
-                {itemName}: {quantity + ' '}
-              </Text>
-            ))}
-          </View>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Serial Number:{' '}
-              <Text style={styles.dataText}>{item.serialNumber}</Text>
-            </Text>
-          </Text>
-
-          <Text style={styles.infoText}>
-            <Text style={styles.titleText}>
-              Remark: <Text style={styles.dataText}>{item.remark}</Text>
-            </Text>
+            {item.status ? 'Completed' : 'Pending'}
           </Text>
         </View>
-      )}
-    </>
-  );
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>ServicePerson Contact: </Text>
+          <Text style={styles.dataText}>{item.servicePerson?.contact || 'N/A'}</Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Farmer SaralId: </Text>
+          <Text style={styles.dataText}>{item.farmerSaralId || 'N/A'}</Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Farmer Name: </Text>
+          <Text style={styles.dataText}>{item.farmerName || 'N/A'}</Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Farmer Village: </Text>
+          <Text style={styles.dataText}>{item.farmerVillage || 'N/A'}</Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Farmer Contact: </Text>
+          <Text style={styles.dataText}>{item.farmerContact || 'N/A'}</Text>
+        </Text>
+
+        <View style={styles.itemContainer}>
+          <Text style={styles.infoText}>
+            <Text style={styles.titleText}>Product: </Text>
+          </Text>
+          {item.items.map(({ _id, itemName, quantity }) => (
+            <Text key={_id} style={styles.dataText}>
+              {itemName}: {quantity + ' '}
+            </Text>
+          ))}
+        </View>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Serial Number: </Text>
+          <Text style={styles.dataText}>{item.serialNumber || 'N/A'}</Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Remark: </Text>
+          <Text style={styles.dataText}>{item.remark || 'N/A'}</Text>
+        </Text>
+      </View>
+    );
+  };
 
   if (loading) {
     return (
@@ -185,7 +157,7 @@ const Outgoing = () => {
 
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by servicePersonName, farmerSaralId"
+        placeholder="Search by servicePerson, farmerSaralId, farmer Name, Village, farmerContact"
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}
@@ -204,7 +176,7 @@ const Outgoing = () => {
   );
 };
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -220,11 +192,11 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   searchBar: {
-    height: 40,
+    height: 60,
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 8,
-    paddingLeft: 8,
+    paddingLeft: 10,
     marginBottom: 16,
   },
   card: {
@@ -233,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
@@ -241,9 +213,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-  },
-  incoming: {
-    color: 'purple',
   },
   outgoing: {
     color: 'orange',

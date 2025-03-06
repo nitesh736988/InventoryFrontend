@@ -65,7 +65,6 @@ const OrderDetails = () => {
     }
   };
 
-  // Render order details
   const renderOrder = ({item}) =>
     item.incoming && (
       <View key={item._id} style={styles.card}>

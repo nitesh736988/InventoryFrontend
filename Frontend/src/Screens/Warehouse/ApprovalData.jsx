@@ -452,6 +452,24 @@ const ApprovalData = () => {
         order.servicePerson?.name
           ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
+
+          order.farmerName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+
+          order.farmerVillage
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+
+          order.serialNumber
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+
+          order.farmerContact
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+
+
         ''),
   );
 
@@ -640,7 +658,7 @@ const ApprovalData = () => {
       <Text style={styles.header}>Incoming Item</Text>
       <TextInput
         style={styles.searchInput}
-        placeholder="Search by farmer SaralId or Serviceperson Name"
+        placeholder="Search by SaralId,Serviceperson,serialNumber,Village,FarmerContact"
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}
@@ -672,12 +690,14 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   searchInput: {
-    height: 40,
+    height: 60,
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 16,
+    paddingLeft: 10,
     paddingHorizontal: 10,
+
   },
   card: {
     padding: 16,

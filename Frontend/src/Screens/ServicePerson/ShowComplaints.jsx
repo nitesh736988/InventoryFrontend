@@ -380,14 +380,14 @@ const ShowComplaints = () => {
           </View>
         </Text>
 
-        {item?.Stage[0]?._id === '675aaf9c44c74418017c1dae' ? (
+        {/* { ( */}
           <OpenMap
             longitude={item?.Farmer[0]?.longitude}
             latitude={item?.Farmer[0]?.latitude}
           />
-        ) : item?.Stage[0]._id === '675aaf9c44c74418017c1daf' ? (
-          <EntypoIcon name="squared-cross" color="red" size={25} />
-        ) : null}   
+        {/* ) : item?.Stage[0]._id === '675aaf9c44c74418017c1daf' ? ( */}
+          {/* <EntypoIcon name="squared-cross" color="red" size={25} />
+        ) : null}    */}
         {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
           onPress={() =>
             {console.log('complaint id from showComplaint page', item?._id)
