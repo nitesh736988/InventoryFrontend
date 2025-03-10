@@ -308,6 +308,7 @@ const ShowComplaints = () => {
       const response = await axios.get(
         `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
       );
+      console.log("fetch data", response.data)
       setComplaints(response.data.data);
     } catch (error) {
       console.log('Error fetching complaints:', error);
@@ -317,18 +318,9 @@ const ShowComplaints = () => {
     }
   };
 
-  // const filterComplaints = () => {
-  //   return complaints.filter(
-  //     complaint =>
-  //       complaint.complainantName
-  //         .toLowerCase()
-  //         .includes(searchQuery.toLowerCase()) ||
-  //       complaint.trackingId.toLowerCase().includes(searchQuery.toLowerCase()),
-  //   );
-  // };
 
   const filterComplaints = () => {
-    return complaints.filter(item =>
+    return complaints?.filter(item =>
       item?.Farmer[0]?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item?.Farmer[0]?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item?.Farmer[0]?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -346,27 +338,7 @@ const ShowComplaints = () => {
     fetchComplaints();
   };
 
-  // const handleApproveBtn = async (sendTransactionId, status) => {
-  //   setLoading(true);
-  //   try {
-  //     const fieldEmpId = await AsyncStorage.getItem('_id');
-
-  //     const sendRequest = await axios.post(
-  //       `http://88.222.214.93:8001/filedService/complaintAccept`,
-  //       {
-  //         stageId: status,
-  //         complaintId: sendTransactionId,
-  //         empId: fieldEmpId,
-  //       },
-  //     );
-  //     console.log(sendRequest.data);
-  //   } catch (error) {
-  //     Alert.alert(JSON.stringify(error));
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+ 
   const renderComplaintItem = ({item}) => (
     <View key={item._id} style={styles.card}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -385,9 +357,7 @@ const ShowComplaints = () => {
             longitude={item?.Farmer[0]?.longitude}
             latitude={item?.Farmer[0]?.latitude}
           />
-        {/* ) : item?.Stage[0]._id === '675aaf9c44c74418017c1daf' ? ( */}
-          {/* <EntypoIcon name="squared-cross" color="red" size={25} />
-        ) : null}    */}
+       
         {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
           onPress={() =>
             {console.log('complaint id from showComplaint page', item?._id)
@@ -441,26 +411,6 @@ const ShowComplaints = () => {
         {new Date(item.created_At).toLocaleDateString()}
       </Text>
 
-      {/* <View style={styles.actionContainer}>
-        {item?.Stage[0]?.stage === 'Assigned' && (
-          <> */}
-            {/* <TouchableOpacity
-              onPress={() =>
-                handleApproveBtn(item._id, '675aaf9c44c74418017c1daf')
-              }
-              style={styles.declineButton}>
-              <Text style={styles.buttonText}>Decline</Text>
-            </TouchableOpacity> */}
-            {/* <TouchableOpacity
-              style={styles.approveButton}
-              onPress={() =>
-                handleApproveBtn(item._id, '675aaf9c44c74418017c1dae')
-              }>
-              <Text style={styles.buttonText}>Approve</Text>
-            </TouchableOpacity> */}
-          {/* </>
-        )}
-      </View> */}
     </View>
   );
 

@@ -427,7 +427,7 @@ const ApprovalData = () => {
         fetchOrders();
       }
     } catch (error) {
-      console.error('Approval Error:', error.response?.data || error.message);
+      console.log('Approval Error:', error.response?.data || error.message);
       Alert.alert(
         'Error',
         error.response?.data?.message ||
@@ -447,30 +447,14 @@ const ApprovalData = () => {
   const filteredOrders = orders.filter(
     order =>
       order.incoming === true &&
-      (order.farmerSaralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        '' ||
-        order.servicePerson?.name
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-
-          order.farmerName
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-
-          order.farmerVillage
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-
-          order.serialNumber
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-
-          order.farmerContact
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-
-
-        ''),
+      (
+        order.farmerSaralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.servicePerson?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.farmerVillage?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.farmerContact?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+      )
   );
 
   const formatDate = dateString => {
