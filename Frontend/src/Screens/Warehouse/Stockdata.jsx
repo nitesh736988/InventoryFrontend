@@ -12,8 +12,9 @@ import {
 import axios from 'axios';
 import {API_URL} from '@env';
 import {Picker} from '@react-native-picker/picker';
-
+import { useNavigation } from '@react-navigation/native';
 const Stockdata = ({route}) => {
+  const navigation = useNavigation();
   const {itemId, itemName} = route.params;
   const [loading, setLoading] = useState(true);
   const [allWarehouses, setAllWarehouses] = useState([]);
@@ -82,6 +83,7 @@ const Stockdata = ({route}) => {
         arrivedDate: new Date(),
       });
       Alert.alert('Success', 'Item added successfully!');
+      navigation.navigate('WarehouseNavigation');
     } catch (error) {
       Alert.alert(
         'Error',
