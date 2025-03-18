@@ -239,8 +239,8 @@ const QuaterData = () => {
       setFilteredData(response.data.data); 
 
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch data');
-      console.log(JSON.stringify(error.response));
+       Alert.alert("Error", JSON.stringify(error.response.data?.message));
+      // console.log(JSON.stringify(error.response));
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -939,7 +939,8 @@ const ShowComplaintData = ({route}) => {
         'Error submitting form:',
         error.response?.data || error.message,
       );
-      Alert.alert('Error', 'Failed to submit form.');
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
+      
       setIsButtonHidden(false);
     } finally {
       setLoading(false);

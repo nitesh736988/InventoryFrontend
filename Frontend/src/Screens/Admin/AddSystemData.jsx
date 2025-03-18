@@ -24,7 +24,7 @@ const AddSystemData = () => {
         console.log('System data:', data.data);
         setItems(data.data);
       } catch (error) {
-        console.error('Failed to fetch items:', error);
+        console.log('Failed to fetch items:', error);
         Alert.alert('Error', 'Unable to fetch system items. Please try again later.');
       }
     };

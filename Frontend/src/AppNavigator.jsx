@@ -72,8 +72,19 @@ const AppNavigator = () => {
   useEffect(() => {
     const checkToken = async () => {
       try {
+        const token = await AsyncStorage.getItem('token');
         const role = await AsyncStorage.getItem('role');
-        if (role) {
+
+        if (token) {
+          const decoded = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+
+          if (decoded.exp < currentTime) {
+            await AsyncStorage.clear();
+            setInitialRoute('LoginPage'); 
+            return;
+          }
+
           if (role === 'serviceperson') {
             setInitialRoute('ServicePersonNavigation');
           } else if (role === 'warehouseAdmin') {
@@ -92,6 +103,12 @@ const AppNavigator = () => {
     };
 
     checkToken();
+
+    const interval = setInterval(() => {
+      checkToken();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {

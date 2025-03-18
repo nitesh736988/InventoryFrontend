@@ -83,10 +83,10 @@ const Sidebarmodal = () => {
     navigation.navigate('ApprovalNewInstallation');
   };
 
-  // const openLocationTracker = () => {
-  //   closeModal();
-  //   navigation.navigate('LocationTracker');
-  // };
+  const openServicePersonLocation = () => {
+    closeModal();
+    navigation.navigate('ServicePersonLocation');
+  };
 
 
 
@@ -160,11 +160,11 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>Approval NewInstallation</Text>
           </TouchableOpacity>
 
-          {/* <TouchableOpacity
-            onPress={openLocationTracker}
+          <TouchableOpacity
+            onPress={openServicePersonLocation}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Location Tracker</Text>
-          </TouchableOpacity> */}
+            <Text style={styles.optionText}>ServicePerson Location</Text>
+          </TouchableOpacity>
 
 
 

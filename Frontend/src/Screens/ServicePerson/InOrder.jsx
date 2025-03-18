@@ -593,7 +593,7 @@ const InOrder = ({route}) => {
       Alert.alert('Success', 'Transaction saved successfully');
       navigation.goBack();
     } catch (error) {
-      Alert.alert(error?.response?.data?.message);
+       Alert.alert("Error", JSON.stringify(error.response.data?.message));
     } finally {
       setLoading(false);
     }

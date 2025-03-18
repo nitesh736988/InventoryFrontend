@@ -311,7 +311,7 @@ const ShowComplaints = () => {
       console.log("fetch data", response.data)
       setComplaints(response.data.data);
     } catch (error) {
-      console.log('Error fetching complaints:', error);
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
     } finally {                 
       setLoading(false);
       setRefreshing(false);

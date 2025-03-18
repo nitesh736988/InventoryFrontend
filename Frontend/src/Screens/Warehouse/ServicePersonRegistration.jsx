@@ -150,7 +150,7 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholder="Working Block"
             value={formData.block}
             onChangeText={(value) => handleChange('block', value)}
-            maxLength={10}
+            // maxLength={10}
             placeholderTextColor={'#000'}
           />
 
@@ -162,7 +162,7 @@ const ServicePersonRegistration = ({ navigation }) => {
             placeholder="Working District"
             value={formData.district}
             onChangeText={(value) => handleChange('district', value)}
-            maxLength={10}
+            // maxLength={10}
             placeholderTextColor={'#000'}
           />
 
@@ -173,8 +173,8 @@ const ServicePersonRegistration = ({ navigation }) => {
             style={styles.input}
             placeholder="State"
             value={formData.state}
-            onChangeText={(value) => handleChange('district', value)}
-            maxLength={10}
+            onChangeText={(value) => handleChange('state', value)}
+            // maxLength={10}
             placeholderTextColor={'#000'}
           />
 
