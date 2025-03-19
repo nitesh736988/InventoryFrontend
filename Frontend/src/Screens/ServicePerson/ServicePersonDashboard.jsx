@@ -38,7 +38,7 @@ const ServicePersonDashboard = ({navigation}) => {
       setServicePersonOutgoing(outgoing.flatMap(item => item.items || []));
     } catch (error) {
       console.log('Error fetching service persons:', error);
-      Alert.alert('Error', 'Failed to fetch data');
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
     } finally {
       setIsRefreshing(false);
     }

@@ -30,7 +30,7 @@ const OrderDetails = () => {
       setFilteredOrders(response.data.pickupItemsDetail);
       setError('');
     } catch (error) {
-      console.error(error);
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
       setError('Unable to fetch orders. Please try again later.');
     } finally {
       setLoading(false);

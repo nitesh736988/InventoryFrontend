@@ -339,7 +339,7 @@ const OutStatus = () => {
       setOrders(response.data.pickupItemsDetail);
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', 'Unable to fetch orders');
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -372,7 +372,7 @@ const OutStatus = () => {
         setRefreshing(true);
       }
     } catch (error) {
-      Alert.alert(JSON.stringify(error));
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
     }
   };
 

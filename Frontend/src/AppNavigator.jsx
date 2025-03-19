@@ -61,6 +61,8 @@ import NewFarmerInstallation from './Screens/Warehouse/NewFarmerInstallation';
 import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
 import InOrder from './Screens/ServicePerson/InOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ServicePersonLocation from './Screens/ServicePerson/ServicePersonLocation'
+import SurveyPersonLocation from './Screens/Survey/SurveyPersonLocation';
 
 const Stack = createStackNavigator();
 
@@ -480,6 +482,19 @@ const AppNavigator = () => {
         <Stack.Screen
           name="InOrder"
           component={InOrder}
+          options={{title: 'InOrder', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ServicePersonLocation"
+          component={ServicePersonLocation}
+          options={{title: 'InOrder', headerShown: false}}
+        />
+
+
+        <Stack.Screen
+          name="SurveyPersonLocation"
+          component={SurveyPersonLocation}
           options={{title: 'InOrder', headerShown: false}}
         />
       

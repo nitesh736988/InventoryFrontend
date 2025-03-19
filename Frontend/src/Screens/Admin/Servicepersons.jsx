@@ -94,6 +94,7 @@ const Servicepersons = () => {
       <Text style={styles.label}>
         Latitude: <Text style={styles.value}>{item.latitude ?? 'NA'}</Text>
       </Text>
+      
       <TouchableOpacity
         accessibilityLabel={`Deactivate ${item.name}`}
         style={styles.deleteButton}

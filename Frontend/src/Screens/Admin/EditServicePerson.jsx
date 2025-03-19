@@ -20,9 +20,9 @@ const EditServicePerson = ({ route }) => {
     name,
     email,
     contact,
-    block: '',
-    district: '',
-    state: '',
+    block: block.length ? block.join(', ') : '',
+    district,
+    state,
     longitude,
     latitude,
     updatedAt: new Date().toISOString(),
@@ -48,7 +48,7 @@ const EditServicePerson = ({ route }) => {
       }
     } catch (error) {
       Alert.alert('Error', error.response?.data?.message || 'An error occurred during the update.');
-      console.error('Update error:', error);
+      console.log('Update error:', error);
     } finally {
       setLoading(false);
     }
