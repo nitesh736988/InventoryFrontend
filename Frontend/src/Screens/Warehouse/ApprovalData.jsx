@@ -495,6 +495,8 @@ const ApprovalData = () => {
                 navigation.navigate('AddTransaction', {
                   farmerComplaintId: item?.farmerComplaintId,
                   farmerContact: item?.farmerContact,
+                  farmerVillage: item?.farmerVillage,
+                  farmerName: item?.farmerName,
                   farmerSaralId: item?.farmerSaralId,
                 })
               }>

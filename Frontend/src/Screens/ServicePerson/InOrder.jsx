@@ -423,8 +423,8 @@ import {useNavigation} from '@react-navigation/native';
 
 const InOrder = ({route}) => {
   const {id, name, farmerContact, saralId, farmerName, village} = route.params;
-  // console.log('complaint Id md', farmerName);
-  // console.log('complaint Id md', village);
+  console.log('complaint Id md', farmerName);
+  console.log('complaint Id md', village);
   const [items, setItems] = useState([{}]);
   const [warehouses, setWarehouses] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);

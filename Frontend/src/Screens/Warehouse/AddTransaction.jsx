@@ -15,7 +15,7 @@ import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
 
 const AddTransaction = ({route}) => {
-  const {farmerComplaintId, farmerContact, farmerSaralId} = route.params || {};
+  const {farmerComplaintId, farmerContact, farmerName,farmerVillage, farmerSaralId} = route.params || {};
 
   // console.log("farmerComplaintId", farmerComplaintId)
   // console.log("farmerContact", farmerContact)
@@ -77,6 +77,7 @@ const AddTransaction = ({route}) => {
         setAllWarehouses(response?.data?.warehouseName);
       } catch (error) {
         console.log('Failed to fetch warehouse names:', error);
+         Alert.alert("Error", JSON.stringify(error.response.data?.message));
         setAllWarehouses([]);
       }
     };
@@ -147,6 +148,8 @@ const AddTransaction = ({route}) => {
       farmerComplaintId,
       servicePerson: selectedServicePerson,
       farmerContact,
+      farmerName, 
+      farmerVillage,
       items: itemsData,
       warehouse: selectedWarehouse,
       remark: remarks,
