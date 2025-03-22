@@ -72,86 +72,31 @@ const AppNavigator = () => {
   const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState('LoginPage');
 
-  // useEffect(() => {
-  //   const checkToken = async () => {
-  //     try {
-  //       const token = await AsyncStorage.getItem('token');
-  //       const role = await AsyncStorage.getItem('role');
-
-  //       if (token) {
-  //         const decoded = jwtDecode(token);
-  //         const currentTime = Date.now() / 1000;
-
-  //         if (decoded.exp < currentTime) {
-  //           await AsyncStorage.clear();
-  //           setInitialRoute('LoginPage'); 
-  //           return;
-  //         }
-
-  //         if (role === 'serviceperson') {
-  //           setInitialRoute('ServicePersonNavigation');
-  //         } else if (role === 'warehouseAdmin') {
-  //           setInitialRoute('WarehouseNavigation');
-  //         } else if (role === 'admin') {
-  //           setInitialRoute('Navigation');
-  //         } else if (role === 'surveyperson') {
-  //           setInitialRoute('SurvayNavigation');
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log('Error checking token:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   checkToken();
-
-  //   const interval = setInterval(() => {
-  //     checkToken();
-  //   }, 172800);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-
   useEffect(() => {
     const checkToken = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
         const role = await AsyncStorage.getItem('role');
-        const loginTime = await AsyncStorage.getItem('loginTime'); // Get saved login time
-  
-        if (token && loginTime) {
-          const currentTime = Date.now();
-          const timeElapsed = currentTime - parseInt(loginTime);
-  
-          // Check if 48 hours (48 * 60 * 60 * 1000 ms) have passed
-          if (timeElapsed >= 48 * 60 * 60 * 1000) {
+
+        if (token) {
+          const decoded = jwtDecode(token);
+          const currentTime = Date.now() / 1000;
+
+          if (decoded.exp < currentTime) {
             await AsyncStorage.clear();
-            setInitialRoute('LoginPage');
+            setInitialRoute('LoginPage'); 
             return;
           }
-  
-          // Role-based navigation
-          switch (role) {
-            case 'serviceperson':
-              setInitialRoute('ServicePersonNavigation');
-              break;
-            case 'warehouseAdmin':
-              setInitialRoute('WarehouseNavigation');
-              break;
-            case 'admin':
-              setInitialRoute('Navigation');
-              break;
-            case 'surveyperson':
-              setInitialRoute('SurvayNavigation');
-              break;
-            default:
-              setInitialRoute('LoginPage');
+
+          if (role === 'serviceperson') {
+            setInitialRoute('ServicePersonNavigation');
+          } else if (role === 'warehouseAdmin') {
+            setInitialRoute('WarehouseNavigation');
+          } else if (role === 'admin') {
+            setInitialRoute('Navigation');
+          } else if (role === 'surveyperson') {
+            setInitialRoute('SurvayNavigation');
           }
-        } else {
-          setInitialRoute('LoginPage');
         }
       } catch (error) {
         console.log('Error checking token:', error);
@@ -159,16 +104,16 @@ const AppNavigator = () => {
         setLoading(false);
       }
     };
-  
+
     checkToken();
-  
-    // Check every 1 hour (3600000 ms) to ensure timely logout
+
     const interval = setInterval(() => {
       checkToken();
-    }, 3600000); // 1 hour in milliseconds
-  
+    }, 172800);
+
     return () => clearInterval(interval);
   }, []);
+
   
   if (loading) {
     return (

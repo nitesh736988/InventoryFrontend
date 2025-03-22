@@ -68,7 +68,7 @@ const ServicePersonDashboard = ({navigation}) => {
         error.message,
         error.response?.data || error,
       );
-      Alert.alert('Error', 'Failed to logout. Please try again.');
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
     }
   };
 
