@@ -72,6 +72,7 @@ const Outgoing = () => {
 
   const renderOrderItem = ({ item }) => {
     console.log("Rendering item:", item);
+    const pickupDate = item.pickupDate.split("T");
 
     return (
       <View key={item._id} style={styles.card}>
@@ -136,6 +137,11 @@ const Outgoing = () => {
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>Remark: </Text>
           <Text style={styles.dataText}>{item.remark || 'N/A'}</Text>
+        </Text>
+
+        <Text style={styles.infoText}>
+          <Text style={styles.titleText}>Pickup Date: </Text>
+          <Text style={styles.dataText}>{ pickupDate[0]|| 'N/A'}</Text>
         </Text>
       </View>
     );

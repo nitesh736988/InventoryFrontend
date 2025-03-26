@@ -13,7 +13,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {API_URL} from '@env';
-import Sidebarmodal from './Sidebarmodal'
+import Sidebarmodal from './Sidebarmodal';
+import ServicePersonLocation from '../ServicePerson/ServicePersonLocation';
 
 const {width} = Dimensions.get('window');
 
@@ -38,7 +39,7 @@ const ServicePersonDashboard = ({navigation}) => {
       setServicePersonOutgoing(outgoing.flatMap(item => item.items || []));
     } catch (error) {
       console.log('Error fetching service persons:', error);
-      Alert.alert("Error", JSON.stringify(error.response.data?.message));
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     } finally {
       setIsRefreshing(false);
     }
@@ -68,7 +69,7 @@ const ServicePersonDashboard = ({navigation}) => {
         error.message,
         error.response?.data || error,
       );
-      Alert.alert("Error", JSON.stringify(error.response.data?.message));
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     }
   };
 
@@ -86,19 +87,26 @@ const ServicePersonDashboard = ({navigation}) => {
           </View>
         ))
       ) : (
-        <Text style= {{color: 'black'}}>No Data Available</Text>
+        <Text style={{color: 'black'}}>No Data Available</Text>
       ),
     [],
   );
 
   return (
     <View style={styles.container}>
-      
-      <View style={styles.header}>
-      <Sidebarmodal/>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Icon name="sign-out" size={20} color="white" />
-        </TouchableOpacity>
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <Sidebarmodal />
+        </View>
+        <View style={styles.headerCenter}>
+          <ServicePersonLocation />
+        </View>
+
+        <View style={styles.headersignOut}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Icon name="sign-out" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -120,15 +128,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fbd33b'
+    backgroundColor: '#fbd33b',
+    justifyContent:'flex-start',
   },
-  header: {
-    width: '100%',
+  headerContainer:{
+    width:width-35,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingVertical: 10,
+    justifyContent: 'space-between',
+    paddingVertical: 10
     
   },
+
+  headerCenter:{
+    height:
+  },
+  
+  headersignOut:{
+  
+  },
+
   logoutButton: {
     backgroundColor: 'black',
     padding: 10,
@@ -138,6 +156,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: 20,
   },
+
   sectionTitle: {
     color: '#070604',
     fontSize: 28,

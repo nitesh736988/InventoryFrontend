@@ -455,7 +455,7 @@ const InOrder = ({route}) => {
     controllerSelected,
     withoutRMU,
     rmuRemark,
-    farmerSaralId,
+  farmerSaralId,
   } = formData;
 
   useEffect(() => {
@@ -701,7 +701,7 @@ const InOrder = ({route}) => {
                 selectedWarehouse: value,
               }))
             }>
-            {warehouses.map(warehouse => (
+            {warehouses?.map(warehouse => (
               <Picker.Item
                 key={warehouse._id}
                 label={warehouse.warehouseName}

@@ -213,6 +213,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { API_URL } from '@env';
+import {useNavigation} from '@react-navigation/native';
 
 const Reject = () => {
   const [itemName, setItemName] = useState('');
@@ -222,6 +223,7 @@ const Reject = () => {
   const [rejected, setRejected] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedValue, setSelectedValue] = useState('');
+    const navigation = useNavigation();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -270,7 +272,7 @@ const Reject = () => {
       navigation.navigate('WarehouseNavigation');
     } catch (error) {
       console.log('Error submitting data:', error?.response?.data || error?.message);
-       Alert.alert('Error',error.response?.data?.message || 'Something went wrong while submitting.');
+       Alert.alert('Error',error.response?.data?.message);
     } finally {
       setLoading(false);
     }

@@ -65,64 +65,14 @@ import ServicePersonLocation from './Screens/ServicePerson/ServicePersonLocation
 import SurveyPersonLocation from './Screens/Survey/SurveyPersonLocation';
 import InstallationStock from './Screens/ServicePerson/InstallationStock';
 
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
 
-  const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState('LoginPage');
-
-  useEffect(() => {
-    const checkToken = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        const role = await AsyncStorage.getItem('role');
-
-        if (token) {
-          const decoded = jwtDecode(token);
-          const currentTime = Date.now() / 1000;
-
-          if (decoded.exp < currentTime) {
-            await AsyncStorage.clear();
-            setInitialRoute('LoginPage'); 
-            return;
-          }
-
-          if (role === 'serviceperson') {
-            setInitialRoute('ServicePersonNavigation');
-          } else if (role === 'warehouseAdmin') {
-            setInitialRoute('WarehouseNavigation');
-          } else if (role === 'admin') {
-            setInitialRoute('Navigation');
-          } else if (role === 'surveyperson') {
-            setInitialRoute('SurvayNavigation');
-          }
-        }
-      } catch (error) {
-        console.log('Error checking token:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkToken();
-
-    const interval = setInterval(() => {
-      checkToken();
-    }, 172800);
-
-    return () => clearInterval(interval);
-  }, []);
-
+   
   
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
-  }
-
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRoute} >
