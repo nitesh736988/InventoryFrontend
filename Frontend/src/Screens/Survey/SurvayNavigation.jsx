@@ -34,9 +34,9 @@ const TabNavigator = () => {
             iconName = 'truck-delivery';
           }
 
-          else if (route.name === 'SurveyPersonLocation') {
-            iconName = 'truck-delivery';
-          }
+          // else if (route.name === 'SurveyPersonLocation') {
+          //   iconName = 'truck-delivery';
+          // }
 
           return (
             <MaterialCommunityIcons name={iconName} color={color} size={size} />
@@ -54,11 +54,11 @@ const TabNavigator = () => {
         options={{title: 'SurveyAssign'}}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="SurveyPersonLocation"
         component={SurveyPersonLocation}
         options={{title: 'SurveyPersonLocation'}}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

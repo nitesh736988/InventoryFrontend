@@ -71,6 +71,41 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
 
   const [initialRoute, setInitialRoute] = useState('LoginPage');
+  // const [loading, setLoading] = useState(true);
+
+
+  // useEffect(() => {
+  //   const checkToken = async () => {
+  //     try {
+  //       const role = await AsyncStorage.getItem('role');
+  //       if (role) {
+  //         if (role === 'serviceperson') {
+  //           setInitialRoute('ServicePersonNavigation');
+  //         } else if (role === 'warehouseAdmin') {
+  //           setInitialRoute('WarehouseNavigation');
+  //         } else if (role === 'admin') {
+  //           setInitialRoute('AdminNavigation');
+  //         } else if (role === 'surveyperson') {
+  //           setInitialRoute('SurvayNavigation');
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.log('Error checking token:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   checkToken();
+  // }, []);
+
+  // if (loading) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+  //       <ActivityIndicator size="large" color="#000" />
+  //     </View>
+  //   );
+  // }
    
   
   return (

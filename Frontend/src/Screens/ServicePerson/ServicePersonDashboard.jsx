@@ -8,6 +8,7 @@ import {
   Alert,
   Dimensions,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,12 +17,16 @@ import {API_URL} from '@env';
 import Sidebarmodal from './Sidebarmodal';
 import ServicePersonLocation from '../ServicePerson/ServicePersonLocation';
 
+
 const {width} = Dimensions.get('window');
 
 const ServicePersonDashboard = ({navigation}) => {
   const [servicePersons, setServicePersons] = useState([]);
   const [servicePersonOutgoing, setServicePersonOutgoing] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [empId, setEmpId] = useState(null); // 
+  const [punchStatus, setPunchStatus]= useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchServicePersons = async () => {
     try {
@@ -72,6 +77,56 @@ const ServicePersonDashboard = ({navigation}) => {
       Alert.alert('Error', JSON.stringify(error.response.data?.message));
     }
   };
+  useEffect(() => {
+    const fetchEmpData = async () => {
+      try {
+        const id = await AsyncStorage.getItem('_id');
+        const storedContact = await AsyncStorage.getItem('Contact');
+        const punchInTimestamp = await AsyncStorage.getItem('punchInTime');
+
+        console.log('Fetched from AsyncStorage:', { id, storedContact, punchInTimestamp });
+
+        if (id) setEmpId(id);
+        if (storedContact) setContact(JSON.parse(storedContact));
+
+        if (punchInTimestamp) {
+          const punchInDate = new Date(JSON.parse(punchInTimestamp));
+          setPunchInTime(punchInDate);
+          setIsActive(true);
+          setShowPunchOut(true);
+
+          const now = new Date();
+          const secondsElapsed = Math.floor((now - punchInDate) / 1000);
+          setTimer(secondsElapsed);
+        }
+      } catch (error) {
+        console.log('Error fetching employee data:', error);
+      }
+    };
+
+    fetchEmpData();
+  }, []);
+
+  useEffect(() => {
+    console.log()
+    const fetchData = async () => {
+      try {
+        const response = await axios.post(
+          'http://88.222.214.93:8001/track/checkDailyPunchIn',
+          { fieldEmpId: empId }
+        );
+        setPunchStatus(response?.data?.data)
+        console.log("DPS", response.data);
+
+      } catch (error) {
+        console.log("Error fetching data:", error);
+      }finally {
+        setLoading(false); // Stop loading when API response is received
+      }
+    };
+
+    fetchData();
+  }, [empId]);
 
   useEffect(() => {
     fetchServicePersons();
@@ -99,7 +154,11 @@ const ServicePersonDashboard = ({navigation}) => {
           <Sidebarmodal />
         </View>
         <View style={styles.headerCenter}>
-          <ServicePersonLocation />
+          {loading ? (
+            <ActivityIndicator size="large" color="blue" /> // Show loader while API is fetching
+          ) : (
+            <ServicePersonLocation status={punchStatus} />
+          )}
         </View>
 
         <View style={styles.headersignOut}>
@@ -139,13 +198,7 @@ const styles = StyleSheet.create({
     
   },
 
-  headerCenter:{
-    height:
-  },
-  
-  headersignOut:{
-  
-  },
+
 
   logoutButton: {
     backgroundColor: 'black',

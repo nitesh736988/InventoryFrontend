@@ -114,12 +114,14 @@
 
 
 
-import {View, Text, TouchableOpacity, Alert, StyleSheet} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const ServicePersonLocation = () => {
+const ServicePersonLocation = ({status}) => {
+  console.log("status", status)
+
   const [showPunchOut, setShowPunchOut] = useState(false);
   const [empId, setEmpId] = useState(null);
   const [timer, setTimer] = useState(0);
@@ -132,22 +134,19 @@ const ServicePersonLocation = () => {
       try {
         const id = await AsyncStorage.getItem('_id');
         const storedContact = await AsyncStorage.getItem('Contact');
-  
-        if (storedContact) {
-          setContact(JSON.parse(storedContact)); 
-        } else {
-          console.log('Contact not found in AsyncStorage');
-        }
-  
-        setEmpId(id);
-  
         const punchInTimestamp = await AsyncStorage.getItem('punchInTime');
+
+        console.log('Fetched from AsyncStorage:', { id, storedContact, punchInTimestamp });
+
+        if (id) setEmpId(id);
+        if (storedContact) setContact(JSON.parse(storedContact));
+
         if (punchInTimestamp) {
-          const punchInDate = new Date(punchInTimestamp);
+          const punchInDate = new Date(JSON.parse(punchInTimestamp));
           setPunchInTime(punchInDate);
           setIsActive(true);
           setShowPunchOut(true);
-  
+
           const now = new Date();
           const secondsElapsed = Math.floor((now - punchInDate) / 1000);
           setTimer(secondsElapsed);
@@ -156,10 +155,9 @@ const ServicePersonLocation = () => {
         console.log('Error fetching employee data:', error);
       }
     };
-  
+
     fetchEmpData();
   }, []);
-  
 
   useEffect(() => {
     let interval = null;
@@ -177,9 +175,7 @@ const ServicePersonLocation = () => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins
-      .toString()
-      .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const handlePunchIn = async () => {
@@ -189,26 +185,22 @@ const ServicePersonLocation = () => {
     }
     try {
       const now = new Date();
-      console.log(empId);
-      console.log(contact);
+      console.log('Punching In:', { empId, contact });
+
       const response = await axios.post(
         'http://88.222.214.93:8001/track/empPunchIn',
-        {
-          empId,
-          contact
-        },
-
+        { empId, contact }
       );
 
-      console.log('Response data', response.data);
+      console.log('Punch In Response:', response.data);
 
-      await AsyncStorage.setItem('punchInTime', now.toString());
+      await AsyncStorage.setItem('punchInTime', JSON.stringify(now));
       setPunchInTime(now);
-      
-      Alert.alert('Success', `Punch In Successful at ${now.toLocaleTimeString()}`);
       setShowPunchOut(true);
       setIsActive(true);
       setTimer(0);
+
+      Alert.alert('Success', `Punch In Successful at ${now.toLocaleTimeString()}`);
     } catch (error) {
       console.log('Punch In Error:', error);
       Alert.alert('Error', error.response?.data?.message || 'Punch In failed');
@@ -217,7 +209,7 @@ const ServicePersonLocation = () => {
 
   const handlePunchOut = async () => {
     if (!empId || !punchInTime) {
-      Alert.alert('Error', 'Employee ID or punch in time not found');
+      Alert.alert('Error', 'Employee ID or punch-in time not found');
       return;
     }
 
@@ -226,25 +218,22 @@ const ServicePersonLocation = () => {
       const timeWorkedInSeconds = Math.floor((now - punchInTime) / 1000);
       const timeWorkedFormatted = formatTime(timeWorkedInSeconds);
 
+      console.log('Punching Out:', { empId, contact });
+
       const response = await axios.post(
         'http://88.222.214.93:8001/track/empPunchOut',
-        {
-          empId,
-          contact
-        },
+        { empId, contact }
       );
-    
+
+      console.log('Punch Out Response:', response.data);
+
       await AsyncStorage.removeItem('punchInTime');
-      
-      Alert.alert(
-        'Success',
-        `Punch Out Successful\nTime Worked: ${timeWorkedFormatted}`,
-      );
-      console.log('Punch Out', response.data);
       setShowPunchOut(false);
       setIsActive(false);
       setTimer(0);
       setPunchInTime(null);
+
+      Alert.alert('Success', `Punch Out Successful\nTime Worked: ${timeWorkedFormatted}`);
     } catch (error) {
       console.log('Punch Out Error:', error);
       Alert.alert('Error', error.response?.data?.message || 'Punch Out failed');
@@ -253,8 +242,6 @@ const ServicePersonLocation = () => {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.title}>Service Person Location</Text> */}
-
       {showPunchOut && punchInTime && (
         <View style={styles.timerContainer}>
           <Text style={styles.timerText}>Time Worked:</Text>
@@ -265,21 +252,24 @@ const ServicePersonLocation = () => {
         </View>
       )}
 
-      {!showPunchOut ? (
+      {( status === false ) ? (
         <TouchableOpacity style={styles.button} onPress={handlePunchIn}>
           <Text style={styles.buttonText}>Employee Punch In</Text>
         </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={[styles.button, styles.punchOut]}
-          onPress={handlePunchOut}>
-          <Text style={styles.buttonText}>Employee Punch Out</Text>
-        </TouchableOpacity>
-      )}
+      ) : <Text></Text>
+      }
+      {
+        (status === true) ? (
+          <TouchableOpacity
+            style={[styles.button, styles.punchOut]}
+            onPress={handlePunchOut}>
+            <Text style={styles.buttonText}>Employee Punch Out</Text>
+          </TouchableOpacity>
+        ) : <Text> </Text>
+      }
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     // flex: 1,
