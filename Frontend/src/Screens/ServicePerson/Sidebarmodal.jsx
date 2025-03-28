@@ -83,10 +83,10 @@ const Sidebarmodal = () => {
     navigation.navigate('ApprovalNewInstallation');
   };
 
-  // const openServicePersonLocation = () => {
-  //   closeModal();
-  //   navigation.navigate('ServicePersonLocation');
-  // };
+  const openServicePersonLocation = () => {
+    closeModal();
+    navigation.navigate('ServicePersonLocation');
+  };
 
 
 
@@ -159,12 +159,12 @@ const Sidebarmodal = () => {
             style={styles.optionButton}>
             <Text style={styles.optionText}>Approval NewInstallation</Text>
           </TouchableOpacity>
-{/* 
+
           <TouchableOpacity
             onPress={openServicePersonLocation}
             style={styles.optionButton}>
             <Text style={styles.optionText}>ServicePerson Location</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
 
 
