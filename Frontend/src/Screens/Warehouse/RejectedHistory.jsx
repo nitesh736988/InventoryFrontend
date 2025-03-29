@@ -30,7 +30,7 @@ const RejectedHistory = () => {
       
       setFilteredOrders(response.data.allRejectItemData);
     } catch (error) {
-      Alert.alert('Error', 'Unable to fetch orders');
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     } finally {
       setLoading(false);
       setRefreshing(false);

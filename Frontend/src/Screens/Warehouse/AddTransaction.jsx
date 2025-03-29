@@ -45,7 +45,8 @@ const AddTransaction = ({route}) => {
         console.log(response?.data.data);
         setServicePerson(response?.data?.data);
       } catch (error) {
-        console.log('Failed to fetch service persons:', error);
+        // console.log('Failed to fetch service persons:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
       }
     };
 
@@ -65,7 +66,8 @@ const AddTransaction = ({route}) => {
         setAllItems(items);
         setFilteredItems(items);
       } catch (error) {
-        console.log('Failed to fetch items:', error);
+        // console.log('Failed to fetch items:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
       }
     };
 
@@ -76,8 +78,9 @@ const AddTransaction = ({route}) => {
         );
         setAllWarehouses(response?.data?.warehouseName);
       } catch (error) {
-        console.log('Failed to fetch warehouse names:', error);
-         Alert.alert("Error", JSON.stringify(error.response.data?.message));
+        // console.log('Failed to fetch warehouse names:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
+        //  Alert.alert("Error", JSON.stringify(error.response.data?.message));
         setAllWarehouses([]);
       }
     };
@@ -179,7 +182,7 @@ const AddTransaction = ({route}) => {
       }
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', 'An error occurred while saving the transaction');
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     }
     finally {
       setLoading(false); 

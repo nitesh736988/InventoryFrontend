@@ -26,7 +26,7 @@ const InstallationHistoryData = () => {
       const response = await axios.get(`${API_URL}/warehouse-admin/warehouse-installation-data`);
       setOrders(response.data.data || []);
     } catch (error) {
-      Alert.alert('Error', 'Unable to fetch orders');
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
       console.log('Error fetching orders:', error);
     } finally {
       setLoading(false);

@@ -26,7 +26,7 @@ const AssignSystem = () => {
         }));
         setServicePersons(persons);
       } catch (error) {
-        console.log('Failed to fetch service persons:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
       }
     };
 

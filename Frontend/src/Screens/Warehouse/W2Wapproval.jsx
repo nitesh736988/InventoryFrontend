@@ -307,7 +307,7 @@ const W2Wapproval = () => {
       setOrders(response.data.incomingDefectiveData);
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', 'Unable to fetch orders');
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     } finally {
       setRefreshing(false);
       setLoading(false);
@@ -332,7 +332,7 @@ const W2Wapproval = () => {
       setBtnClickedStatus((prev) => ({ ...prev, [sendTransactionId]: true }));
       setRefreshing(true);
     } catch (error) {
-      Alert.alert('Error', 'Unable to update status');
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     }
   };
 

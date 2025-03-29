@@ -36,7 +36,7 @@ const Stockdata = ({route}) => {
         setAllWarehouses([]);
       }
     } catch (error) {
-      console.error('Error fetching warehouses:', error);
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
       setAllWarehouses([]);
     } finally {
       setLoading(false);

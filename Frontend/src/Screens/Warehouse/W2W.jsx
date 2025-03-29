@@ -438,9 +438,8 @@ const W2W = () => {
     selectedItems: [],
     quantities: {},
     isDefective: null,
-    fromWarehouse: '',
+    fromWarehouse: 'Bhiwani',
     toWarehouse: '',
-
   });
 
   useEffect(() => {
@@ -456,7 +455,7 @@ const W2W = () => {
         setItems(items);
         setFilteredItems(items);
       } catch (error) {
-        console.log('Failed to fetch items:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
       }
     };
 
@@ -470,7 +469,7 @@ const W2W = () => {
           fromWarehouse: response.data.warehouseName,
         }));
       } catch (error) {
-        console.log('Failed to fetch warehouses:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
       }
     };
 
@@ -486,7 +485,7 @@ const W2W = () => {
         );
         setAllWarehouse(response.data.allWarehouses);
       } catch (error) {
-        console.log('Failed to fetch all warehouses:', error);
+        Alert.alert('Error', JSON.stringify(error.response.data?.message));
       }
     };
 
@@ -593,12 +592,11 @@ const W2W = () => {
       if (response.status === 200) {
         resetForm();
         Alert.alert('Success', 'Transaction saved successfully');
-        
       } else {
         Alert.alert('Error', 'Failed to save transaction');
       }
     } catch (error) {
-      Alert.alert("warehouse Item does not exist's");
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     }
   };
 
@@ -617,34 +615,34 @@ const W2W = () => {
 
   return (
     <View style={styles.container}>
-        <View
-          style={{
-            paddingHorizontal: 20,
-            backgroundColor: '#fbd33b',
-            paddingTop: 30,
-          }}>
-          <Text style={styles.heading}>Warehouse to Warehouse Transfer</Text>
-          <Text style={styles.label}>Select Items:</Text>
-          <MultiSelect
-            hideTags
-            items={filteredItems}
-            uniqueKey="itemName"
-            onSelectedItemsChange={handleItemSelect}
-            selectedItems={selectedItems}
-            selectText="Pick Items"
-            searchInputPlaceholderText="Search Items..."
-            onSearch={handleSearch}
-            displayKey="itemName"
-            hideSubmitButton
-            styleListContainer={styles.listContainer}
-            textColor="#000"
-          />
-        </View>
+      <View
+        style={{
+          paddingHorizontal: 20,
+          backgroundColor: '#fbd33b',
+          paddingTop: 30,
+        }}>
+        <Text style={styles.heading}>Warehouse to Warehouse Transfer</Text>
+        <Text style={styles.label}>Select Items:</Text>
+        <MultiSelect
+          hideTags
+          items={filteredItems}
+          uniqueKey="itemName"
+          onSelectedItemsChange={handleItemSelect}
+          selectedItems={selectedItems}
+          selectText="Pick Items"
+          searchInputPlaceholderText="Search Items..."
+          onSearch={handleSearch}
+          displayKey="itemName"
+          hideSubmitButton
+          styleListContainer={styles.listContainer}
+          textColor="#000"
+        />
+      </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* <View style={styles.modalContainer}> */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* <View style={styles.modalContainer}> */}
 
-          {formData.selectedItems.map(item => (
+        {formData.selectedItems.map(item => (
           <View key={item} style={styles.itemQuantityContainer}>
             <Text style={styles.label}>Quantity for {item}:</Text>
             <TextInput
@@ -657,52 +655,66 @@ const W2W = () => {
             />
           </View>
         ))}
-        
-        
-            <Text style={styles.label}>Driver Name:</Text>
-            <TextInput
-              value={formData.driverName}
-              onChangeText={value => handleInputChange('driverName', value)}
-              placeholder="Enter Driver Name"
-              style={styles.input}
-              placeholderTextColor={'#000'}
-            />
-            <Text style={styles.label}>Driver Contact:</Text>
-            <TextInput
-              value={formData.driverContact}
-              onChangeText={value => handleInputChange('driverContact', value)}
-              placeholder="Enter Driver Contact"
-              style={styles.input}
-              keyboardType="phone-pad"
-              placeholderTextColor={'#000'}
-            />
 
-            <Text style={styles.label}>From Warehouse:</Text>
-            <Picker
-              selectedValue={formData.fromWarehouse}
-              style={styles.picker}
-              onValueChange={value =>
-                handleInputChange('fromWarehouse', value)
-              }>
-              <Picker.Item
-                label={formData.fromWarehouse}
-                value={formData.fromWarehouse}
-              />
-            </Picker>
-            <Text style={styles.label}>To Warehouse:</Text>
-            <Picker
-              selectedValue={formData.toWarehouse}
-              style={styles.picker}
-              onValueChange={value => handleInputChange('toWarehouse', value)}>
-              {allWarehouses.map(warehouse => (
-                <Picker.Item
-                  key={warehouse._id}
-                  label={warehouse.warehouseName}
-                  value={warehouse.warehouseName}
-                />
-              ))}
-            </Picker>
-            <Text style={styles.label}>Is Defective:</Text>
+        <Text style={styles.label}>Driver Name:</Text>
+        <TextInput
+          value={formData.driverName}
+          onChangeText={value => handleInputChange('driverName', value)}
+          placeholder="Enter Driver Name"
+          style={styles.input}
+          placeholderTextColor={'#000'}
+        />
+        <Text style={styles.label}>Driver Contact:</Text>
+        <TextInput
+          value={formData.driverContact}
+          onChangeText={value => handleInputChange('driverContact', value)}
+          placeholder="Enter Driver Contact"
+          style={styles.input}
+          keyboardType="phone-pad"
+          placeholderTextColor={'#000'}
+        />
+
+        <Text style={styles.label}>From Warehouse:</Text>
+        <Picker
+          selectedValue={formData.fromWarehouse}
+          style={styles.picker}
+          onValueChange={value => handleInputChange('fromWarehouse', value)}>
+          <Picker.Item
+            label={formData.fromWarehouse}
+            value={formData.fromWarehouse}
+          />
+        </Picker>
+
+        {/* <Text style={styles.label}>To Warehouse:</Text>
+        <Picker
+          selectedValue={formData.toWarehouse}
+          style={styles.picker}
+          onValueChange={value => handleInputChange('toWarehouse', value)}>
+          {allWarehouses.map(warehouse => (
+            <Picker.Item
+              key={warehouse._id}
+              label={warehouse.warehouseName}
+              value={warehouse.warehouseName}
+            />
+          ))}
+        </Picker> */}
+
+        <Text style={styles.label}>To Warehouse:</Text>
+        <Picker
+          selectedValue={formData.toWarehouse || null}
+          style={styles.picker}
+          onValueChange={value => handleInputChange('toWarehouse', value)}>
+          <Picker.Item label="Select Warehouse" value={null} />
+          {allWarehouses.map(warehouse => (
+            <Picker.Item
+              key={warehouse._id}
+              label={warehouse.warehouseName}
+              value={warehouse.warehouseName}
+            />
+          ))}
+        </Picker>
+
+        {/* <Text style={styles.label}>Is Defective:</Text>
             <Picker
               selectedValue={formData.isDefective}
               style={styles.picker}
@@ -713,26 +725,38 @@ const W2W = () => {
               ].map(({_id, name}) => (
                 <Picker.Item key={_id} label={name} value={name} />
               ))}
-            </Picker>
-            <Text style={styles.label}>Remarks:</Text>
-            <TextInput
-              value={formData.remarks}
-              onChangeText={value => handleInputChange('remarks', value)}
-              placeholder="Enter Remarks"
-              style={styles.input}
-              maxLength={100}
-              multiline
-              numberOfLines={4}
-              placeholderTextColor={'#000'}
-            />
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleDataOnSubmit}>
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
-           </ScrollView>
-          </View>
-          
+            </Picker> */}
+
+        <Text style={styles.label}>Is Defective:</Text>
+        <Picker
+          selectedValue={formData.isDefective || null}
+          style={styles.picker}
+          onValueChange={value => handleInputChange('isDefective', value)}>
+          <Picker.Item label="Select Data" value={null} />
+          {[
+            {_id: 1, name: 'Yes'},
+            {_id: 2, name: 'No'},
+          ].map(({_id, name}) => (
+            <Picker.Item key={_id} label={name} value={name} />
+          ))}
+        </Picker>
+
+        <Text style={styles.label}>Remarks:</Text>
+        <TextInput
+          value={formData.remarks}
+          onChangeText={value => handleInputChange('remarks', value)}
+          placeholder="Enter Remarks"
+          style={styles.input}
+          maxLength={100}
+          multiline
+          numberOfLines={4}
+          placeholderTextColor={'#000'}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleDataOnSubmit}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -794,7 +818,7 @@ const W2W = () => {
 //   },
 // });
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -809,7 +833,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: height * 0.02,
     alignItems: 'center',
-    marginBottom: 140
+    marginBottom: 140,
   },
   buttonText: {
     color: '#fbd33b',
@@ -872,4 +896,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default W2W;      
+export default W2W;

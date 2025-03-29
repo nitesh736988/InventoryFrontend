@@ -195,7 +195,8 @@ const AddData = ({ route }) => {
       setStock('');
       setDefective('');
     } catch (error) {
-      console.log('Error adding item:', error);
+      // console.log('Error adding item:', error);
+      Alert.alert('Error adding item', JSON.stringify(error.response.data?.message));
       if (error.response && error.response.data) {
         Alert.alert(
           'Error',

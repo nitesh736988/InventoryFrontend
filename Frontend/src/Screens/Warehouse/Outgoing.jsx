@@ -27,12 +27,12 @@ const Outgoing = () => {
 
       console.log("API Response:", response.data);
 
-      const items = response.data.pickupItems || []; // Ensure array
+      const items = response.data.pickupItems || [];
       setOrders(items);
       setFilteredOrders(items);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      Alert.alert('Error', 'Failed to fetch data');
+      console.log("Error fetching data:", error);
+      Alert.alert('Error', JSON.stringify(error.response.data?.message));
     } finally {
       setLoading(false);
       setRefreshing(false);
