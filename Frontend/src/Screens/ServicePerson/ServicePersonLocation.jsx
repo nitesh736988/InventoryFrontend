@@ -234,8 +234,13 @@ const ServicePersonLocation = () => {
         
         setHasPunchedIn(response.data.data);
       } catch (err) {
-        console.error('Error checking punch-in status:', err);
-        setError('Failed to check punch status');
+        // console.log('Error checking punch-in status:', err);
+        // setError('Failed to check punch status');
+
+        setError(err.response?.data?.message || 'Failed to check punch status');
+        console.log('Error checking punch-in status:', err.response?.data?.message || err.message);
+        Alert.alert('Error', err.response?.data?.message || 'Punch in failed. Please try again.');
+        
       } finally {
         setCheckingStatus(false);
       }
@@ -262,8 +267,9 @@ const ServicePersonLocation = () => {
       setHasPunchedIn(true);
       console.log('PunchIn response:', response.data);
     } catch (err) {
-      setError('Failed to punch in. Please try again.');
-      console.error('PunchIn error:', err);
+      setError(err.response?.data?.message || 'Failed to punch in');
+      console.log('PunchIn error:', err.response?.data?.message || err.message);
+      Alert.alert('Error', err.response?.data?.message || 'Punch in failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -287,8 +293,10 @@ const ServicePersonLocation = () => {
       setHasPunchedIn(false);
       console.log('PunchOut response:', response.data);
     } catch (err) {
-      setError('Failed to punch out. Please try again.');
-      console.error('PunchOut error:', err);
+      setError(err.response?.data?.message || 'Failed to punch out');
+      console.log('PunchIn error:', err.response?.data?.message || err.message);
+      Alert.alert('Error', err.response?.data?.message || 'Punch in failed. Please try again.');
+
     } finally {
       setLoading(false);
     }
