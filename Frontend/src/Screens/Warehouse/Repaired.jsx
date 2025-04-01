@@ -22,7 +22,7 @@ const Repaired = () => {
   const [repaired, setRepaired] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedValue, setSelectedValue] = useState(''); 
-  const [changeMaterial, setChangeMaterial] = useState(''); //new
+  const [changeMaterial, setChangeMaterial] = useState('');
 
 const navigation = useNavigation()
   useEffect(() => {
@@ -143,34 +143,37 @@ const navigation = useNavigation()
           style={styles.input}
         />
 
-        <Text style={styles.label}>Select an Issue:</Text>
-        <Picker
-          selectedValue={selectedValue}
-          onValueChange={setSelectedValue}
-          style={styles.input}>
-          <Picker.Item label="Controller IGBT Issue" value="Controller IGBT Issue" />
-          <Picker.Item label="Controller Display Issue" value="Controller Display Issue" />
-          <Picker.Item label="Winding Problem" value="Winding Problem"/>
-          <Picker.Item label="Bush Problem" value="Bush Problem" />
-          <Picker.Item label="Stamping Damaged" value="Stamping Damaged" />
-          <Picker.Item label="Thrust Plate Damage" value="Thrust Plate Damage" />
-          <Picker.Item label="Shaft and Rotor Dameged" value="Shaft and Rotor Dameged" />
-          <Picker.Item label="Bearing plate damaged" value="Bearing plate damaged" />
-          <Picker.Item label="Oil Seal Damaged" value="Oil Seal Damaged" />
 
-          <Picker.Item label="Other" value="other" />
-        </Picker>
+      <Text style={styles.label}>Select an Issue:</Text>
+      <Picker
+        selectedValue={selectedValue}
+        onValueChange={(itemValue) => setSelectedValue(itemValue)}
+        style={styles.input}
+      >
+        <Picker.Item label="Select an issue..." value="" />
+        <Picker.Item label="Controller IGBT Issue" value="Controller IGBT Issue" />
+        <Picker.Item label="Controller Display Issue" value="Controller Display Issue" />
+        <Picker.Item label="Winding Problem" value="Winding Problem" />
+        <Picker.Item label="Bush Problem" value="Bush Problem" />
+        <Picker.Item label="Stamping Damaged" value="Stamping Damaged" />
+        <Picker.Item label="Thrust Plate Damage" value="Thrust Plate Damage" />
+        <Picker.Item label="Shaft and Rotor Damaged" value="Shaft and Rotor Damaged" />
+        <Picker.Item label="Bearing plate damaged" value="Bearing plate damaged" />
+        <Picker.Item label="Oil Seal Damaged" value="Oil Seal Damaged" />
+        <Picker.Item label="Other" value="other" />
+      </Picker>
 
-        {selectedValue === 'other' && (
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Enter remarks..."
-            placeholderTextColor= 'gray'
-            value={remark}
-            onChangeText={setRemark}
-            multiline
-          />
-        )}
+      {selectedValue === 'other' && (
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder="Enter remarks..."
+          placeholderTextColor="gray"
+          value={remark}
+          onChangeText={setRemark}
+          multiline
+          numberOfLines={4}
+        />
+      )}
 
         <Text style={styles.label}>Change Material:</Text>
         <TextInput

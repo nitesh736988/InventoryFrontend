@@ -200,7 +200,7 @@
 
 // export default Repaired;
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -210,9 +210,9 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
 
 const Reject = () => {
@@ -223,12 +223,14 @@ const Reject = () => {
   const [rejected, setRejected] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedValue, setSelectedValue] = useState('');
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
+        const response = await axios.get(
+          `${API_URL}/warehouse-admin/view-items`,
+        );
         const items = response.data.items.map((item, index) => ({
           _id: index + 1,
           itemName: item,
@@ -243,7 +245,13 @@ const Reject = () => {
   }, []);
 
   const handleSubmit = async () => {
-    if (!itemName || !serialNumber || !rejected || (!selectedValue === "other" && !remark) || !selectedValue) {
+    if (
+      !itemName ||
+      !serialNumber ||
+      !rejected ||
+      (!selectedValue === 'other' && !remark) ||
+      !selectedValue
+    ) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
     }
@@ -256,12 +264,15 @@ const Reject = () => {
       createdAt: new Date(),
     };
 
-    console.log("new Item", newItem);
+    console.log('new Item', newItem);
 
     try {
       setLoading(true);
-      const response = await axios.post(`${API_URL}/warehouse-admin/reject-item`, newItem);
-      console.log("my response data for reject element",response.data.data);
+      const response = await axios.post(
+        `${API_URL}/warehouse-admin/reject-item`,
+        newItem,
+      );
+      console.log('my response data for reject element', response.data.data);
 
       Alert.alert('Success', 'Item repaired data has been submitted.');
       setItemName('');
@@ -271,8 +282,11 @@ const Reject = () => {
       setSelectedValue('');
       navigation.navigate('WarehouseNavigation');
     } catch (error) {
-      console.log('Error submitting data:', error?.response?.data || error?.message);
-       Alert.alert('Error',error.response?.data?.message);
+      console.log(
+        'Error submitting data:',
+        error?.response?.data || error?.message,
+      );
+      Alert.alert('Error', error.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -313,7 +327,7 @@ const Reject = () => {
           style={styles.input}
         />
 
-        <Text style={styles.label}>Select an Issue:</Text>
+        {/* <Text style={styles.label}>Select an Issue:</Text>
         <Picker
           selectedValue={selectedValue}
           onValueChange={setSelectedValue}
@@ -337,6 +351,51 @@ const Reject = () => {
             value={remark}
             onChangeText={setRemark}
             multiline
+          />
+        )} */}
+
+        <Text style={styles.label}>Select an Issue:</Text>
+        <Picker
+          selectedValue={selectedValue}
+          onValueChange={itemValue => setSelectedValue(itemValue)}
+          style={styles.input}>
+          <Picker.Item label="Select an issue..." value="" />
+          <Picker.Item
+            label="Controller IGBT Issue"
+            value="Controller IGBT Issue"
+          />
+          <Picker.Item
+            label="Controller Display Issue"
+            value="Controller Display Issue"
+          />
+          <Picker.Item label="Winding Problem" value="Winding Problem" />
+          <Picker.Item label="Bush Problem" value="Bush Problem" />
+          <Picker.Item label="Stamping Damaged" value="Stamping Damaged" />
+          <Picker.Item
+            label="Thrust Plate Damage"
+            value="Thrust Plate Damage"
+          />
+          <Picker.Item
+            label="Shaft and Rotor Damaged"
+            value="Shaft and Rotor Damaged"
+          />
+          <Picker.Item
+            label="Bearing plate damaged"
+            value="Bearing plate damaged"
+          />
+          <Picker.Item label="Oil Seal Damaged" value="Oil Seal Damaged" />
+          <Picker.Item label="Other" value="other" />
+        </Picker>
+
+        {selectedValue === 'other' && (
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Enter remarks..."
+            placeholderTextColor="gray"
+            value={remark}
+            onChangeText={setRemark}
+            multiline
+            numberOfLines={4}
           />
         )}
 
@@ -372,7 +431,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
