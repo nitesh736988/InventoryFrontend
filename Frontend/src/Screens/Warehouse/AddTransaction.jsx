@@ -17,9 +17,10 @@ import {useNavigation} from '@react-navigation/native';
 const AddTransaction = ({route}) => {
   const {farmerComplaintId, farmerContact, farmerName,farmerVillage, farmerSaralId} = route.params || {};
 
-  // console.log("farmerComplaintId", farmerComplaintId)
-  // console.log("farmerContact", farmerContact)
-  // console.log("farmerSaralId", farmerSaralId)
+  console.log("farmerComplaintId", farmerComplaintId)
+  console.log("farmerContact", farmerContact)
+  console.log("farmerSaralId", farmerSaralId)
+  console.log("farmername", farmerName)
 
   const [servicePerson, setServicePerson] = useState([]);
   const [selectedServicePerson, setSelectedServicePerson] = useState('');
@@ -279,6 +280,7 @@ const AddTransaction = ({route}) => {
                 placeholderTextColor={'#000'}
               />
             </Picker>
+            
 
             <Text style={styles.label}>Remarks:</Text>
             <TextInput
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#000',
     marginBottom: 15,
   },
   button: {

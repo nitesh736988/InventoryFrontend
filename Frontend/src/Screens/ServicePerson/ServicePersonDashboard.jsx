@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import {API_URL} from '@env';
 import Sidebarmodal from './Sidebarmodal';
-// import ServicePersonLocation from '../ServicePerson/ServicePersonLocation';
+import ServicePersonLocation from '../ServicePerson/ServicePersonLocation';
 
 
 const {width} = Dimensions.get('window');
@@ -155,6 +155,7 @@ const ServicePersonDashboard = ({navigation}) => {
           <Sidebarmodal />
         </View>
         <View style={styles.headerCenter}>
+        
           {/* {loading ? (
             <ActivityIndicator size="large" color="blue" /> // Show loader while API is fetching
           ) : (
