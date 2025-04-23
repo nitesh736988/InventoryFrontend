@@ -12,7 +12,7 @@ import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 
-const UpperHistory = () => {
+const ThirdPartyOutgoingHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,10 +20,11 @@ const UpperHistory = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${API_URL}/warehouse-admin/incoming-items-data`,
+        `${API_URL}/warehouse-admin/outgoing-items-data`,
       );
-      setOrders(response.data.incomingItemsData || []);
+      setOrders(response.data.data || []);
     } catch (error) {
+
       Alert.alert('Error', error.message || 'Unable to fetch orders');
     } finally {
       setLoading(false);
@@ -52,19 +53,18 @@ const UpperHistory = () => {
     <View style={styles.itemContainer}>
       <OrderDetail label="Item Name" value={item.itemName} />
       <OrderDetail label="Quantity" value={item.quantity} />
-      <OrderDetail label="Defective" value={item.defective} />
     </View>
   );
 
   const renderOrder = ({item}) => (
     <View style={styles.card}>
-      <OrderDetail label="Coming From" value={item.itemComingFrom} />
-      <OrderDetail label="Warehouse" value={item.warehouse} />
+      <OrderDetail label="From Warehouse" value={item.fromWarehouse} />
+      <OrderDetail label="To Service Center" value={item.toServiceCenter} />
       <OrderDetail 
-        label="Arrival Date" 
-        value={formatDate(item.arrivedDate)}     
+        label="Sending Date" 
+        value={formatDate(item.sendingDate)}     
       />
-      {/* <Text style={{...styles.cardTitle, marginTop: 10}}>Items:</Text> */}
+      <Text style={{...styles.cardTitle, marginTop: 10}}>Items:</Text>
       {item.items.map((item, index) => (
         <View key={index}>
           {renderItem(item)}
@@ -84,7 +84,7 @@ const UpperHistory = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Upper Order History</Text>
+        <Text style={styles.header}>Third Party Outgoing History</Text>
         <TouchableOpacity onPress={fetchOrders}>
           <Icon name="refresh" size={30} color="black" />
         </TouchableOpacity>
@@ -99,7 +99,7 @@ const UpperHistory = () => {
           }
         />
       ) : (
-        <Text>No orders found.</Text>
+        <Text style={styles.emptyMessage}>No orders found.</Text>
       )}
     </View>
   );
@@ -115,7 +115,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: 'black'
+    color: 'black',
+    textAlign: 'center',
   },
   card: {
     padding: 16,
@@ -163,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UpperHistory;
+export default ThirdPartyOutgoingHistory;

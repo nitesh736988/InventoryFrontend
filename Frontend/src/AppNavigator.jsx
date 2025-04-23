@@ -16,7 +16,7 @@ import RepairReject from './Screens/Admin/RepairReject';
 import AddTransaction from './Screens/Warehouse/AddTransaction';
 import ServicePersonNavigation from './Screens/ServicePerson/ServicePersonNavigation';
 import ApprovalHistoryData from './Screens/Warehouse/ApprovalHistoryData';
-import Stockdata from './Screens/Warehouse/Stockdata';
+import IncomingStock from './Screens/Warehouse/IncomingStock';
 import UpperHistory from './Screens/Warehouse/UpperHistory';
 import W2W from './Screens/Warehouse/W2W';
 import OrderTracker from './Screens/Admin/OrderTracker';
@@ -64,6 +64,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ServicePersonLocation from './Screens/ServicePerson/ServicePersonLocation'
 import SurveyPersonLocation from './Screens/Survey/SurveyPersonLocation';
 import InstallationStock from './Screens/ServicePerson/InstallationStock';
+import ThirdPartyOutgoingStock from './Screens/Warehouse/ThirdPartyOutgoingStock';
+import ThirdPartyOutgoingHistory from './Screens/Warehouse/ThirdPartyOutgoingHistory';
 
 
 const Stack = createStackNavigator();
@@ -202,9 +204,9 @@ const AppNavigator = () => {
         />
 
         <Stack.Screen
-          name="Stockdata"
-          component={Stockdata}
-          options={{title: 'Stockdata', headerShown: false}}
+          name="IncomingStock"
+          component={IncomingStock}
+          options={{title: 'IncomingStock', headerShown: false}}
         />
 
         <Stack.Screen
@@ -435,18 +437,6 @@ const AppNavigator = () => {
           component={AddSystemSubItem}
           options={{title: 'AddSystemSubItem', headerShown: false}}
         />
-{/* 
-        <Stack.Screen
-          name="NetworkConnectivityCompaintForms"
-          component={NetworkConnectivityCompaintForms}
-          options={{title: 'NetworkConnectivityCompaintForms', headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="UserForm"
-          component={UserForm}
-          options={{title: 'UserForm', headerShown: false}}
-        /> */}
 
         <Stack.Screen
           name="NewFormInstallation"
@@ -489,6 +479,18 @@ const AppNavigator = () => {
           name="InstallationStock"
           component={InstallationStock}
           options={{title: 'InstallationStock', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ThirdPartyOutgoingStock"
+          component={ThirdPartyOutgoingStock}
+          options={{title: 'ThirdPartyOutgoingStock', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ThirdPartyOutgoingHistory"
+          component={ThirdPartyOutgoingHistory}
+          options={{title: 'ThirdPartyOutgoingHistory', headerShown: false}}
         />
       
       </Stack.Navigator>

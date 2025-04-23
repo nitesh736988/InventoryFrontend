@@ -163,7 +163,7 @@ const ShowComplaintData = ({route}) => {
       {
         mediaType: 'photo',
         cameraType: 'back',
-        quality: 1,
+        quality: 1,  
         includeBase64: true,
       },
       async response => {

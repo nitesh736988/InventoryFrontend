@@ -38,7 +38,7 @@ const ServicePersonRegistration = ({ navigation }) => {
   };
 
   const handleSubmit = async () => {
-    const { name, email, contact, password,longitude,latitude } = formData;
+    const { name, email, contact, password,longitude,latitude,block,district,state, } = formData;
     const createdAt = new Date().toISOString();
 
     if (!name || !email || !contact || !password) {
@@ -51,7 +51,7 @@ const ServicePersonRegistration = ({ navigation }) => {
     try {
       const response = await axios.post(
         `${API_URL}/warehouse-admin/service-person-signup`,
-        { name, email, contact, password,longitude, latitude, createdAt }
+        { name, email, contact, password,longitude, latitude,block,district,state, createdAt }
       );
       Alert.alert('Registration Successful');
       setFormData({

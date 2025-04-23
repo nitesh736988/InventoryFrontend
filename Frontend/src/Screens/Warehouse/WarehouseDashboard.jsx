@@ -156,7 +156,7 @@ const WarehouseDashboard = () => {
                 Rejected: {rejected}
               </Text>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.externalLinkIcon}
                 onPress={() =>
                   navigation.navigate('Stockdata', {
@@ -165,7 +165,7 @@ const WarehouseDashboard = () => {
                   })
                 }>
                 <Icon name="external-link" size={20} color="blue" />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           ))
         ) : (
