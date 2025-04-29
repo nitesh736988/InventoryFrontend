@@ -104,8 +104,16 @@ const OrderDetails = () => {
             ))}
           </View>
           <Text style={styles.detailText}>
+            Warehouse: {item.warehouse}
+          </Text>
+          <Text style={styles.detailText}>
             Serial Number: {item.serialNumber}
           </Text>
+
+          <Text style={styles.detailText}>
+            Remarks: {item.remark}
+          </Text>
+
           <Text style={styles.detailText}>
             RMU Present:{' '}
             {item.withoutRMU === null ? 'N/A' : !item.withoutRMU ? 'YES' : 'NO'}
@@ -113,6 +121,11 @@ const OrderDetails = () => {
           <Text style={styles.detailText}>
             RMU Remark: {item.rmuRemark === '' ? 'N/A' : item.rmuRemark}
           </Text>
+
+          <Text style={styles.detailText}>
+            Pickup Date: {item.pickupDate}
+          </Text>
+
           {item.arrivedDate && (
             <Text style={styles.detailText}>
               Approved Date: {formatDate(item.arrivedDate)}
