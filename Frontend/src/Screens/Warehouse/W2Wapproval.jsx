@@ -320,6 +320,7 @@ const W2Wapproval = () => {
 
   const handleApproveBtn = async (sendTransactionId) => {
     try {
+      console.log("API ", API_URL)
       const sendRequest = await axios.put(
         `${API_URL}/warehouse-admin/update-defective-order-status`,
         {

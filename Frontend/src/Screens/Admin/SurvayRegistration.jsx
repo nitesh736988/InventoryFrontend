@@ -60,7 +60,7 @@ const SurveyRegistration = () => {
         Alert.alert('Error', 'Registration failed. Please try again.');
       }
     } catch (error) {
-      Alert.alert('Error', 'An error occurred during registration.');
+      Alert.alert("Error", JSON.stringify(error.response.data?.message));
     } finally {
       setLoading(false);
     }
