@@ -66,6 +66,11 @@ import SurveyPersonLocation from './Screens/Survey/SurveyPersonLocation';
 import InstallationStock from './Screens/ServicePerson/InstallationStock';
 import ThirdPartyOutgoingStock from './Screens/Warehouse/ThirdPartyOutgoingStock';
 import ThirdPartyOutgoingHistory from './Screens/Warehouse/ThirdPartyOutgoingHistory';
+import ShowSystem from './Screens/Warehouse/ShowSystem';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ShowSystemItem from './Screens/Warehouse/ShowSystemItem';
+import BomData from './Screens/Warehouse/BomData';
+import MaharastraW2W from './Screens/Warehouse/MaharastraW2W';
 
 
 const Stack = createStackNavigator();
@@ -491,6 +496,30 @@ const AppNavigator = () => {
           name="ThirdPartyOutgoingHistory"
           component={ThirdPartyOutgoingHistory}
           options={{title: 'ThirdPartyOutgoingHistory', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ShowSystem"
+          component={ShowSystem}
+          options={{title: 'ShowSystem', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ShowSystemItem"
+          component={ShowSystemItem}
+          options={{title: 'ShowSystemItem', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="BomData"
+          component={BomData}
+          options={{title: 'BomData', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="MaharastraW2W"
+          component={MaharastraW2W}
+          options={{title: 'MaharastraW2W', headerShown: false}}
         />
       
       </Stack.Navigator>

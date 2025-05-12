@@ -51,7 +51,7 @@ const LoginPage = () => {
       await AsyncStorage.setItem('role', role);
 
       if (role === 'serviceperson') {
-        const { id, block,latitude,longitude,contact } = response.data;
+        const { id, block,latitude,longitude,contact, } = response.data;
         console.log("Login Person id", id);
         console.log("Login Person block", block);
         console.log("latitude", latitude)

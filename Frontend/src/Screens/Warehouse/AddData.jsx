@@ -11,17 +11,18 @@
 // import axios from 'axios';
 // import {API_URL} from '@env';
 
-// const AddData = () => {
-//   const [itemName, setItemName] = useState('');
+// const AddData = ({ route }) => {
+//   const { itemName } = route.params;
 //   const [stock, setStock] = useState('');
 //   const [defective, setDefective] = useState('');
 //   const [loading, setLoading] = useState(false);
 
 //   const handleSubmit = async () => {
-//     if (!itemName || !stock || !defective) {
-//       Alert.alert('Error', 'Please fill All fields.');
+//     if (!stock || !defective) {
+//       Alert.alert('Error', 'Please fill all fields.');
 //       return;
 //     }
+
 //     const stockValue = parseInt(stock);
 //     if (isNaN(stockValue) || stockValue < 0) {
 //       Alert.alert('Error', 'Stock must be a positive integer.');
@@ -30,33 +31,38 @@
 
 //     const defectiveValue = parseInt(defective);
 //     if (isNaN(defectiveValue) || defectiveValue < 0) {
-//       Alert.alert('Error', 'defective must be a positive integer.');
+//       Alert.alert('Error', 'Defective quantity must be a positive integer.');
 //       return;
 //     }
+
 //     const itemData = {
 //       itemName,
-//       quantity: stockValue,
-//       defective: defectiveValue,
+//       quantity: stock
 //     };
-//     setLoading(true);
 
+//     setLoading(true);
+//     console.log({
+//       items: [itemData],
+//       defective: defective,
+//     });
 //     try {
-//       console.log({items: [itemData]});
-//       const response = await axios.post(`${API_URL}/warehouse-admin/add-item`, {
+      
+//       const response = await axios.post(`${API_URL}/warehouse-admin/add-item-stock`, {
 //         items: [itemData],
+//         defective: defective,
 //       });
 //       console.log('Response:', response.data);
 //       Alert.alert('Success', 'Item added successfully!');
 
-//       setItemName('');
 //       setStock('');
 //       setDefective('');
 //     } catch (error) {
-//       console.log('Error adding item:', error);
+//       // console.log('Error adding item:', error);
+//       Alert.alert('Error adding item', JSON.stringify(error.response.data?.message));
 //       if (error.response && error.response.data) {
 //         Alert.alert(
 //           'Error',
-//           error.response.data.message || 'Item already exists.',
+//           error.response.data.message || 'An error occurred.',
 //         );
 //       } else {
 //         Alert.alert('Error', 'An unexpected error occurred. Please try again.');
@@ -68,12 +74,6 @@
 
 //   return (
 //     <View style={styles.container}>
-//       <Text style={styles.label}>Item Name:</Text>
-//       <TextInput
-//         style={styles.input}
-//         value={itemName}
-//         onChangeText={setItemName}
-//       />
 //       <Text style={styles.label}>Stock:</Text>
 //       <TextInput
 //         style={styles.input}
@@ -89,6 +89,7 @@
 //         onChangeText={setDefective}
 //         keyboardType="numeric"
 //       />
+
 //       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
 //         {loading ? (
 //           <ActivityIndicator color="#ffffff" />
@@ -110,7 +111,7 @@
 //     marginVertical: 10,
 //     fontSize: 16,
 //     fontWeight: '600',
-//     color: 'black'
+//     color: 'black',
 //   },
 //   input: {
 //     color: 'black',
@@ -152,11 +153,12 @@ import {API_URL} from '@env';
 const AddData = ({ route }) => {
   const { itemName } = route.params;
   const [stock, setStock] = useState('');
+  const [newStock, setNewStock] = useState('');
   const [defective, setDefective] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!stock || !defective) {
+    if (!stock || !newStock || !defective) {
       Alert.alert('Error', 'Please fill all fields.');
       return;
     }
@@ -164,6 +166,12 @@ const AddData = ({ route }) => {
     const stockValue = parseInt(stock);
     if (isNaN(stockValue) || stockValue < 0) {
       Alert.alert('Error', 'Stock must be a positive integer.');
+      return;
+    }
+
+    const newStockValue = parseInt(newStock);
+    if (isNaN(newStockValue) || newStockValue < 0) {
+      Alert.alert('Error', 'New Stock must be a positive integer.');
       return;
     }
 
@@ -175,7 +183,8 @@ const AddData = ({ route }) => {
 
     const itemData = {
       itemName,
-      quantity: stock
+      quantity: stock,
+      newStock
     };
 
     setLoading(true);
@@ -193,6 +202,7 @@ const AddData = ({ route }) => {
       Alert.alert('Success', 'Item added successfully!');
 
       setStock('');
+      setNewStock('');
       setDefective('');
     } catch (error) {
       // console.log('Error adding item:', error);
@@ -212,11 +222,21 @@ const AddData = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.label}>Item Name: {itemName}</Text>
+  
       <Text style={styles.label}>Stock:</Text>
       <TextInput
         style={styles.input}
         value={stock}
         onChangeText={setStock}
+        keyboardType="numeric"
+      />
+
+      <Text style={styles.label}>New Stock:</Text>
+      <TextInput
+        style={styles.input}
+        value={newStock}
+        onChangeText={setNewStock}
         keyboardType="numeric"
       />
 
