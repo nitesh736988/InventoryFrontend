@@ -29,7 +29,7 @@ const MaharastraW2W = () => {
     remarks: '',
     selectedItems: [],
     quantities: {},
-    serialNumber: {},
+    serialNumber: '',
     outgoing: true,
     pickupDate: new Date().toISOString(),
     fromWarehouse: '',
@@ -96,52 +96,21 @@ const MaharastraW2W = () => {
         acc[item] = prevData.quantities[item] || '';
         return acc;
       }, {}),
-      serialNumber: validItems.reduce((acc, item) => {
-        acc[item] = prevData.serialNumber[item] || [];
-        return acc;
-      }, {}),
     }));
   };
 
   const handleQuantityChange = (itemName, quantity) => {
-    const qty = parseInt(quantity) || 0;
-
-    setFormData(prevData => {
-      const newSerialNumbers = { ...prevData.serialNumber };
-
-      if (qty > 0) {
-        newSerialNumbers[itemName] = Array(qty).fill('').map((_, i) =>
-          prevData.serialNumber[itemName]?.[i] || ''
-        );
-      } else {
-        newSerialNumbers[itemName] = [];
-      }
-
-      return {
-        ...prevData,
-        quantities: {
-          ...prevData.quantities,
-          [itemName]: quantity,
-        },
-        serialNumber: newSerialNumbers,
-      };
-    });
-  };
-
-  const handleSerialNumberChange = (itemName, index, value) => {
-    setFormData(prevData => {
-      const newSerialNumbers = { ...prevData.serialNumber };
-      newSerialNumbers[itemName][index] = value;
-
-      return {
-        ...prevData,
-        serialNumber: newSerialNumbers,
-      };
-    });
+    setFormData(prevData => ({
+      ...prevData,
+      quantities: {
+        ...prevData.quantities,
+        [itemName]: quantity,
+      },
+    }));
   };
 
   const validateInput = () => {
-    const { driverName, driverContact, selectedItems, quantities, serialNumber, fromWarehouse, toWarehouse } = formData;
+    const { driverName, driverContact, selectedItems, quantities, fromWarehouse, toWarehouse } = formData;
 
     if (!driverName || !driverContact) {
       Alert.alert('Error', 'Please enter driver details');
@@ -168,17 +137,6 @@ const MaharastraW2W = () => {
         Alert.alert('Error', `Quantity for ${item} must be greater than 0`);
         return false;
       }
-
-      const itemSerialNumbers = serialNumber[item] || [];
-      for (let i = 0; i < itemSerialNumber.length; i++) {
-        if (!itemSerialNumbers[i]) {
-          Alert.alert(
-            'Error',
-            `Please enter serial number ${i + 1} for ${item}`,
-          );
-          return false;
-        }
-      }
     }
 
     if (isNaN(Number(driverContact))) {
@@ -200,22 +158,22 @@ const MaharastraW2W = () => {
       return {
         systemItemId: systemItem._id,
         quantity: parseInt(quantities[itemName], 10),
-        serialNumber: serialNumber[itemName] || [],
       };
     });
 
     const data = {
+      fromWarehouse,
+      toWarehouse,
       itemsList,
       driverName,
       driverContact: Number(driverContact),
       remarks,
+      serialNumber: serialNumber || "", // Empty string if not provided
       outgoing: true,
       pickupDate: new Date().toISOString(),
-      fromWarehouse,
-      toWarehouse,
     };
 
-    console.log("Data to be sent:", data);
+    console.log("Data to be sent:", JSON.stringify(data, null, 2));
 
     try {
       const response = await axios.post(
@@ -234,8 +192,7 @@ const MaharastraW2W = () => {
       console.log('Transfer error:', error.response?.data || error.message);
       Alert.alert(
         'Error',
-        error.response?.data?.message || 'Failed to create transfer'
-      );
+        error.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -248,7 +205,7 @@ const MaharastraW2W = () => {
       remarks: '',
       selectedItems: [],
       quantities: {},
-      serialNumber: {},
+      serialNumber: '',
       outgoing: true,
       pickupDate: new Date().toISOString(),
       fromWarehouse: fromWarehouse?._id || '',
@@ -304,8 +261,6 @@ const MaharastraW2W = () => {
           style={pickerSelectStyles}
         />
 
-        
-
         {formData.selectedItems.map(item => (
           <View key={item} style={styles.itemContainer}>
             <Text style={styles.itemLabel}>{item}</Text>
@@ -319,22 +274,6 @@ const MaharastraW2W = () => {
               keyboardType="numeric"
               placeholderTextColor="#000"
             />
-
-            {formData.quantities[item] > 0 && (
-              <View style={styles.serialContainer}>
-                <Text style={styles.label}>Serial Numbers:</Text>
-                {Array(parseInt(formData.quantities[item])).fill(0).map((_, index) => (
-                  <TextInput
-                    key={`${item}-${index}`}
-                    value={formData.serialNumber[item]?.[index] || ''}
-                    onChangeText={value => handleSerialNumberChange(item, index, value)}
-                    placeholder={`Serial #${index + 1}`}
-                    style={styles.input}
-                    placeholderTextColor="#000"
-                  />
-                ))}
-              </View>
-            )}
           </View>
         ))}
 
@@ -364,6 +303,15 @@ const MaharastraW2W = () => {
           placeholder="Enter Remarks"
           style={[styles.input, styles.remarksInput]}
           multiline
+          placeholderTextColor="#888"
+        />
+
+        <Text style={styles.label}>Serial Number:</Text>
+        <TextInput
+          value={formData.serialNumber}
+          onChangeText={value => setFormData(prev => ({ ...prev, serialNumber: value }))}
+          placeholder="Enter Serial Number"
+          style={styles.input}
           placeholderTextColor="#888"
         />
 
@@ -441,9 +389,6 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     marginBottom: 10,
-  },
-  serialContainer: {
-    marginTop: 10,
   },
   warehouseDisplay: {
     backgroundColor: '#fff',

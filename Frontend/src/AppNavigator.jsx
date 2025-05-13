@@ -71,6 +71,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ShowSystemItem from './Screens/Warehouse/ShowSystemItem';
 import BomData from './Screens/Warehouse/BomData';
 import MaharastraW2W from './Screens/Warehouse/MaharastraW2W';
+import W2WmhApproval from './Screens/Warehouse/W2WmhApproval';
+import AllStockUpdateHistory from './Screens/Admin/AllStockUpdateHistory';
+import ApprovalIncomingItemMh from './Screens/Warehouse/ApprovalIncomingItemMh';
+import ApprovalOutgoingItemMh from './Screens/Warehouse/ApprovalOutgoingItemMh';
+import ShowOutgoingHistoryMh from './Screens/Warehouse/ShowOutgoingHistoryMh';
+import ShowIncomingHistoryMh from './Screens/Warehouse/ShowIncomingHistoryMh';
+import UpperIncomingItemsMh from './Screens/Warehouse/UpperIncomingItemsMh';
+
 
 
 const Stack = createStackNavigator();
@@ -521,7 +529,50 @@ const AppNavigator = () => {
           component={MaharastraW2W}
           options={{title: 'MaharastraW2W', headerShown: false}}
         />
-      
+
+        <Stack.Screen
+          name="W2WmhApproval"
+          component={W2WmhApproval}
+          options={{title: 'W2WmhApproval', headerShown: false}}
+        />
+
+         <Stack.Screen
+          name="AllStockUpdateHistory"
+          component={AllStockUpdateHistory}
+          options={{title: 'AllStockUpdateHistory', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ApprovalOutgoingItemMh"
+          component={ApprovalOutgoingItemMh}
+          options={{title: 'ApprovalOutgoingItemMh', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ApprovalIncomingItemMh"
+          component={ApprovalIncomingItemMh}
+          options={{title: 'ApprovalIncomingItemMh', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ShowOutgoingHistoryMh"
+          component={ShowOutgoingHistoryMh}
+          options={{title: 'ShowOutgoingHistoryMh', headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ShowIncomingHistoryMh"
+          component={ShowIncomingHistoryMh}
+          options={{title: 'ShowIncomingHistoryMh', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="UpperIncomingItemsMh"
+          component={UpperIncomingItemsMh}
+          options={{title: 'UpperIncomingItemsMh', headerShown: false}}
+          />
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

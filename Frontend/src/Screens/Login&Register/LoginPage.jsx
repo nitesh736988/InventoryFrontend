@@ -20,7 +20,7 @@ import { API_URL } from '@env';
 axios.defaults.withCredentials = true;
 
 const LoginPage = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation();           
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
@@ -64,9 +64,11 @@ const LoginPage = () => {
         await AsyncStorage.setItem("Contact", JSON.stringify(contact));
         navigation.navigate('ServicePersonNavigation');
       } else if (role === 'warehouseAdmin') {
-        const {id} = response.data;
-        console.log("Login Person id", id);
+        const {id,warehouse} = response.data;
+        console.log("Login Person id", warehouse);
+        console.log("Login Person Warehouse", id);
         await AsyncStorage.setItem("_id", id);
+        await AsyncStorage.setItem("warehouse", JSON.stringify(warehouse));
         navigation.navigate('WarehouseNavigation');
         
       } else if (role === 'admin') {

@@ -336,6 +336,8 @@ const Sidebar = ({userType}) => {
     System: false,
     mhSystem: false,
     mhHistory: false,
+    mhHistorydata: false,
+    mhformfill: false
   });
   const slideAnim = useRef(new Animated.Value(-300)).current;
 
@@ -369,6 +371,8 @@ const Sidebar = ({userType}) => {
         System: false,
         mhSystem: false,
         mhHistory: false,
+        mhHistorydata: false,
+        mhformfill: false
       };
       newState[section] = !prevState[section];
       return newState;
@@ -601,13 +605,78 @@ const Sidebar = ({userType}) => {
                     style={styles.subOptionButton}>
                     <Text style={styles.subOptionText}>Maharastra W2W</Text>
                   </TouchableOpacity>
-                  {/* <TouchableOpacity
-                    onPress={() => navigateAndHighlight('MhServiceHistory')}
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('ApprovalIncomingItemMh')}
                     style={styles.subOptionButton}>
-                    <Text style={styles.subOptionText}>Service History</Text>
+                    <Text style={styles.subOptionText}> Approval Incoming ItemMh</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('ApprovalOutgoingItemMh')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}> Approval Outgoing ItemMh</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              <TouchableOpacity
+                onPress={() => toggleSection('mhHistorydata')}
+                style={styles.optionButton}>
+                <View style={styles.optionHeader}>
+                  <Text style={styles.optionText}>Maharastra History</Text>
+                  <Icon
+                    name={expandedSections.mhHistorydata ? 'chevron-down' : 'chevron-right'}
+                    size={16}
+                    color="#333"
+                  />
+                </View>
+              </TouchableOpacity>
+              {expandedSections.mhHistorydata && (
+                <>
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('ShowOutgoingHistoryMh')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}>Show Outgoing History</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('ShowIncomingHistoryMh')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}>Show Incoming History</Text>
+                  </TouchableOpacity>
+
+                  {/* <TouchableOpacity
+                    onPress={() => navigateAndHighlight('BomData')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}>BomData</Text>
                   </TouchableOpacity> */}
                 </>
               )}
+
+
+              <TouchableOpacity
+                onPress={() => toggleSection('mhformfill')}
+                style={styles.optionButton}>
+                <View style={styles.optionHeader}>
+                  <Text style={styles.optionText}>Maharastra Form Fill</Text>
+                  <Icon
+                    name={expandedSections.mhformfill ? 'chevron-down' : 'chevron-right'}
+                    size={16}
+                    color="#333"
+                  />
+                </View>
+              </TouchableOpacity>
+              {expandedSections.mhformfill && (
+                <>
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('UpperIncomingItemsMh')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}>Upper Incoming Items</Text>
+                  </TouchableOpacity>
+
+                </>
+              )}
+
             </>
           )}
         </Animated.View>
