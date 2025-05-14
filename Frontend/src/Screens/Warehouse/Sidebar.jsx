@@ -674,6 +674,12 @@ const Sidebar = ({userType}) => {
                     <Text style={styles.subOptionText}>Upper Incoming Items</Text>
                   </TouchableOpacity>
 
+                   <TouchableOpacity
+                    onPress={() => navigateAndHighlight('OutgoingDataInServiceMh')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}>Outgoing Data Maharastra</Text>
+                  </TouchableOpacity>
+
                 </>
               )}
 

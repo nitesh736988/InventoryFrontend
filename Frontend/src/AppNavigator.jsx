@@ -78,6 +78,7 @@ import ApprovalOutgoingItemMh from './Screens/Warehouse/ApprovalOutgoingItemMh';
 import ShowOutgoingHistoryMh from './Screens/Warehouse/ShowOutgoingHistoryMh';
 import ShowIncomingHistoryMh from './Screens/Warehouse/ShowIncomingHistoryMh';
 import UpperIncomingItemsMh from './Screens/Warehouse/UpperIncomingItemsMh';
+import OutgoingDataInServiceMh from './Screens/Warehouse/OutgoingDataInServiceMh';
 
 
 
@@ -570,6 +571,12 @@ const AppNavigator = () => {
           name="UpperIncomingItemsMh"
           component={UpperIncomingItemsMh}
           options={{title: 'UpperIncomingItemsMh', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="OutgoingDataInServiceMh"
+          component={OutgoingDataInServiceMh}
+          options={{title: 'OutgoingDataInServiceMh', headerShown: false}}
           />
 
 
