@@ -58,7 +58,7 @@ import SurvayData from './Screens/ServicePerson/SurveyData'
 import AddSystemSubItem from './Screens/Admin/AddSystemSubItem';
 import NewFormInstallation from './Screens/Warehouse/NewFormInstallation';
 import NewFarmerInstallation from './Screens/Warehouse/NewFarmerInstallation';
-import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
+// import ApprovalNewInstallation from './Screens/ServicePerson/ApprovalNewInstallation';
 import InOrder from './Screens/ServicePerson/InOrder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ServicePersonLocation from './Screens/ServicePerson/ServicePersonLocation'
@@ -79,7 +79,9 @@ import ShowOutgoingHistoryMh from './Screens/Warehouse/ShowOutgoingHistoryMh';
 import ShowIncomingHistoryMh from './Screens/Warehouse/ShowIncomingHistoryMh';
 import UpperIncomingItemsMh from './Screens/Warehouse/UpperIncomingItemsMh';
 import OutgoingDataInServiceMh from './Screens/Warehouse/OutgoingDataInServiceMh';
-
+import ServiceApprovalDataMh from './Screens/ServicePerson/ServiceApprovalDataMh';
+import ApproveDataMh from './Screens/ServicePerson/ApproveDataMh';
+import InstallationForm from './Screens/ServicePerson/InstallationForm';
 
 
 const Stack = createStackNavigator();
@@ -464,11 +466,11 @@ const AppNavigator = () => {
           options={{title: 'NewFarmerInstallation', headerShown: false}}
         />
 
-        <Stack.Screen
+        {/* <Stack.Screen
           name="ApprovalNewInstallation"
           component={ApprovalNewInstallation}
           options={{title: 'ApprovalNewInstallation', headerShown: false}}
-        />
+        /> */}
 
         <Stack.Screen
           name="InOrder"
@@ -577,6 +579,24 @@ const AppNavigator = () => {
           name="OutgoingDataInServiceMh"
           component={OutgoingDataInServiceMh}
           options={{title: 'OutgoingDataInServiceMh', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="ServiceApprovalDataMh"
+          component={ServiceApprovalDataMh}
+          options={{title: 'ServiceApprovalDataMh', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="ApproveDataMh"
+          component={ApproveDataMh}
+          options={{title: 'ApproveDataMh', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="InstallationForm"
+          component={InstallationForm}
+          options={{title: 'InstallationForm', headerShown: false}}
           />
 
 

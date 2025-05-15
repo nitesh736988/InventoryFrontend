@@ -78,14 +78,19 @@ const Sidebarmodal = () => {
   };
 
 
-  const openApprovalNewInstallation = () => {
-    closeModal();
-    navigation.navigate('ApprovalNewInstallation');
-  };
+  // const openApprovalNewInstallation = () => {
+  //   closeModal();
+  //   navigation.navigate('ApprovalNewInstallation');
+  // };
 
   const openServicePersonLocation = () => {
     closeModal();
     navigation.navigate('ServicePersonLocation');
+  };
+
+  const openApproveDataMh = () => {
+    closeModal();
+    navigation.navigate('ApproveDataMh');
   };
 
 
@@ -154,16 +159,22 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>New Installation</Text>
           </TouchableOpacity> */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={openApprovalNewInstallation}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Approval NewInstallation</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             onPress={openServicePersonLocation}
             style={styles.optionButton}>
             <Text style={styles.optionText}>ServicePerson Location</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={openApproveDataMh}
+            style={styles.optionButton}>
+            <Text style={styles.optionText}>Approve Data Mh</Text>
           </TouchableOpacity>
 
 

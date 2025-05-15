@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import ServicePersonDashboard from './ServicePersonDashboard';
 import OrderDetails from './OrderDetails';
 import OutStatus from './OutStatus';
+import ServiceApprovalDataMh from './ServiceApprovalDataMh';
 
 const headerColor = '#186cbf';
 
@@ -38,6 +39,10 @@ const TabNavigator = () => {
           } else if (route.name === 'ApprovedData') {
             iconName = 'cube-outline';
           }
+         
+          else if (route.name === 'ServiceApprovalDataMh') {
+            iconName = 'cube-outline';
+          }
 
           return (
             <MaterialCommunityIcons name={iconName} color={color} size={size} />
@@ -60,6 +65,12 @@ const TabNavigator = () => {
         name="OutStatus"
         component={OutStatus}
         options={{title: 'OutStatus'}}
+      />
+
+      <Tab.Screen
+        name="ServiceApprovalDataMh"
+        component={ ServiceApprovalDataMh}
+        options={{title: ' Maharastra Approval Data'}}
       />
     </Tab.Navigator>
   );

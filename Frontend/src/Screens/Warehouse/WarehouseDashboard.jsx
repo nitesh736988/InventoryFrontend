@@ -681,7 +681,7 @@ const WarehouseDashboard = () => {
             activeCard === 'Service' && styles.activeButton,
           ]}
           onPress={() => setActiveCard('Service')}>
-          <Text style={styles.switchButtonText}>Bhiwani Data</Text>
+          <Text style={styles.switchButtonText}>Service Data </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
