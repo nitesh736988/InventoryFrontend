@@ -1,495 +1,435 @@
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   Button,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Image,
-//   PermissionsAndroid,
-//   Platform,
-//   Alert,
-// } from 'react-native';
-// import { launchCamera } from 'react-native-image-picker';
-
-// const InstallationForm = ({route}) => {
-//     const {installationId,farmerSaralId } = route.params;
-//   const [saralid, setSaralid] = useState('');
-//   const [photos, setPhotos] = useState(Array(9).fill(null));
-
-//   const requestCameraPermission = async () => {
-//     if (Platform.OS === 'android') {
-//       try {
-//         const granted = await PermissionsAndroid.request(
-//           PermissionsAndroid.PERMISSIONS.CAMERA,
-//           {
-//             title: 'Camera Permission',
-//             message: 'App needs access to your camera',
-//             buttonNeutral: 'Ask Me Later',
-//             buttonNegative: 'Cancel',
-//             buttonPositive: 'OK',
-//           },
-//         );
-//         return granted === PermissionsAndroid.RESULTS.GRANTED;
-//       } catch (err) {
-//         console.warn(err);
-//         return false;
-//       }
-//     }
-//     return true;
-//   };
-
-//   const takePhoto = async (index) => {
-//     const hasPermission = await requestCameraPermission();
-//     if (!hasPermission) {
-//       Alert.alert('Permission denied', 'You need to grant camera permissions to take photos');
-//       return;
-//     }
-
-//     const options = {
-//       mediaType: 'photo',
-//       quality: 1,
-//       saveToPhotos: false,
-//     };
-
-//     launchCamera(options, (response) => {
-//       if (response.didCancel) {
-//         console.log('User cancelled image picker');
-//       } else if (response.error) {
-//         console.log('ImagePicker Error: ', response.error);
-//       } else if (response.assets && response.assets[0].uri) {
-//         const newPhotos = [...photos];
-//         newPhotos[index] = response.assets[0].uri;
-//         setPhotos(newPhotos);
-//       }
-//     });
-//   };
-
-//   const handleSubmit = () => {
-//     if (!saralid) {
-//       Alert.alert('Error', 'Please enter Saralid');
-//       return;
-//     }
-
-//     if (photos.some(photo => photo === null)) {
-//       Alert.alert('Error', 'Please take all 9 photos');
-//       return;
-//     }
-
-//     // Here you would typically send the data to your backend
-//     console.log('Submitting:', { saralid, photos });
-//     Alert.alert('Success', 'Form submitted successfully!');
-    
-//     // Reset form
-//     setSaralid('');
-//     setPhotos(Array(9).fill(null));
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.title}>Installation Form</Text>
-      
-//       {/* Saralid Field */}
-//       <View style={styles.inputContainer}>
-//         <Text style={styles.label}>Saralid:</Text>
-//         <TextInput
-//           style={styles.input}
-//           value={saralid}
-//           onChangeText={setSaralid}
-//           placeholder="Enter Saralid"
-//         />
-//       </View>
-      
-//       {/* Photo Grid */}
-//       <Text style={styles.label}>Take 9 Photos:</Text>
-//       <View style={styles.photoGrid}>
-//         {photos.map((photo, index) => (
-//           <TouchableOpacity 
-//             key={index} 
-//             style={styles.photoButton}
-//             onPress={() => takePhoto(index)}
-//           >
-//             {photo ? (
-//               <Image source={{ uri: photo }} style={styles.photo} />
-//             ) : (
-//               <Text style={styles.photoPlaceholder}>Photo {index + 1}</Text>
-//             )}
-//           </TouchableOpacity>
-//         ))}
-//       </View>
-      
-//       {/* Submit Button */}
-//       <Button 
-//         title="Submit Installation" 
-//         onPress={handleSubmit}
-//         disabled={!saralid || photos.some(photo => photo === null)}
-//       />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 20,
-//     textAlign: 'center',
-//   },
-//   inputContainer: {
-//     marginBottom: 20,
-//   },
-//   label: {
-//     fontSize: 16,
-//     marginBottom: 8,
-//     fontWeight: 'bold',
-//   },
-//   input: {
-//     height: 40,
-//     borderColor: 'gray',
-//     borderWidth: 1,
-//     borderRadius: 5,
-//     paddingHorizontal: 10,
-//   },
-//   photoGrid: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     justifyContent: 'space-between',
-//     marginBottom: 20,
-//   },
-//   photoButton: {
-//     width: '32%',
-//     aspectRatio: 1,
-//     backgroundColor: '#f0f0f0',
-//     marginBottom: 10,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     borderRadius: 5,
-//   },
-//   photoPlaceholder: {
-//     color: '#666',
-//   },
-//   photo: {
-//     width: '100%',
-//     height: '100%',
-//     borderRadius: 5,
-//   },
-// });
-
-// export default InstallationForm;
-
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  TextInput,
-  Button,
-  TouchableOpacity,
   StyleSheet,
-  Image,
-  PermissionsAndroid,
-  Platform,
-  Alert,
+  TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
 } from 'react-native';
-import { launchCamera } from 'react-native-image-picker';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {launchCamera} from 'react-native-image-picker';
+import {useForm, Controller} from 'react-hook-form';
+import Geolocation from '@react-native-community/geolocation';
+import {PermissionsAndroid} from 'react-native';
+import ImageResizer from 'react-native-image-resizer';
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const requestCameraPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: 'Camera Permission',
+        message: 'We need access to your camera to take pictures',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
+const requestLocationPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location Permission',
+        message: 'We need access to your location to fetch coordinates',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
 
 const InstallationForm = ({route}) => {
-    const {installationId, farmerSaralId } = route.params;
-    const [saralid, setSaralid] = useState(farmerSaralId || '');
-    const [photos, setPhotos] = useState(Array(9).fill(null));
-    const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const {
+    installationId,
+    farmerName,
+    farmerContact,
+    farmerSaralId,
+  } = route.params;
 
-    const requestCameraPermission = async () => {
-        if (Platform.OS === 'android') {
-            try {
-                const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CAMERA,
-                {
-                    title: 'Camera Permission',
-                    message: 'App needs access to your camera',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK',
-                },
-                );
-                return granted === PermissionsAndroid.RESULTS.GRANTED;
-            } catch (err) {
-                console.warn(err);
-                return false;
-            }
+  const {control, handleSubmit, setValue} = useForm();
+  const [loading, setLoading] = useState(true);
+  const [photos, setPhotos] = useState({});
+  const navigation = useNavigation();
+  const [longitude, setLongitude] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const filesNameList = [
+    'borePhoto',
+    'challanPhoto',
+    'landDocPhoto',
+    'sprinklerPhoto',
+    'boreFarmerPhoto',
+    'finalFoundationFarmerPhoto',
+    'panelFarmerPhoto',
+    'controllerBoxFarmerPhoto',
+    'waterDischargeFarmerPhoto',
+  ];
+
+  const fileLabels = {
+    borePhoto: 'Bore Photo',
+    challanPhoto: 'Challan Photo',
+    landDocPhoto: 'Land Document Photo',
+    sprinklerPhoto: 'Sprinkler Photo',
+    boreFarmerPhoto: 'Bore Farmer Photo',
+    finalFoundationFarmerPhoto: 'Final Foundation Farmer Photo',
+    panelFarmerPhoto: 'Panel Farmer Photo',
+    controllerBoxFarmerPhoto: 'Controller Box Farmer Photo',
+    waterDischargeFarmerPhoto: 'Water Discharge Farmer Photo',
+  };
+
+  useEffect(() => {
+    const initialize = async () => {
+      if (Platform.OS === 'android') {
+        const locationGranted = await requestLocationPermission();
+        if (locationGranted) {
+          Geolocation.getCurrentPosition(
+            position => {
+              setLongitude(position.coords.longitude.toString());
+              setLatitude(position.coords.latitude.toString());
+              setValue('longitude', position.coords.longitude.toString());
+              setValue('latitude', position.coords.latitude.toString());
+            },
+            error => {
+              console.log('Error getting location:', error.message);
+              Alert.alert('Error', 'Unable to fetch location.');
+            },
+          );
         }
-        return true;
+      }
+
+      // Initialize photos object with empty arrays for each category
+      const initialPhotos = {};
+      filesNameList.forEach(category => {
+        initialPhotos[category] = [];
+      });
+      setPhotos(initialPhotos);
+
+      setLoading(false);
     };
 
-    const takePhoto = async (index = currentPhotoIndex) => {
-        const hasPermission = await requestCameraPermission();
-        if (!hasPermission) {
-            Alert.alert('Permission denied', 'You need to grant camera permissions to take photos');
-            return;
+    initialize();
+  }, []);
+
+  const openGeneralCamera = async category => {
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert('Permission Denied', 'Camera access is required.');
+      return;
+    }
+
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'back',
+        quality: 0.8,
+        includeBase64: false,
+      },
+      async response => {
+        if (response.didCancel) {
+          console.log('User cancelled camera picker');
+        } else if (response.errorCode) {
+          console.log('Camera Error:', response.errorMessage);
+        } else if (response.assets && response.assets.length > 0) {
+          try {
+            const originalPhoto = response.assets[0];
+            
+            const resizedImage = await ImageResizer.createResizedImage(
+              originalPhoto.uri,
+              800,
+              800,
+              'JPEG',
+              80,
+              0,
+              null,
+            );
+            const newPhoto = {
+              uri: resizedImage.uri,
+              type: originalPhoto.type || 'image/jpeg',
+              name: `photo_${Date.now()}.jpg`,
+            };
+
+            setPhotos(prevPhotos => ({
+              ...prevPhotos,
+              [category]: [...prevPhotos[category], newPhoto],
+            }));
+
+          } catch (error) {
+            console.log('Error processing image:', error.message);
+            Alert.alert('Error', 'Failed to process the image.');
+          }
         }
-
-        const options = {
-            mediaType: 'photo',
-            quality: 1,
-            saveToPhotos: false,
-        };
-
-        launchCamera(options, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else if (response.assets && response.assets[0].uri) {
-                const newPhotos = [...photos];
-                newPhotos[index] = response.assets[0].uri;
-                setPhotos(newPhotos);
-                
-                // Move to next empty photo if available
-                if (index === currentPhotoIndex) {
-                    const nextEmptyIndex = newPhotos.findIndex((photo, i) => i > index && photo === null);
-                    if (nextEmptyIndex !== -1) {
-                        setCurrentPhotoIndex(nextEmptyIndex);
-                    }
-                }
-            }
-        });
-    };
-
-    const deletePhoto = (index) => {
-        const newPhotos = [...photos];
-        newPhotos[index] = null;
-        setPhotos(newPhotos);
-        setCurrentPhotoIndex(index); // Set focus to the deleted photo's position
-    };
-
-    const handleSubmit = () => {
-        if (!saralid) {
-            Alert.alert('Error', 'Please enter Saralid');
-            return;
-        }
-
-        if (photos.some(photo => photo === null)) {
-            Alert.alert('Error', 'Please take all 9 photos');
-            return;
-        }
-
-        // Here you would typically send the data to your backend
-        console.log('Submitting:', { saralid, photos, installationId });
-        Alert.alert('Success', 'Form submitted successfully!');
-        
-        // Reset form
-        setSaralid('');
-        setPhotos(Array(9).fill(null));
-        setCurrentPhotoIndex(0);
-    };
-
-    return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>Installation Form</Text>
-            
-            {/* Saralid Field */}
-            <View style={styles.inputContainer}>
-                <Text style={styles.label}>Saralid:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={saralid}
-                    onChangeText={setSaralid}
-                    placeholder="Enter Saralid"
-                    editable={!farmerSaralId}
-                />
-            </View>
-            
-            {/* Current Photo Status */}
-            <Text style={styles.statusText}>
-                {photos[currentPhotoIndex] 
-                    ? `Photo ${currentPhotoIndex + 1} taken` 
-                    : `Ready for photo ${currentPhotoIndex + 1}`}
-            </Text>
-            
-            {/* Photo Grid - 3x3 Grid */}
-            <View style={styles.photoGridContainer}>
-                {[0, 1, 2].map((row) => (
-                    <View key={row} style={styles.photoRow}>
-                        {[0, 1, 2].map((col) => {
-                            const index = (row * 3) + col;
-                            return (
-                                <View key={index} style={styles.photoCell}>
-                                    <TouchableOpacity 
-                                        style={[
-                                            styles.photoContainer,
-                                            index === currentPhotoIndex && styles.activePhotoContainer,
-                                        ]}
-                                        onPress={() => setCurrentPhotoIndex(index)}
-                                        activeOpacity={0.7}
-                                    >
-                                        {photos[index] ? (
-                                            <>
-                                                <Image 
-                                                    source={{ uri: photos[index] }} 
-                                                    style={styles.photo} 
-                                                />
-                                                <TouchableOpacity 
-                                                    style={styles.deleteButton}
-                                                    onPress={() => deletePhoto(index)}
-                                                >
-                                                    <Icon name="close" size={20} color="white" />
-                                                </TouchableOpacity>
-                                            </>
-                                        ) : (
-                                            <View style={styles.photoPlaceholder}>
-                                                <Text style={styles.photoNumber}>{index + 1}</Text>
-                                            </View>
-                                        )}
-                                    </TouchableOpacity>
-                                    <Text style={styles.photoLabel}>Photo {index + 1}</Text>
-                                </View>
-                            );
-                        })}
-                    </View>
-                ))}
-            </View>
-            
-            {/* Take Photo Button */}
-            <View style={styles.actionButton}>
-                <Button 
-                    title={`Take Photo ${currentPhotoIndex + 1}`}
-                    onPress={() => takePhoto()}
-                    color="#4CAF50"
-                />
-            </View>
-            
-            {/* Submit Button */}
-            <View style={styles.actionButton}>
-                <Button 
-                    title="Submit Installation" 
-                    onPress={handleSubmit}
-                    disabled={!saralid || photos.some(photo => photo === null)}
-                    color="#2196F3"
-                />
-            </View>
-        </ScrollView>
+      },
     );
+  };
+
+  const handleImageRemove = (category, uri) => {
+    setPhotos(prevPhotos => ({
+      ...prevPhotos,
+      [category]: prevPhotos[category].filter(photo => photo.uri !== uri),
+    }));
+  };
+
+  const onSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      const serviceId = await AsyncStorage.getItem('_id');
+      if (!serviceId) {
+        throw new Error('Service ID not found');
+      }
+
+      const formData = new FormData();
+      
+      // Add all required fields to formData
+      formData.append('farmerSaralId', farmerSaralId);
+      formData.append('latitude', latitude);
+      formData.append('longitude', longitude);
+      formData.append('installationId', installationId);
+      formData.append('servicePersonId', serviceId);
+
+      // Add all photos to formData
+      filesNameList.forEach(category => {
+        photos[category].forEach((photo, index) => {
+          formData.append(`${category}`, {
+            uri: photo.uri,
+            type: photo.type,
+            name: photo.name || `photo_${category}_${index}.jpg`,
+          });
+        });
+      });
+
+      console.log('Submitting form data:', formData);
+
+      const response = await axios.post(
+        'http://88.222.214.93:5000/service-person/new-system-installation',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      console.log('Response data', response.data);
+
+      if (response.status === 200) {
+        Alert.alert('Success', 'Form submitted successfully!');
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.log(
+        'Error submitting form:',
+        error.response?.data || error.message
+      );
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to submit form'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>Installation Details</Text>
+
+      <View style={styles.card}>
+        <View style={styles.row}>
+          <Text style={styles.label}>Farmer Name:</Text>
+          <Text style={styles.value}>{farmerName || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Farmer Contact:</Text>
+          <Text style={styles.value}>{farmerContact?.toString() || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Saral Id:</Text>
+          <Text style={styles.value}>{farmerSaralId || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Longitude:</Text>
+          <Text style={styles.value}>{longitude || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Latitude:</Text>
+          <Text style={styles.value}>{latitude || 'N/A'}</Text>
+        </View>
+      </View>
+
+      {filesNameList.map(category => (
+        <View key={category} style={styles.fileContainer}>
+          <Text style={styles.label}>{fileLabels[category]}</Text>
+
+          <TouchableOpacity
+            onPress={() => openGeneralCamera(category)}
+            style={styles.imageButton}>
+            <MaterialIcon name="camera-plus" size={28} color="#000" />
+            <Text style={styles.title}>Camera</Text>
+          </TouchableOpacity>
+
+          <ScrollView horizontal style={styles.imagePreviewContainer}>
+            {photos[category]?.map((photo, index) => (
+              <View key={index} style={styles.imageWrapper}>
+                <Image source={{uri: photo.uri}} style={styles.imagePreview} />
+                <TouchableOpacity
+                  style={styles.cutButton}
+                  onPress={() => handleImageRemove(category, photo.uri)}>
+                  <Text style={styles.cutButtonText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      ))}
+
+      <TouchableOpacity
+        onPress={handleSubmit(onSubmit)}
+        style={styles.submitButton}
+        disabled={isSubmitting}>
+        {isSubmitting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Submit</Text>
+        )}
+      </TouchableOpacity>
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-        color: '#333',
-    },
-    inputContainer: {
-        marginBottom: 20,
-        backgroundColor: 'white',
-        padding: 15,
-        borderRadius: 10,
-        elevation: 2,
-    },
-    label: {
-        fontSize: 16,
-        marginBottom: 8,
-        fontWeight: 'bold',
-        color: '#555',
-    },
-    input: {
-        height: 40,
-        borderColor: '#ddd',
-        borderWidth: 1,
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        backgroundColor: '#f9f9f9',
-    },
-    statusText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 15,
-        textAlign: 'center',
-        color: '#333',
-        backgroundColor: '#e3f2fd',
-        padding: 10,
-        borderRadius: 5,
-    },
-    photoGridContainer: {
-        marginBottom: 20,
-        backgroundColor: 'white',
-        padding: 15,
-        borderRadius: 10,
-        elevation: 2,
-    },
-    photoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 15,
-    },
-    photoCell: {
-        alignItems: 'center',
-        width: '30%',
-    },
-    photoContainer: {
-        width: '100%',
-        aspectRatio: 1,
-        backgroundColor: '#f0f0f0',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        overflow: 'hidden',
-        position: 'relative',
-    },
-    activePhotoContainer: {
-        borderColor: '#2196F3',
-        borderWidth: 2,
-    },
-    photo: {
-        width: '100%',
-        height: '100%',
-    },
-    photoPlaceholder: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#e9e9e9',
-    },
-    photoNumber: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#999',
-    },
-    photoLabel: {
-        marginTop: 5,
-        fontSize: 12,
-        color: '#666',
-    },
-    deleteButton: {
-        position: 'absolute',
-        top: 5,
-        right: 5,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        borderRadius: 10,
-        width: 20,
-        height: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    actionButton: {
-        marginVertical: 10,
-        borderRadius: 5,
-        overflow: 'hidden',
-    },
+  container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: 'black',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  card: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 3,
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  value: {
+    fontSize: 16,
+    color: '#555',
+  },
+  fileContainer: {
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    elevation: 2,
+  },
+  imageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 12,
+    alignSelf: 'flex-start',
+  },
+  title: {
+    marginLeft: 8,
+    fontSize: 16,
+  },
+  imagePreviewContainer: {
+    flexDirection: 'row',
+  },
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 10,
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  cutButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cutButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  submitButton: {
+    backgroundColor: '#000',
+    borderRadius: 8,
+    padding: 16,
+    marginVertical: 20,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fbd33b',
+  },
 });
 
 export default InstallationForm;

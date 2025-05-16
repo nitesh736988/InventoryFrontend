@@ -312,6 +312,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     height: 50,
     justifyContent: 'center',
+    color: '#000',
   },
   input: {
     height: 40,

@@ -813,6 +813,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000',
     marginBottom: 15,
+    color: '#000',
   },
   button: {
     backgroundColor: '#070604',

@@ -1442,6 +1442,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: height * 0.02,
     marginHorizontal: width * 0.05,
+    color: '#000',
   },
   button: {
     backgroundColor: '#070604',
