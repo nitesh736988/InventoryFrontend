@@ -1125,16 +1125,22 @@ const WarehouseDashboard = () => {
                     {systemItemId.itemName}
                   </Text>
                 </TouchableOpacity>
-                {stockLow && (
+                {/* {stockLow && (
+                  <View style={styles.lowStockIndicator}>
+                    <Icon name="exclamation-triangle" size={16} color="#d9534f" />
+                    <Text style={styles.lowStockText}>Low Stock</Text>
+                  </View>
+                )} */}
+              </View>
+              <Text style={styles.cardDetails}>Current Quantity: {quantity}</Text>
+              <Text style={styles.cardDetails}>Required Quantity: {requiredQuantity}</Text>
+              <Text style={styles.cardDetails}>Material Short: {materialShort}</Text>
+              {stockLow && (
                   <View style={styles.lowStockIndicator}>
                     <Icon name="exclamation-triangle" size={16} color="#d9534f" />
                     <Text style={styles.lowStockText}>Low Stock</Text>
                   </View>
                 )}
-              </View>
-              <Text style={styles.cardDetails}>Current Quantity: {quantity}</Text>
-              <Text style={styles.cardDetails}>Required Quantity: {requiredQuantity}</Text>
-              <Text style={styles.cardDetails}>Material Short: {materialShort}</Text>
             </View>
           ))
         ) : (

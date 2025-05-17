@@ -1050,7 +1050,7 @@ const OutgoingDataInServiceMh = () => {
         for (const subItem of item.subItems) {
           if (selectedSubItems[subItem.subItemId._id]) {
             const subItemQty = subItemQuantities[subItem.subItemId._id];
-            if (!subItemQty || isNaN(subItemQty) || parseInt(subItemQty, 10) <= 0) {
+            if (!subItemQty || isNaN(subItemQty)) {
               Alert.alert('Error', `Please enter a valid quantity for sub-item ${subItem.subItemId.itemName}`);
               return false;
             }
@@ -1065,51 +1065,59 @@ const OutgoingDataInServiceMh = () => {
   const handleSubmit = async () => {
     if (!validateInput()) return;
 
-    // Prepare items list
-    const itemsList = selectedItems.map(itemId => {
-      const item = items.find(i => i.systemItemId._id === itemId);
-      
-      // Base item structure
-      const itemData = {
-        systemItemId: itemId,
-        quantity: parseInt(quantities[itemId], 10),
+    try {
+      // Prepare items list
+      const itemsList = selectedItems.map(itemId => {
+        const item = items.find(i => i.systemItemId._id === itemId);
+        
+        const itemData = {
+          systemItemId: itemId,
+          quantity: parseInt(quantities[itemId], 10),
+        };
+
+        // Add subItems if any are selected
+        if (item.subItems && item.subItems.length > 0) {
+          const selectedSubs = item.subItems
+            .filter(subItem => selectedSubItems[subItem.subItemId._id])
+            .map(subItem => ({
+              subItemId: subItem.subItemId._id,
+              quantity: parseInt(subItemQuantities[subItem.subItemId._id], 10)
+            }));
+
+          if (selectedSubs.length > 0) {
+            itemData.subItems = selectedSubs;
+          }
+        }
+
+        return itemData;
+      });
+
+      // Filter out empty panel numbers
+      const filteredPanelNumbers = panelNumbers.filter(num => num && num.trim() !== '');
+
+      // Format the items list correctly
+      const formattedItemsList = itemsList.flatMap(item => {
+        const base = [{ systemItemId: item.systemItemId, quantity: item.quantity }];
+        const subs = item.subItems?.map(sub => ({
+          systemItemId: sub.subItemId,
+          quantity: sub.quantity
+        })) || [];
+        return base.concat(subs);
+      });
+
+      const payload = {
+        farmerSaralId: farmerSaralId,
+        empId: selectedServicePerson,
+        systemId: selectedSystem,
+        itemsList: formattedItemsList,
+        ...(filteredPanelNumbers.length > 0 && { panelNumbers: filteredPanelNumbers }),
+        ...(pumpNumber && { pumpNumber }),
+        ...(controllerNumber && { controllerNumber }),
+        ...(rmuNumber && { rmuNumber }),
       };
 
-      // Add subItems if any are selected
-      if (item.subItems && item.subItems.length > 0) {
-        const selectedSubs = item.subItems
-          .filter(subItem => selectedSubItems[subItem.subItemId._id])
-          .map(subItem => ({
-            subItemId: subItem.subItemId._id,
-            quantity: parseInt(subItemQuantities[subItem.subItemId._id], 10)
-          }));
+      console.log('Final Payload:', payload);
 
-        if (selectedSubs.length > 0) {
-          itemData.subItems = selectedSubs;
-        }
-      }
-
-      return itemData;
-    });
-
-    // Filter out empty panel numbers
-    const filteredPanelNumbers = panelNumbers.filter(num => num && num.trim() !== '');
-
-    // Prepare the complete payload
-    const payload = {
-      farmerSaralId: farmerSaralId,
-      empId: selectedServicePerson,
-      systemId: selectedSystem,
-      itemsList: itemsList,
-      ...(filteredPanelNumbers.length > 0 && { panelNumbers: filteredPanelNumbers }),
-      ...(pumpNumber && { pumpNumber }),
-      ...(controllerNumber && { controllerNumber }),
-      ...(rmuNumber && { rmuNumber }),
-    };
-
-    console.log('Final Payload:', payload);
-
-    try {
       setLoading(true);
       const response = await axios.post(
         `${API_URL}/warehouse-admin/add-new-installation`,
