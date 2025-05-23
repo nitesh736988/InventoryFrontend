@@ -28,8 +28,8 @@
         
 //         setHasPunchedIn(response.data.data);
 //       } catch (err) {
-//         // console.log('Error checking punch-in status:', err);
-//         // setError('Failed to check punch status');
+//         console.log('Error checking punch-in status:', err);
+//         setError('Failed to check punch status');
 
 //         setError(err.response?.data?.message || 'Failed to check punch status');
 //         console.log('Error checking punch-in status:', err.response?.data?.message || err.message);
@@ -209,11 +209,11 @@ import {
   TouchableOpacity, 
   StyleSheet,
   ActivityIndicator,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MapView, { Polyline } from 'react-native-maps';
 
 const ServicePersonLocation = () => {
   const [loading, setLoading] = useState(false);
@@ -221,9 +221,8 @@ const ServicePersonLocation = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [hasPunchedIn, setHasPunchedIn] = useState(false);
-  const [showMap, setShowMap] = useState(false);
-  const [locations, setLocations] = useState([]);
-  const [totalDistance, setTotalDistance] = useState(0);
+  const [travelHistory, setTravelHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   useEffect(() => {
     const checkPunchInStatus = async () => {
@@ -234,14 +233,9 @@ const ServicePersonLocation = () => {
         });
         
         setHasPunchedIn(response.data.data);
-        if (response.data.data) {
-          // If already punched in, show the map
-          setShowMap(true);
-          fetchLocations();
-        }
       } catch (err) {
+        console.log('Error checking punch-in status:', err);
         setError(err.response?.data?.message || 'Failed to check punch status');
-        console.log('Error checking punch-in status:', err.response?.data?.message || err.message);
         Alert.alert('Error', err.response?.data?.message || 'Punch in failed. Please try again.');
       } finally {
         setCheckingStatus(false);
@@ -249,54 +243,25 @@ const ServicePersonLocation = () => {
     };
     
     checkPunchInStatus();
+    fetchTravelHistory();
   }, []);
 
-  const fetchLocations = async () => {
+  const fetchTravelHistory = async () => {
     try {
+      setHistoryLoading(true);
       const empId = await AsyncStorage.getItem('_id');
-      const response = await axios.get(`http://88.222.214.93:8001/track/getLocations/${empId}`);
-      setLocations(response.data.locations || []);
+      const response = await axios.post('http://88.222.214.93:8001/track/empTravelHistoryForApp', {
+        fieldEmpId: empId
+
+      });
       
-      // Calculate total distance if locations are available
-      if (response.data.locations && response.data.locations.length > 1) {
-        calculateDistance(response.data.locations);
-      }
+      setTravelHistory(response.data.data);
     } catch (err) {
-      console.log('Error fetching locations:', err);
+      console.log('Error fetching travel history:', err);
+      Alert.alert('Error', 'Failed to fetch travel history');
+    } finally {
+      setHistoryLoading(false);
     }
-  };
-
-  const calculateDistance = (locArray) => {
-    let distance = 0;
-    for (let i = 1; i < locArray.length; i++) {
-      const prevLoc = locArray[i - 1];
-      const currLoc = locArray[i];
-      distance += getDistanceFromLatLonInKm(
-        prevLoc.latitude,
-        prevLoc.longitude,
-        currLoc.latitude,
-        currLoc.longitude
-      );
-    }
-    setTotalDistance(distance);
-  };
-
-  // Haversine formula to calculate distance between two coordinates
-  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const d = R * c; // Distance in km
-    return d;
-  };
-
-  const deg2rad = (deg) => {
-    return deg * (Math.PI/180);
   };
 
   const handlePunchIn = async () => {
@@ -315,14 +280,9 @@ const ServicePersonLocation = () => {
       
       setMessage('Punched in successfully!');
       setHasPunchedIn(true);
-      setShowMap(true);
-      console.log('PunchIn response:', response.data);
-      
-      // Start fetching locations periodically
-      fetchLocations();
+      fetchTravelHistory();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to punch in');
-      console.log('PunchIn error:', err.response?.data?.message || err.message);
       Alert.alert('Error', err.response?.data?.message || 'Punch in failed. Please try again.');
     } finally {
       setLoading(false);
@@ -343,17 +303,52 @@ const ServicePersonLocation = () => {
         contact 
       });
       
-      setMessage(`Punched out successfully! Total distance traveled: ${totalDistance.toFixed(2)} km`);
+      setMessage('Punched out successfully!');
       setHasPunchedIn(false);
-      setShowMap(false);
-      console.log('PunchOut response:', response.data);
+      fetchTravelHistory();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to punch out');
-      console.log('PunchIn error:', err.response?.data?.message || err.message);
       Alert.alert('Error', err.response?.data?.message || 'Punch in failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const calculateDistance = (item) => {
+    if (!item.punchOut || item.punchOut.length === 0) return null;
+    return (item.finalDistance - item.initialDistance)
+  };
+
+  const renderHistoryItem = (item, index) => {
+    const distance = calculateDistance(item);
+    const hasPunchedOut = item.punchOut && item.punchOut.length > 0;
+    
+    return (
+      <View key={index} style={styles.historyItem}>
+        <Text style={styles.historyDate}>{formatDate(item.punchDate)}</Text>
+        <View style={styles.historyDetails}>
+          {hasPunchedOut ? (
+            <>
+              <Text style={styles.historyStatus}>Status: Completed</Text>
+              <Text style={styles.historyDistance}>
+                Distance: {distance.toFixed(4)} km
+              </Text>
+            </>
+          ) : (
+            <Text style={styles.historyWarning}>Not Punched Out</Text>
+          )}
+        </View>
+      </View>
+    );
   };
 
   if (checkingStatus) {
@@ -404,31 +399,18 @@ const ServicePersonLocation = () => {
         Current Status: {hasPunchedIn ? 'Punched In' : 'Not Punched In'}
       </Text>
 
-      {showMap && locations.length > 0 && (
-        <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: locations[0].latitude,
-              longitude: locations[0].longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-          >
-            <Polyline
-              coordinates={locations.map(loc => ({
-                latitude: loc.latitude,
-                longitude: loc.longitude
-              }))}
-              strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-              strokeColors={['#7F0000']}
-              strokeWidth={6}
-            />
-          </MapView>
-          <Text style={styles.distanceText}>
-            Distance traveled: {totalDistance.toFixed(2)} km
-          </Text>
-        </View>
+      <Text style={styles.sectionTitle}>Travel History</Text>
+      
+      {historyLoading ? (
+        <ActivityIndicator size="small" style={{marginTop: 20}} />
+      ) : (
+        <ScrollView style={styles.historyContainer}>
+          {travelHistory.length > 0 ? (
+            travelHistory.map(renderHistoryItem)
+          ) : (
+            <Text style={styles.noHistoryText}>No travel history available</Text>
+          )}
+        </ScrollView>
       )}
     </View>
   );
@@ -438,7 +420,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'flex-start', 
   },
   title: {
     fontSize: 20,
@@ -448,7 +429,7 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     flexDirection: 'row',
-    justifyContent: 'center', 
+    justifyContent: 'center',
     marginBottom: 20,
   },
   button: {
@@ -480,27 +461,55 @@ const styles = StyleSheet.create({
   },
   statusText: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 10,
     fontSize: 16,
     color: '#555',
+    marginBottom: 20,
   },
-  mapContainer: {
-    flex: 1,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  map: {
-    flex: 1,
-  },
-  distanceText: {
-    textAlign: 'center',
-    padding: 10,
-    fontSize: 16,
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  historyContainer: {
+    flex: 1,
+    marginTop: 10,
+  },
+  historyItem: {
     backgroundColor: '#f8f8f8',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  historyDate: {
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  historyDetails: {
+    alignItems: 'flex-end',
+  },
+  historyStatus: {
+    color: '#555',
+    fontSize: 14,
+  },
+  historyDistance: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  historyWarning: {
+    color: '#f44336',
+    fontSize: 14,
+    marginTop: 5,
+  },
+  noHistoryText: {
+    textAlign: 'center',
+    color: '#888',
+    marginTop: 20,
   },
 });
 
