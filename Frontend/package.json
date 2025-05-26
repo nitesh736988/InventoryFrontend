@@ -56,7 +56,8 @@
     "react-native-sectioned-multi-select": "^0.10.0",
     "react-native-skeleton-placeholder": "^5.2.4",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-video": "^6.6.4"
+    "react-native-video": "^6.6.4",
+    "react-native-vision-camera": "^4.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

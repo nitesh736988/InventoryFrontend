@@ -82,6 +82,9 @@ import OutgoingDataInServiceMh from './Screens/Warehouse/OutgoingDataInServiceMh
 import ServiceApprovalDataMh from './Screens/ServicePerson/ServiceApprovalDataMh';
 import ApproveDataMh from './Screens/ServicePerson/ApproveDataMh';
 import InstallationForm from './Screens/ServicePerson/InstallationForm';
+import ShowPath from './Component/Map/ShowPath';
+import BarcodeScanner from './Screens/Warehouse/BarcodeScanner';
+import NewInstallationTransactionData from './Screens/Warehouse/NewInstallationTransactionData';
 
 
 const Stack = createStackNavigator();
@@ -598,6 +601,24 @@ const AppNavigator = () => {
           name="InstallationForm"
           component={InstallationForm}
           options={{title: 'InstallationForm', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="ShowPath"
+          component={ShowPath}
+          options={{title: 'ShowPath', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="BarcodeScanner"
+          component={BarcodeScanner}
+          options={{title: 'BarcodeScanner', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="NewInstallationTransactionData"
+          component={NewInstallationTransactionData}
+          options={{title: 'NewInstallationTransactionData', headerShown: false}}
           />
 
 

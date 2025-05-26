@@ -324,6 +324,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import BarcodeScanner from './BarcodeScanner';
 
 const Sidebar = ({userType}) => {
   const [visible, setVisible] = useState(false);
@@ -645,11 +646,11 @@ const Sidebar = ({userType}) => {
                     <Text style={styles.subOptionText}>Show Incoming History</Text>
                   </TouchableOpacity>
 
-                  {/* <TouchableOpacity
-                    onPress={() => navigateAndHighlight('BomData')}
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('NewInstallationTransactionData')}
                     style={styles.subOptionButton}>
-                    <Text style={styles.subOptionText}>BomData</Text>
-                  </TouchableOpacity> */}
+                    <Text style={styles.subOptionText}>NewInstallation Data</Text>
+                  </TouchableOpacity>
                 </>
               )}
 
@@ -678,6 +679,12 @@ const Sidebar = ({userType}) => {
                     onPress={() => navigateAndHighlight('OutgoingDataInServiceMh')}
                     style={styles.subOptionButton}>
                     <Text style={styles.subOptionText}>Outgoing Data Maharastra</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => navigateAndHighlight('BarcodeScanner')}
+                    style={styles.subOptionButton}>
+                    <Text style={styles.subOptionText}>Barcode Scanner</Text>
                   </TouchableOpacity>
 
                 </>
