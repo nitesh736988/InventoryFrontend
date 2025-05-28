@@ -681,11 +681,11 @@ const Sidebar = ({userType}) => {
                     <Text style={styles.subOptionText}>Outgoing Data Maharastra</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => navigateAndHighlight('BarcodeScanner')}
                     style={styles.subOptionButton}>
                     <Text style={styles.subOptionText}>Barcode Scanner</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
 
                 </>
               )}

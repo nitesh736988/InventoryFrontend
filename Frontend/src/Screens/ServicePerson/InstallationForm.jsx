@@ -76,9 +76,9 @@ const InstallationForm = ({route}) => {
 
   const filesNameList = [
     'borePhoto',
-    'challanPhoto',
-    'landDocPhoto',
-    'sprinklerPhoto',
+    // 'challanPhoto',
+    // 'landDocPhoto',
+    // 'sprinklerPhoto',
     'boreFarmerPhoto',
     'finalFoundationFarmerPhoto',
     'panelFarmerPhoto',
@@ -88,9 +88,9 @@ const InstallationForm = ({route}) => {
 
   const fileLabels = {
     borePhoto: 'Bore Photo',
-    challanPhoto: 'Challan Photo',
-    landDocPhoto: 'Land Document Photo',
-    sprinklerPhoto: 'Sprinkler Photo',
+    // challanPhoto: 'Challan Photo',
+    // landDocPhoto: 'Land Document Photo',
+    // sprinklerPhoto: 'Sprinkler Photo',
     boreFarmerPhoto: 'Bore Farmer Photo',
     finalFoundationFarmerPhoto: 'Final Foundation Farmer Photo',
     panelFarmerPhoto: 'Panel Farmer Photo',

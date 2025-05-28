@@ -340,7 +340,7 @@ const ServicePersonLocation = () => {
             <>
               <Text style={styles.historyStatus}>Status: Completed</Text>
               <Text style={styles.historyDistance}>
-                Distance: {distance.toFixed(4)} km
+                Distance: {distance.toFixed(2)} km
               </Text>
             </>
           ) : (
