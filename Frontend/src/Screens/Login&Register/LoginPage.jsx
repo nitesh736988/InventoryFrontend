@@ -334,6 +334,7 @@ const LoginPage = () => {
     setFormLoading(true);
 
     try {
+      console.log(API_URL);
       const response = await axios.post(`${API_URL}/user/login`, { 
         email, 
         password, 

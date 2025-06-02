@@ -269,9 +269,7 @@
 
 // export default W2Wapproval;
 
-
-
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -285,7 +283,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const W2Wapproval = () => {
   const [orders, setOrders] = useState([]);
@@ -294,19 +292,20 @@ const W2Wapproval = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [btnClickedStatus, setBtnClickedStatus] = useState({});
 
-  const { width } = Dimensions.get('window');
+  const {width} = Dimensions.get('window');
   const cardWidth = width * 0.9;
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${API_URL}/warehouse-admin/view-defective-orders`
+        `${API_URL}/warehouse-admin/view-defective-orders`,
       );
       console.log(response.data);
       setOrders(response.data.incomingDefectiveData);
     } catch (error) {
       console.log(error);
+      console.log('Eroor response: ', error.response.data?.message);
       Alert.alert('Error', JSON.stringify(error.response.data?.message));
     } finally {
       setRefreshing(false);
@@ -318,40 +317,41 @@ const W2Wapproval = () => {
     fetchOrders();
   }, [refreshing]);
 
-  const handleApproveBtn = async (sendTransactionId) => {
+  const handleApproveBtn = async sendTransactionId => {
     try {
-      console.log("API ", API_URL)
+      console.log('API ', API_URL);
       const sendRequest = await axios.put(
         `${API_URL}/warehouse-admin/update-defective-order-status`,
         {
           status: true,
           defectiveOrderId: sendTransactionId,
           arrivedDate: Date.now(),
-        }
+        },
       );
       console.log(sendRequest);
-      setBtnClickedStatus((prev) => ({ ...prev, [sendTransactionId]: true }));
+      setBtnClickedStatus(prev => ({...prev, [sendTransactionId]: true}));
       setRefreshing(true);
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error.response.data?.message));
+      Alert.alert('Error', error.response.data?.message);
+      console.log('Error response: ', error.response.data?.message);
     }
   };
 
   useEffect(() => {
     const updateClickedStatus = {};
-    orders.forEach((order) => {
+    orders.forEach(order => {
       updateClickedStatus[order._id] = order.status || false;
     });
     setBtnClickedStatus(updateClickedStatus);
   }, [orders]);
 
-  const dateObject = (newDate) => new Date(newDate);
+  const dateObject = newDate => new Date(newDate);
 
   const filteredOrders = orders.filter(
-    (order) =>
+    order =>
       order.driverName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.fromWarehouse.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.toWarehouse.toLowerCase().includes(searchQuery.toLowerCase())
+      order.toWarehouse.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -364,14 +364,13 @@ const W2Wapproval = () => {
     );
   }
 
-  const renderOrderItem = ({ item }) => (
-    <View key={item._id} style={[styles.card, { width: cardWidth }]}>
+  const renderOrderItem = ({item}) => (
+    <View key={item._id} style={[styles.card, {width: cardWidth}]}>
       <Text
         style={[
           styles.statusText,
           item.incoming ? styles.incoming : styles.outgoing,
-        ]}
-      >
+        ]}>
         {item.incoming ? 'Incoming' : 'Outgoing'}
       </Text>
       <View style={styles.infoRow}>
@@ -387,7 +386,7 @@ const W2Wapproval = () => {
         Is Defective: {item.isDefective ? 'YES' : 'NO'}
       </Text>
       <View style={styles.itemContainer}>
-        {item.items.map(({ _id, itemName, quantity }) => (
+        {item.items.map(({_id, itemName, quantity}) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
@@ -412,8 +411,7 @@ const W2Wapproval = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.approveButton}
-              onPress={() => handleApproveBtn(item._id)}
-            >
+              onPress={() => handleApproveBtn(item._id)}>
               <Text style={styles.buttonText}>Approve</Text>
             </TouchableOpacity>
           </>
@@ -435,7 +433,7 @@ const W2Wapproval = () => {
       <FlatList
         data={filteredOrders}
         renderItem={renderOrderItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={item => item._id}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <Text style={styles.emptyMessage}>No Data found.</Text>
@@ -443,8 +441,7 @@ const W2Wapproval = () => {
       />
       <TouchableOpacity
         style={styles.refreshIcon}
-        onPress={() => setRefreshing(true)}
-      >
+        onPress={() => setRefreshing(true)}>
         <Icon name="refresh" size={30} color="black" />
       </TouchableOpacity>
     </View>
@@ -478,7 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     alignSelf: 'center',

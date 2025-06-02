@@ -9,33 +9,30 @@ import {
   Alert,
   Linking,
   Vibration,
+  Platform
 } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { useCodeScanner } from 'react-native-vision-camera';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
-const BarcodeScanner = ({ navigation }) => {
-  const [scannedItems, setScannedItems] = useState([]);
+const BarcodeScanner = () => {
   const [scannedData, setScannedData] = useState(null);
-  const [showScanner, setShowScanner] = useState(false);
+  const [showScanner, setShowScanner] = useState(true);
   const [torchOn, setTorchOn] = useState(false);
   const [isCameraInitialized, setIsCameraInitialized] = useState(false);
   const { hasPermission, requestPermission } = useCameraPermission();
   const device = useCameraDevice('back');
   const route = useRoute();
+  const navigation = useNavigation();
 
   useEffect(() => {
     const checkCameraPermission = async () => {
       try {
-        let cameraPermission = hasPermission;
-        if (!cameraPermission) {
-          cameraPermission = await requestPermission();
-        }
-
-        if (cameraPermission) {
-          setShowScanner(true);
-        } else {
-          showPermissionDeniedAlert();
+        if (!hasPermission) {
+          const cameraPermission = await requestPermission();
+          if (!cameraPermission) {
+            showPermissionDeniedAlert();
+          }
         }
       } catch (error) {
         console.error('Permission error:', error);
@@ -44,7 +41,7 @@ const BarcodeScanner = ({ navigation }) => {
     };
 
     checkCameraPermission();
-  }, [hasPermission]);
+  }, [hasPermission, requestPermission]);
 
   const showPermissionDeniedAlert = useCallback(() => {
     Alert.alert(
@@ -57,36 +54,21 @@ const BarcodeScanner = ({ navigation }) => {
     );
   }, [navigation]);
 
-  const handleRequestPermission = useCallback(async () => {
-    try {
-      const status = await requestPermission();
-      if (status) {
-        setShowScanner(true);
-      } else {
-        showPermissionDeniedAlert();
-      }
-    } catch (error) {
-      console.error('Permission request error:', error);
-      Alert.alert('Error', 'Failed to request camera permission');
-    }
-  }, [requestPermission, showPermissionDeniedAlert]);
-
   const handleCodeScanned = useCallback((codes) => {
     if (codes.length > 0 && showScanner && isCameraInitialized) {
       const scannedValue = codes[0].value;
 
-      if (scannedItems.includes(scannedValue)) {
+      if (route.params?.existingBarcodes?.includes(scannedValue)) {
         Vibration.vibrate(100);
         Alert.alert("Duplicate", `"${scannedValue}" already scanned.`);
         return;
       }
 
       Vibration.vibrate(200);
-      setScannedItems(prev => [...prev, scannedValue]);
       setScannedData(scannedValue);
       setShowScanner(false);
     }
-  }, [showScanner, isCameraInitialized, scannedItems]);
+  }, [showScanner, isCameraInitialized, route.params?.existingBarcodes]);
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13', 'code-128', 'code-39', 'upc-a', 'pdf-417'],
@@ -103,18 +85,18 @@ const BarcodeScanner = ({ navigation }) => {
   }, [navigation]);
 
   const handleDone = useCallback(() => {
-    if (scannedItems.length > 0) {
-      const scannedData = scannedItems[0]; // Get the first scanned item
-      navigation.goBack(); // Go back to previous screen
-      
-      // Call the callback function passed in params with the scanned data
-      if (route.params?.onBarcodeScanned) {
-        route.params.onBarcodeScanned(scannedData);
-      }
-    } else {
-      Alert.alert('No Data', 'Please scan at least one barcode.');
+    if (scannedData) {
+      navigation.navigate({
+        name: route.params?.returnScreen || 'OutgoingDataInServiceMh',
+        params: { 
+          scannedBarcode: scannedData,
+          barcodeType: route.params?.barcodeType,
+          panelIndex: route.params?.panelIndex 
+        },
+        merge: true
+      });
     }
-  }, [navigation, scannedItems, route.params]);
+  }, [navigation, scannedData, route.params]);
 
   if (!device) {
     return (
@@ -130,7 +112,10 @@ const BarcodeScanner = ({ navigation }) => {
       <View style={styles.permissionContainer}>
         <Text style={styles.permissionTitle}>Camera Access Needed</Text>
         <Text style={styles.permissionText}>To scan barcodes, please grant camera permissions</Text>
-        <TouchableOpacity style={styles.permissionButton} onPress={handleRequestPermission}>
+        <TouchableOpacity 
+          style={styles.permissionButton} 
+          onPress={requestPermission}
+        >
           <Text style={styles.permissionButtonText}>Allow Camera Access</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.secondaryButton} onPress={handleBack}>
@@ -159,8 +144,13 @@ const BarcodeScanner = ({ navigation }) => {
               <TouchableOpacity style={styles.closeButton} onPress={handleBack}>
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.torchButton} onPress={() => setTorchOn(!torchOn)}>
-                <Text style={styles.torchButtonText}>{torchOn ? '🔦 On' : '⚡ Off'}</Text>
+              <TouchableOpacity 
+                style={styles.torchButton} 
+                onPress={() => setTorchOn(!torchOn)}
+              >
+                <Text style={styles.torchButtonText}>
+                  {torchOn ? '🔦 On' : '⚡ Off'}
+                </Text>
               </TouchableOpacity>
             </View>
             <View style={styles.scanFrame}>
@@ -191,7 +181,10 @@ const { width } = Dimensions.get('window');
 const frameSize = width * 0.7;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#000' 
+  },
   permissionContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -288,12 +281,13 @@ const styles = StyleSheet.create({
   },
   scanFrame: {
     alignItems: 'center',
+    marginBottom: 100,
   },
   frame: {
     width: frameSize,
     height: frameSize * 0.5,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.7)',
     backgroundColor: 'transparent',
     borderRadius: 10,
     position: 'relative',
