@@ -993,7 +993,7 @@ const OutgoingDataInServiceMh = () => {
   const [items, setItems] = useState([]);
   const [selectedServicePerson, setSelectedServicePerson] = useState('');
   const [selectedSystem, setSelectedSystem] = useState('');
-  const [selectedSystemName, setSelectedSystemName] = useState(''); // Track system name
+  const [selectedSystemName, setSelectedSystemName] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [selectedSubItems, setSelectedSubItems] = useState({});
@@ -1009,16 +1009,17 @@ const OutgoingDataInServiceMh = () => {
   const [farmerDetails, setFarmerDetails] = useState(null);
   const [allScannedBarcodes, setAllScannedBarcodes] = useState([]);
   const [motorNumber, setMotorNumber] = useState('');
-  const [pumpItems, setPumpItems] = useState([]);
-  const [panelNumbers, setPanelNumbers] = useState([]); // For storing panel numbers
+  const [availablePumps, setAvailablePumps] = useState([]);
+  const [panelNumbers, setPanelNumbers] = useState([]);
+  const [extraPanelNumbers, setExtraPanelNumbers] = useState([]);
+  const [pumpdata, setPumpData] = useState({});
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Handle barcode scan results
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       if (route.params?.scannedBarcode && route.params?.barcodeType) {
-        const {scannedBarcode, barcodeType} = route.params;
+        const {scannedBarcode, barcodeType, panelIndex} = route.params;
 
         if (allScannedBarcodes.includes(scannedBarcode)) {
           Alert.alert('Duplicate', 'This barcode has already been scanned');
@@ -1039,8 +1040,14 @@ const OutgoingDataInServiceMh = () => {
             setMotorNumber(scannedBarcode);
             break;
           case 'panel':
-            // Update the specific panel number based on index if needed
-            setPanelNumbers(prev => [...prev, scannedBarcode]);
+            if (panelIndex !== undefined && panelIndex !== null) {
+              handlePanelNumberChange(panelIndex, scannedBarcode);
+            }
+            break;
+          case 'extraPanel':
+            if (panelIndex !== undefined && panelIndex !== null) {
+              handleExtraPanelNumberChange(panelIndex, scannedBarcode);
+            }
             break;
         }
 
@@ -1048,6 +1055,7 @@ const OutgoingDataInServiceMh = () => {
         navigation.setParams({
           scannedBarcode: undefined,
           barcodeType: undefined,
+          panelIndex: undefined,
         });
       }
     });
@@ -1084,41 +1092,37 @@ const OutgoingDataInServiceMh = () => {
 
   useEffect(() => {
     if (selectedSystem) {
-      fetchPumpItemsForSystem();
+      fetchAvailablePumps();
       fetchItemsForSystem();
       initializePanelNumbers();
     }
   }, [selectedSystem]);
 
   const initializePanelNumbers = () => {
-    // Reset panel numbers when system changes
     setPanelNumbers([]);
+    setExtraPanelNumbers([]);
     
-    // Initialize panel numbers based on selected system
     const system = systems.find(sys => sys._id === selectedSystem);
     if (system) {
       setSelectedSystemName(system.systemName);
       
       if (system.systemName.includes('7.5HP')) {
-        // Initialize 13 empty panel numbers for 7.5HP
         setPanelNumbers(Array(13).fill(''));
       } else if (system.systemName.includes('5HP')) {
-        // Initialize 9 empty panel numbers for 5HP
         setPanelNumbers(Array(9).fill(''));
       } else if (system.systemName.includes('3HP')) {
-        // Initialize 6 empty panel numbers for 3HP
         setPanelNumbers(Array(6).fill(''));
       }
     }
   };
 
-  const fetchPumpItemsForSystem = async () => {
+  const fetchAvailablePumps = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
         `${API_URL}/warehouse-admin/show-pump-data?systemId=${selectedSystem}`,
       );
-      setPumpItems(response?.data?.data);
+      setAvailablePumps(response?.data?.data || []);
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response?.data?.message));
     } finally {
@@ -1141,6 +1145,7 @@ const OutgoingDataInServiceMh = () => {
       setMotorNumber('');
       setSelectedSubItems({});
       setSubItemQuantities({});
+      setExtraPanelNumbers([]);
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response?.data?.message));
     } finally {
@@ -1194,12 +1199,10 @@ const OutgoingDataInServiceMh = () => {
   const toggleItemSelection = itemId => {
     setSelectedItems(prev => {
       if (prev.includes(itemId)) {
-        // Remove item
         const newQuantities = {...quantities};
         delete newQuantities[itemId];
         setQuantities(newQuantities);
 
-        // Remove sub-items
         const item = items.find(i => i.systemItemId._id === itemId);
         if (item?.subItems?.length > 0) {
           const newSelectedSubItems = {...selectedSubItems};
@@ -1214,7 +1217,6 @@ const OutgoingDataInServiceMh = () => {
 
         return prev.filter(id => id !== itemId);
       } else {
-        // Add item without default quantity
         return [...prev, itemId];
       }
     });
@@ -1247,18 +1249,28 @@ const OutgoingDataInServiceMh = () => {
     setPanelNumbers(newPanelNumbers);
   };
 
+  const handleExtraPanelNumberChange = (index, value) => {
+    const newExtraPanelNumbers = [...extraPanelNumbers];
+    newExtraPanelNumbers[index] = value;
+    setExtraPanelNumbers(newExtraPanelNumbers);
+  };
+
   const handleScanBarcode = (type, index = null) => {
     navigation.navigate('BarcodeScanner', {
       barcodeType: type,
       existingBarcodes: allScannedBarcodes,
       returnScreen: 'OutgoingDataInServiceMh',
-      panelIndex: index, // Pass panel index if scanning a panel
+      panelIndex: index,
     });
   };
 
   const getItemName = itemId => {
     const item = items.find(i => i.systemItemId._id === itemId);
     return item?.systemItemId?.itemName || '';
+  };
+
+  const isSolarPanel = itemName => {
+    return itemName.toLowerCase().includes('solar panel');
   };
 
   const validateInput = () => {
@@ -1283,19 +1295,20 @@ const OutgoingDataInServiceMh = () => {
       return false;
     }
 
-    // Validate panel numbers based on system
-    if (selectedSystemName.includes('7.5HP') && panelNumbers.length !== 13) {
-      Alert.alert('Error', 'Please enter all 13 panel numbers for 7.5HP system');
-      return false;
-    } else if (selectedSystemName.includes('5HP') && panelNumbers.length !== 9) {
-      Alert.alert('Error', 'Please enter all 9 panel numbers for 5HP system');
-      return false;
-    } else if (selectedSystemName.includes('3HP') && panelNumbers.length !== 6) {
-      Alert.alert('Error', 'Please enter all 6 panel numbers for 3HP system');
-      return false;
+    const system = systems.find(sys => sys._id === selectedSystem);
+    if (system) {
+      if (system.systemName.includes('7.5HP') && panelNumbers.length !== 13) {
+        Alert.alert('Error', 'Please enter all 13 panel numbers for 7.5HP system');
+        return false;
+      } else if (system.systemName.includes('5HP') && panelNumbers.length !== 9) {
+        Alert.alert('Error', 'Please enter all 9 panel numbers for 5HP system');
+        return false;
+      } else if (system.systemName.includes('3HP') && panelNumbers.length !== 6) {
+        Alert.alert('Error', 'Please enter all 6 panel numbers for 3HP system');
+        return false;
+      }
     }
 
-    // Validate quantities for selected items
     for (const itemId of selectedItems) {
       if (!quantities[itemId] || isNaN(quantities[itemId])) {
         Alert.alert(
@@ -1329,72 +1342,66 @@ const OutgoingDataInServiceMh = () => {
     if (!validateInput()) return;
 
     try {
-      // Prepare items list
-      const itemsList = selectedItems.map(itemId => {
-        const item = items.find(i => i.systemItemId._id === itemId);
+      const mainItemsList = selectedItems.map(itemId => ({
+        systemItemId: itemId,
+        quantity: 1
+      }));
 
-        const itemData = {
+      const extraItemsList = selectedItems
+        .filter(itemId => quantities[itemId] > 1)
+        .map(itemId => ({
           systemItemId: itemId,
-          quantity: parseInt(quantities[itemId], 10),
-        };
+          quantity: parseInt(quantities[itemId], 10)
+        }));
 
-        // Add subItems if any
-        if (item.subItems && item.subItems.length > 0) {
-          const selectedSubs = item.subItems
-            .filter(subItem => selectedSubItems[subItem.subItemId._id])
-            .map(subItem => ({
-              subItemId: subItem.subItemId._id,
-              quantity: parseInt(subItemQuantities[subItem.subItemId._id], 10),
-            }));
-
-          if (selectedSubs.length > 0) {
-            itemData.subItems = selectedSubs;
+      const subItemsList = [];
+      for (const itemId of selectedItems) {
+        const item = items.find(i => i.systemItemId._id === itemId);
+        if (item?.subItems) {
+          for (const subItem of item.subItems) {
+            if (selectedSubItems[subItem.subItemId._id]) {
+              subItemsList.push({
+                systemItemId: subItem.subItemId._id,
+                quantity: parseInt(subItemQuantities[subItem.subItemId._id], 10)
+              });
+            }
           }
         }
+      }
 
-        return itemData;
-      });
-
-      // Format items list
-      const formattedItemsList = itemsList.flatMap(item => {
-        const base = [
-          {systemItemId: item.systemItemId, quantity: item.quantity},
-        ];
-        const subs =
-          item.subItems?.map(sub => ({
-            systemItemId: sub.subItemId,
-            quantity: sub.quantity,
-          })) || [];
-        return base.concat(subs);
-      });
+      const allExtraItems = [...extraItemsList, ...subItemsList];
 
       const payload = {
         farmerSaralId: farmerSaralId,
         empId: selectedServicePerson,
         systemId: selectedSystem,
-        itemsList: formattedItemsList,
+        itemsList: mainItemsList,    
+        panelNumbers: panelNumbers.filter(num => num.trim() !== ''),
         ...(pumpNumber && {pumpNumber}),
         ...(controllerNumber && {controllerNumber}),
         ...(rmuNumber && {rmuNumber}),
         ...(motorNumber && {motorNumber}),
-        panelNumbers: panelNumbers.filter(num => num.trim() !== ''), // Include only non-empty panel numbers
+        ...(extraPanelNumbers.length > 0 && {extraPanelNumbers: extraPanelNumbers.filter(num => num.trim() !== '')}),
+        ...(allExtraItems.length > 0 && {extraItemsList: allExtraItems})
       };
 
+      console.log('Payload to submit:', payload);
+      
       setLoading(true);
-      const response = await axios.post(
-        `${API_URL}/warehouse-admin/add-new-installation`,
-        payload,
-        {headers: {'Content-Type': 'application/json'}},
-      );
+      // const response = await axios.post(
+      //   `${API_URL}/warehouse-admin/add-new-installation`,
+      //   payload,
+      //   {headers: {'Content-Type': 'application/json'}}
+      // );
 
-      Alert.alert('Success', 'Transaction saved successfully');
-      resetForm();
-    } catch (error) {
-      console.log('Submission error:', error.response?.data || error.message);
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to submit data',
-      );
+      // Alert.alert('Success', 'Transaction saved successfully');
+      // resetForm();
+    // } catch (error) {
+    //   console.log('Submission error:', error.response?.data || error.message);
+    //   Alert.alert(
+    //     'Error',
+    //     error.response?.data?.message || 'Failed to submit data'
+    //   );
     } finally {
       setLoading(false);
     }
@@ -1418,12 +1425,16 @@ const OutgoingDataInServiceMh = () => {
     setSaralIdValidationMessage('');
     setAllScannedBarcodes([]);
     setPanelNumbers([]);
+    setExtraPanelNumbers([]);
+    setAvailablePumps([]);
   };
 
   const renderItem = ({item}) => {
     const itemId = item.systemItemId._id;
     const isSelected = selectedItems.includes(itemId);
     const hasSubItems = item.subItems && item.subItems.length > 0;
+    const itemName = item.systemItemId.itemName;
+    const isPanelItem = isSolarPanel(itemName);
 
     return (
       <View style={styles.itemContainer}>
@@ -1432,7 +1443,7 @@ const OutgoingDataInServiceMh = () => {
             value={isSelected}
             onValueChange={() => toggleItemSelection(itemId)}
           />
-          <Text style={styles.itemText}>{item.systemItemId.itemName}</Text>
+          <Text style={styles.itemText}>{itemName}</Text>
         </View>
 
         {isSelected && (
@@ -1445,6 +1456,31 @@ const OutgoingDataInServiceMh = () => {
               keyboardType="numeric"
               placeholder="Enter quantity"
             />
+
+            {isPanelItem && parseInt(quantities[itemId] || 0) > 0 && (
+              <>
+                <Text style={styles.label}>Enter Extra Panel Numbers:</Text>
+                {Array.from({length: parseInt(quantities[itemId] || 0)}).map(
+                  (_, index) => (
+                    <View key={index} style={styles.barcodeInputContainer}>
+                      <TextInput
+                        style={[styles.input, styles.barcodeInput]}
+                        value={extraPanelNumbers[index] || ''}
+                        onChangeText={text =>
+                          handleExtraPanelNumberChange(index, text)
+                        }
+                        placeholder={`Extra Panel ${index + 1} Number`}
+                      />
+                      <TouchableOpacity
+                        style={styles.scanButton}
+                        onPress={() => handleScanBarcode('extraPanel', index)}>
+                        <Text style={styles.scanButtonText}>Scan</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ),
+                )}
+              </>
+            )}
 
             {hasSubItems && (
               <>
@@ -1494,18 +1530,18 @@ const OutgoingDataInServiceMh = () => {
     );
   };
 
-  const renderPumpItems = () => {
-    if (pumpItems.length === 0 || !selectedSystem) return null;
+  const renderPumpSelection = () => {
+    if (availablePumps.length === 0 || !selectedSystem) return null;
 
     return (
       <>
-        <Text style={styles.label}>Available Pumps:</Text>
+        <Text style={styles.label}>Select Pump:</Text>
         <Picker
-          selectedValue={pumpNumber}
-          onValueChange={setPumpNumber}
+          selectedValue={pumpdata}
+          onValueChange={setPumpData}
           style={styles.picker}>
           <Picker.Item label="Select Pump" value="" />
-          {pumpItems.map((pump, index) => (
+          {availablePumps.map((pump, index) => (
             <Picker.Item
               key={index}
               label={pump.itemName}
@@ -1513,6 +1549,21 @@ const OutgoingDataInServiceMh = () => {
             />
           ))}
         </Picker>
+        
+        <Text style={styles.label}>Enter Pump Number:</Text>
+        <View style={styles.barcodeInputContainer}>
+          <TextInput
+            style={[styles.input, styles.barcodeInput]}
+            value={pumpNumber}
+            onChangeText={setPumpNumber}
+            placeholder="Enter Pump Number"
+          />
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={() => handleScanBarcode('pump')}>
+            <Text style={styles.scanButtonText}>Scan</Text>
+          </TouchableOpacity>
+        </View>
       </>
     );
   };
@@ -1658,11 +1709,11 @@ const OutgoingDataInServiceMh = () => {
             ))}
           </Picker>
 
-          {renderPumpItems()}
+          {renderPumpSelection()}
 
           {items.length > 0 && (
             <>
-              <Text style={styles.label}>Select Items:</Text>
+              <Text style={styles.label}>Extra Select Items:</Text>
               <FlatList
                 data={items}
                 renderItem={renderItem}
@@ -1673,21 +1724,6 @@ const OutgoingDataInServiceMh = () => {
           )}
 
           {renderPanelNumbers()}
-
-          <Text style={styles.label}>Pump Number:</Text>
-          <View style={styles.barcodeInputContainer}>
-            <TextInput
-              style={[styles.input, styles.barcodeInput]}
-              value={pumpNumber}
-              onChangeText={setPumpNumber}
-              placeholder="Enter Pump Number"
-            />
-            <TouchableOpacity
-              style={styles.scanButton}
-              onPress={() => handleScanBarcode('pump')}>
-              <Text style={styles.scanButtonText}>Scan</Text>
-            </TouchableOpacity>
-          </View>
 
           <Text style={styles.label}>Controller Number:</Text>
           <View style={styles.barcodeInputContainer}>

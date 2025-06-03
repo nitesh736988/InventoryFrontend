@@ -172,9 +172,10 @@
 // export default NewInstallationTransactionData;
 
 
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList,Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {API_URL} from '@env';
 
 const NewInstallationTransactionData = () => {
   const [data, setData] = useState([]);
@@ -186,17 +187,16 @@ const NewInstallationTransactionData = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://88.222.214.93:5000/warehouse-admin/new-installation-data');
+      const response = await axios.get(`${API_URL}/warehouse-admin/new-installation-data`);
+      console.log('Fetched data:', response.data);
       setData(response.data.data);
     } catch (error) {
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data:', error?.response?.data?.message);
+      Alert.alert('Error fetching data1:', error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
   };
-
-  // Prevent reload on pull-down (disable pull-to-refresh)
-  // Add search bar for farmerSaralId, Name, contact, village, district
 
   const [search, setSearch] = useState('');
   const [filteredData, setFilteredData] = useState([]);
