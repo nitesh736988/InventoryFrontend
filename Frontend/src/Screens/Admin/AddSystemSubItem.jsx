@@ -25,11 +25,13 @@ const AddSystemSubItem = () => {
     const fetchSystems = async () => {
       try {
         const { data } = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
-        console.log('Fetched Systems:', data.data);
+        // console.log('Fetched Systems:', data.data);
+    
         setSystems(data.data);
+
       } catch (error) {
-        console.log('Error fetching systems:', error);
-        Alert.alert('Error', 'Unable to fetch systems.');
+        console.log('Error fetching systems:', error || error?.response?.data?.message || error?.message);
+        Alert.alert('Error', error || error?.response?.data?.message || error?.message);
       }
     };
 
@@ -46,8 +48,8 @@ const AddSystemSubItem = () => {
         console.log('Fetched System Items:', data.data);
         setItems(data.data);
       } catch (error) {
-        console.log('Error fetching system items:', error);
-        Alert.alert('Error', 'Unable to fetch system items.');
+        console.log('Error fetching systems:', error || error?.response?.data?.message || error?.message);
+        Alert.alert('Error', error || error?.response?.data?.message || error?.message);
       }
       setLoadingItems(false);
     };

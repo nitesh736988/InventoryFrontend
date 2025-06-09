@@ -23,11 +23,13 @@ const InstallationHistory = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/admin/all-installations-data`);
+      const response = await axios.get(
+        `${API_URL}/admin/all-installations-data`,
+      );
       setOrders(response.data.data || []);
     } catch (error) {
-      Alert.alert('Error', 'Unable to fetch orders');
-      console.log('Error fetching orders:', error);
+      Alert.alert('Error', error?.response?.data?.message);
+      // console.log('Error fetching orders:', error?.response?.data?.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -52,7 +54,7 @@ const InstallationHistory = () => {
     return orders.filter(
       order =>
         order.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+        order.serialNumber.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   };
 
@@ -63,25 +65,43 @@ const InstallationHistory = () => {
       <Text style={styles.infoText}>Village Name: {item.farmerVillage}</Text>
 
       <View style={styles.itemContainer}>
-      <Text style={styles.infoText}>
-        Product: {' '}</Text>
+        <Text style={styles.infoText}>Product: </Text>
         {item.items.map(({_id, itemName, quantity}) => (
           <Text key={_id} style={styles.infoText}>
             {itemName}: {quantity}
           </Text>
-          
         ))}
       </View>
       <Text style={styles.infoText}>Serial Number: {item.serialNumber}</Text>
       <Text style={styles.infoText}>Longitude: {item.longitude}</Text>
       <Text style={styles.infoText}>Latitude: {item.latitude}</Text>
-        <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
-            <Image source={{ uri: item?.photos[0]}} style={{ width:  100, height: 100 }}/>
-            {item?.photos[1] && <Image source={{ uri: item?.photos[1]}} style={{ width:  100, height: 100 }}/>}
-            {item?.photos[2] && <Image source={{ uri: item?.photos[2]}} style={{ width:  100, height: 100 }}/>}
-            {item?.photos[3] && <Image source={{ uri: item?.photos[3]}} style={{ width:  100, height: 100 }}/>}
-        </View>
-      <Text style={styles.infoText}>Installation Date: {formatDate(item.installationDate)}</Text>
+      <View style={{flexDirection: 'row', gap: 4, flexWrap: 'wrap'}}>
+        <Image
+          source={{uri: item?.photos[0]}}
+          style={{width: 100, height: 100}}
+        />
+        {item?.photos[1] && (
+          <Image
+            source={{uri: item?.photos[1]}}
+            style={{width: 100, height: 100}}
+          />
+        )}
+        {item?.photos[2] && (
+          <Image
+            source={{uri: item?.photos[2]}}
+            style={{width: 100, height: 100}}
+          />
+        )}
+        {item?.photos[3] && (
+          <Image
+            source={{uri: item?.photos[3]}}
+            style={{width: 100, height: 100}}
+          />
+        )}
+      </View>
+      <Text style={styles.infoText}>
+        Installation Date: {formatDate(item.installationDate)}
+      </Text>
     </View>
   );
 
@@ -129,7 +149,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     textAlign: 'center',
-    color: 'black'
+    color: 'black',
   },
   card: {
     padding: 16,

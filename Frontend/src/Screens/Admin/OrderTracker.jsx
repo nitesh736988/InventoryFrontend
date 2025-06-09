@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
 const OrderTracker = () => {
   const [orders, setOrders] = useState([]);
@@ -25,8 +25,7 @@ const OrderTracker = () => {
       const response = await axios.get(`${API_URL}/admin/upper-order-details`);
       setOrders(response.data.itemDetails || []);
     } catch (error) {
-      console.log('API Error:', error);
-      Alert.alert('Error', error?.response?.data?.message || 'Unable to fetch orders.');
+      Alert.alert('Error', error?.response?.data?.message);
     } finally {
       if (isRefreshing) setIsRefreshing(false);
       else setLoading(false);
@@ -37,12 +36,12 @@ const OrderTracker = () => {
     fetchOrders();
   }, []);
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
 
-  const renderOrder = ({ item }) => (
+  const renderOrder = ({item}) => (
     <View style={styles.card}>
       <View style={styles.itemContainer}>
         <View style={styles.row}>
@@ -67,7 +66,9 @@ const OrderTracker = () => {
         </View>
         <View style={styles.row}>
           <Text style={styles.cardTitle}>Arrival Date:</Text>
-          <Text style={styles.cardValue}>{item.arrivedDate ? formatDate(item.arrivedDate) : 'N/A'}</Text>
+          <Text style={styles.cardValue}>
+            {item.arrivedDate ? formatDate(item.arrivedDate) : 'N/A'}
+          </Text>
         </View>
       </View>
     </View>
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     color: '#000',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   card: {
     padding: 16,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },

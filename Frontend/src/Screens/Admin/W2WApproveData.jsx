@@ -22,10 +22,11 @@ const W2WApproveData = () => {
     try {
       const response = await axios.get(
         `${API_URL}/admin/warehouse-to-warehouse-data`);
-      console.log(response.data.defectiveOrderData);
+      // console.log(response.data.defectiveOrderData);
+
       setOrders(response.data.defectiveOrderData || []);
     } catch (error) {
-      Alert.alert('Error', error.message || 'Unable to fetch orders');
+      Alert.alert('Error', error?.responae?.data?.message);
     } finally {
       setLoading(false);
     }

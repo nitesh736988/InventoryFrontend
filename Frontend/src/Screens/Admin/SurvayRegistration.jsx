@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
+import {API_URL} from '@env';
 
 const SurveyRegistration = () => {
   const [formData, setFormData] = useState({
@@ -42,7 +43,7 @@ const SurveyRegistration = () => {
 
     try {
       const response = await axios.post(
-        'http://88.222.214.93:5000/admin/survey-person-signup',
+        `${API_URL}/admin/survey-person-signup`,
         {name, email, contact, password, role, createdAt},
       );
 

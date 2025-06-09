@@ -10,11 +10,11 @@ const RepairReject = () => {
   const fetchRepairRejectData = async () => {
     try {
       const response = await axios.get(`${API_URL}/admin/all-repair-reject-itemData`);
-      console.log('Response Data:', response.data);
+      // console.log('Response Data:', response.data);
       setRepairRejectData(response.data.allRepairRejectData);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch repair & reject data.');
-      console.log('Error fetching data:', error);
+      Alert.alert('Error', error?.response?.data?.message);
+      // console.log('Error fetching data:', error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -24,7 +24,7 @@ const RepairReject = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Repair Reject Data:', repairRejectData);
+    // console.log('Repair Reject Data:', repairRejectData);
   }, [repairRejectData]);
 
   const formatDateTime = (dateTime) => {

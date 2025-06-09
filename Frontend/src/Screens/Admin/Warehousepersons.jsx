@@ -29,7 +29,7 @@ const Warehousepersons = () => {
         'Error',
         error.response?.data?.message || 'Failed to fetch warehouse persons',
       );
-      console.log('Error fetching data:', error);
+      console.log('Error fetching data:', error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -40,11 +40,8 @@ const Warehousepersons = () => {
       Alert.alert('Success', 'Warehouse person deleted successfully');
       setWarehousePersons(prev => prev.filter(person => person._id !== id));
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to delete warehouse person',
-      );
-      console.log('Error deleting data:', error);
+      Alert.alert('Error',error.response?.data?.message);
+      console.log('Error deleting data:', error?.response?.data?.message);
     }
   };
   useEffect(() => {

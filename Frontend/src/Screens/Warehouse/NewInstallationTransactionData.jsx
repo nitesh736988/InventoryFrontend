@@ -1,6 +1,7 @@
-// import { View, Text, StyleSheet, FlatList } from 'react-native';
+// import { View, Text, StyleSheet, FlatList,Alert } from 'react-native';
 // import React, { useEffect, useState } from 'react';
 // import axios from 'axios';
+// import {API_URL} from '@env';
 
 // const NewInstallationTransactionData = () => {
 //   const [data, setData] = useState([]);
@@ -12,12 +13,42 @@
 
 //   const fetchData = async () => {
 //     try {
-//       const response = await axios.get('http://88.222.214.93:5000/warehouse-admin/new-installation-data');
+//       const response = await axios.get(`${API_URL}/warehouse-admin/new-installation-data`);
+//       console.log('Fetched data:', response.data);
 //       setData(response.data.data);
 //     } catch (error) {
-//       console.log('Error fetching data:', error);
+//       console.log('Error fetching data:', error?.response?.data?.message);
+//       Alert.alert('Error fetching data1:', error?.response?.data?.message);
 //     } finally {
 //       setLoading(false);
+//     }
+//   };
+
+//   const [search, setSearch] = useState('');
+//   const [filteredData, setFilteredData] = useState([]);
+
+//   useEffect(() => {
+//     setFilteredData(
+//       data.filter((item) => {
+//       const searchText = search.toLowerCase();
+//       return (
+//         (item.farmerSaralId || '').toLowerCase().includes(searchText) ||
+//         (item.farmerDetails?.farmerName || '').toLowerCase().includes(searchText) ||
+//         (item.farmerDetails?.contact || '').toLowerCase().includes(searchText) ||
+//         (item.farmerDetails?.village || '').toLowerCase().includes(searchText) ||
+//         (item.farmerDetails?.district || '').toLowerCase().includes(searchText)
+//       );
+//       })
+//     );
+//   }, [search, data]);
+
+//   const formatDate = (dateString) => {
+//     try {
+//       if (!dateString) return 'N/A';
+//       const date = new Date(dateString);
+//       return isNaN(date) ? 'Invalid Date' : date.toLocaleDateString();
+//     } catch {
+//       return 'N/A';
 //     }
 //   };
 
@@ -26,14 +57,14 @@
 //       <View style={styles.statusBox}>
 //         <Text style={{ fontWeight: 'bold' }}>
 //           Status:{' '}
-//           {item.accept ? (
+//           {item.accepted ? (
 //             item.installationDone ? (
 //               <Text style={{ color: 'green' }}>Approved - Installation Complete</Text>
 //             ) : (
 //               <Text style={{ color: 'orange' }}>Approved - Not Installed</Text>
 //             )
 //           ) : (
-//             <Text style={{ color: 'red' }}>Pending Approve</Text>
+//             <Text style={{ color: 'red' }}>Pending Approval</Text>
 //           )}
 //         </Text>
 //       </View>
@@ -41,7 +72,7 @@
 //       <View style={styles.section}>
 //         <Text style={styles.sectionTitle}>Farmer Information</Text>
 //         <Text>Name: {item.farmerDetails?.farmerName || 'N/A'}</Text>
-//         <Text>Saral ID: {item.farmerSaralId}</Text>
+//         <Text>Saral ID: {item.farmerSaralId || 'N/A'}</Text>
 //         <Text>Contact: {item.farmerDetails?.contact || 'N/A'}</Text>
 //         <Text>Village: {item.farmerDetails?.village || 'N/A'}</Text>
 //         <Text>District: {item.farmerDetails?.district || 'N/A'}</Text>
@@ -64,23 +95,23 @@
 //         <View style={styles.section}>
 //           <Text style={styles.sectionTitle}>Panel Numbers</Text>
 //           {item.panelNumbers.map((panel, index) => (
-//             <Text key={index}>{panel}</Text>
+//             <Text key={index}>{panel || 'N/A'}</Text>
 //           ))}
 //         </View>
 //       )}
 
 //       <View style={styles.section}>
 //         <Text style={styles.sectionTitle}>Items List</Text>
-//         {item.itemsList.map((listItem, index) => (
+//         {item.itemsList?.map((listItem, index) => (
 //           <Text key={index}>
-//             {listItem.systemItemId.itemName}: {listItem.quantity}
+//             {listItem.systemItemId?.itemName || 'Unknown Item'}: {listItem.quantity || 0}
 //           </Text>
 //         ))}
 //       </View>
 
 //       <View style={styles.section}>
 //         <Text style={styles.sectionTitle}>Sending Date</Text>
-//         <Text>{new Date(item.sendingDate).toLocaleDateString()}</Text>
+//         <Text>{formatDate(item.sendingDate)}</Text>
 //       </View>
 //     </View>
 //   );
@@ -93,7 +124,7 @@
 //     );
 //   }
 
-//   if (data.length === 0) {
+//   if (!data || data.length === 0) {
 //     return (
 //       <View style={styles.noData}>
 //         <Text>No installation data available</Text>
@@ -172,14 +203,16 @@
 // export default NewInstallationTransactionData;
 
 
-import { View, Text, StyleSheet, FlatList,Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {API_URL} from '@env';
+import { API_URL } from '@env';
 
 const NewInstallationTransactionData = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -188,120 +221,188 @@ const NewInstallationTransactionData = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(`${API_URL}/warehouse-admin/new-installation-data`);
-      console.log('Fetched data:', response.data);
       setData(response.data.data);
+      setFilteredData(response.data.data); // Initialize filteredData with all data
     } catch (error) {
       console.log('Error fetching data:', error?.response?.data?.message);
-      Alert.alert('Error fetching data1:', error?.response?.data?.message);
+      Alert.alert('Error', error?.response?.data?.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   };
 
-  const [search, setSearch] = useState('');
-  const [filteredData, setFilteredData] = useState([]);
-
   useEffect(() => {
-    setFilteredData(
-      data.filter((item) => {
-      const searchText = search.toLowerCase();
-      return (
-        (item.farmerSaralId || '').toLowerCase().includes(searchText) ||
-        (item.farmerDetails?.farmerName || '').toLowerCase().includes(searchText) ||
-        (item.farmerDetails?.contact || '').toLowerCase().includes(searchText) ||
-        (item.farmerDetails?.village || '').toLowerCase().includes(searchText) ||
-        (item.farmerDetails?.district || '').toLowerCase().includes(searchText)
+    if (search) {
+      setFilteredData(
+        data.filter((item) => {
+          const searchText = search.toLowerCase();
+          return (
+            (item.farmerSaralId || '').toLowerCase().includes(searchText) ||
+            (item.farmerDetails?.farmerName || '').toLowerCase().includes(searchText) ||
+            (item.farmerDetails?.contact || '').toLowerCase().includes(searchText) ||
+            (item.farmerDetails?.village || '').toLowerCase().includes(searchText) ||
+            (item.farmerDetails?.district || '').toLowerCase().includes(searchText)
+          );
+        })
       );
-      })
-    );
+    } else {
+      setFilteredData(data);
+    }
   }, [search, data]);
 
   const formatDate = (dateString) => {
     try {
       if (!dateString) return 'N/A';
       const date = new Date(dateString);
-      return isNaN(date) ? 'Invalid Date' : date.toLocaleDateString();
+      return isNaN(date) ? 'Invalid Date' : date.toLocaleDateString('en-IN');
     } catch {
       return 'N/A';
     }
   };
 
+  const renderStatus = (accepted, installationDone) => {
+    if (accepted) {
+      return installationDone ? (
+        <Text style={[styles.statusText, styles.statusApproved]}>Approved - Installation Complete</Text>
+      ) : (
+        <Text style={[styles.statusText, styles.statusPendingInstallation]}>Approved - Pending Installation</Text>
+      );
+    }
+    return <Text style={[styles.statusText, styles.statusPending]}>Pending Approval</Text>;
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <View style={styles.statusBox}>
-        <Text style={{ fontWeight: 'bold' }}>
-          Status:{' '}
-          {item.accepted ? (
-            item.installationDone ? (
-              <Text style={{ color: 'green' }}>Approved - Installation Complete</Text>
-            ) : (
-              <Text style={{ color: 'orange' }}>Approved - Not Installed</Text>
-            )
-          ) : (
-            <Text style={{ color: 'red' }}>Pending Approval</Text>
-          )}
-        </Text>
+      <View style={styles.statusContainer}>
+        <Text style={styles.statusLabel}>Status: </Text>
+        {renderStatus(item.accepted, item.installationDone)}
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Farmer Information</Text>
-        <Text>Name: {item.farmerDetails?.farmerName || 'N/A'}</Text>
-        <Text>Saral ID: {item.farmerSaralId || 'N/A'}</Text>
-        <Text>Contact: {item.farmerDetails?.contact || 'N/A'}</Text>
-        <Text>Village: {item.farmerDetails?.village || 'N/A'}</Text>
-        <Text>District: {item.farmerDetails?.district || 'N/A'}</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Name:</Text>
+          <Text style={styles.value}>{item.farmerDetails?.farmerName || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Saral ID:</Text>
+          <Text style={styles.value}>{item.farmerSaralId || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Contact:</Text>
+          <Text style={styles.value}>{item.farmerDetails?.contact || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Village:</Text>
+          <Text style={styles.value}>{item.farmerDetails?.village || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>District:</Text>
+          <Text style={styles.value}>{item.farmerDetails?.district || 'N/A'}</Text>
+        </View>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Service Person</Text>
-        <Text>Name: {item.empId?.name || 'N/A'}</Text>
-        <Text>Contact: {item.empId?.contact || 'N/A'}</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Name:</Text>
+          <Text style={styles.value}>{item.empId?.name || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Contact:</Text>
+          <Text style={styles.value}>{item.empId?.contact || 'N/A'}</Text>
+        </View>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Equipment Details</Text>
-        <Text>Pump Number: {item.pumpNumber || 'N/A'}</Text>
-        <Text>Controller Number: {item.controllerNumber || 'N/A'}</Text>
-        <Text>RMU Number: {item.rmuNumber || 'N/A'}</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Pump Number:</Text>
+          <Text style={styles.value}>{item.pumpNumber || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Controller Number:</Text>
+          <Text style={styles.value}>{item.controllerNumber || 'N/A'}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>RMU Number:</Text>
+          <Text style={styles.value}>{item.rmuNumber || 'N/A'}</Text>
+        </View>
+        {item.motorNumber && (
+          <View style={styles.row}>
+            <Text style={styles.label}>Motor Number:</Text>
+            <Text style={styles.value}>{item.motorNumber}</Text>
+          </View>
+        )}
       </View>
 
       {item.panelNumbers?.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Panel Numbers</Text>
-          {item.panelNumbers.map((panel, index) => (
-            <Text key={index}>{panel || 'N/A'}</Text>
+          <Text style={styles.sectionTitle}>Panel Numbers ({item.panelNumbers.length})</Text>
+          <View style={styles.panelContainer}>
+            {item.panelNumbers.map((panel, index) => (
+              <Text key={index} style={styles.panelNumber}>{panel || 'N/A'}</Text>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {item.extraPanelNumbers?.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Extra Panel Numbers ({item.extraPanelNumbers.length})</Text>
+          <View style={styles.panelContainer}>
+            {item.extraPanelNumbers.map((panel, index) => (
+              <Text key={index} style={styles.panelNumber}>{panel || 'N/A'}</Text>
+            ))}
+          </View>
+        </View>
+      )}
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Items List ({item.itemsList?.length || 0})</Text>
+        {item.itemsList?.map((listItem, index) => (
+          <View key={index} style={styles.row}>
+            <Text style={styles.label}>{listItem.systemItemId?.itemName || 'Unknown Item'}:</Text>
+            <Text style={styles.value}>{listItem.quantity || 0}</Text>
+          </View>
+        ))}
+      </View>
+
+      {item.extraItemsList?.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Extra Items List ({item.extraItemsList.length})</Text>
+          {item.extraItemsList.map((listItem, index) => (
+            <View key={index} style={styles.row}>
+              <Text style={styles.label}>{listItem.systemItemId?.itemName || 'Unknown Item'}:</Text>
+              <Text style={styles.value}>{listItem.quantity || 0}</Text>
+            </View>
           ))}
         </View>
       )}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Items List</Text>
-        {item.itemsList?.map((listItem, index) => (
-          <Text key={index}>
-            {listItem.systemItemId?.itemName || 'Unknown Item'}: {listItem.quantity || 0}
-          </Text>
-        ))}
+        <Text style={styles.sectionTitle}>Dates</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Sending Date:</Text>
+          <Text style={styles.value}>{formatDate(item.sendingDate)}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Created At:</Text>
+          <Text style={styles.value}>{formatDate(item.createdAt)}</Text>
+        </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Sending Date</Text>
-        <Text>{formatDate(item.sendingDate)}</Text>
+        <Text style={styles.sectionTitle}>Warehouse</Text>
+        <Text style={styles.value}>{item.warehouseId?.warehouseName || 'N/A'}</Text>
       </View>
     </View>
   );
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <View style={styles.noData}>
-        <Text>No installation data available</Text>
       </View>
     );
   }
@@ -309,14 +410,33 @@ const NewInstallationTransactionData = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>New Installation Transactions</Text>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item._id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        ListHeaderComponent={<View style={{ height: 10 }} />}
-        ListFooterComponent={<View style={{ height: 20 }} />}
-      />
+      
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by farmer name, ID, contact, village..."
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+
+      {filteredData.length === 0 ? (
+        <View style={styles.noData}>
+          <Text>No installation data found</Text>
+          {search && <Text>for search term: "{search}"</Text>}
+        </View>
+      ) : (
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={<View style={{ height: 10 }} />}
+          ListFooterComponent={<View style={{ height: 20 }} />}
+          refreshing={loading}
+          onRefresh={fetchData}
+        />
+      )}
     </View>
   );
 };
@@ -324,21 +444,38 @@ const NewInstallationTransactionData = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 20,
     backgroundColor: '#f5f5f5',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
     textAlign: 'center',
+    color: '#333',
+  },
+  searchContainer: {
+    paddingHorizontal: 15,
+    marginBottom: 10,
+  },
+  searchInput: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   noData: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f5f5f5',
   },
   listContent: {
     paddingHorizontal: 15,
@@ -346,7 +483,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 15,
     marginBottom: 15,
     shadowColor: '#000',
@@ -355,11 +492,27 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  statusBox: {
+  statusContainer: {
+    flexDirection: 'row',
     marginBottom: 10,
     padding: 8,
-    backgroundColor: '#eef',
+    backgroundColor: '#f8f9fa',
     borderRadius: 5,
+  },
+  statusLabel: {
+    fontWeight: 'bold',
+  },
+  statusText: {
+    fontWeight: 'bold',
+  },
+  statusPending: {
+    color: '#dc3545', // red
+  },
+  statusPendingInstallation: {
+    color: '#fd7e14', // orange
+  },
+  statusApproved: {
+    color: '#28a745', // green
   },
   section: {
     marginBottom: 15,
@@ -369,8 +522,34 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#495057',
+    fontSize: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 5,
-    color: '#555',
+  },
+  label: {
+    color: '#6c757d',
+    flex: 1,
+  },
+  value: {
+    flex: 1,
+    textAlign: 'right',
+    fontWeight: '500',
+  },
+  panelContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  panelNumber: {
+    backgroundColor: '#e9ecef',
+    borderRadius: 4,
+    padding: 4,
+    marginRight: 6,
+    marginBottom: 6,
   },
 });
 

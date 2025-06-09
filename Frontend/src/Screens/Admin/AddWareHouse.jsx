@@ -21,18 +21,18 @@ const AddWareHouse = () => {
       Alert.alert('Error', 'Please enter a valid warehouse name.');
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const response = await axios.post(`${API_URL}/admin/add-warehouse`, {
         warehouseName: trimmedName,
       });
       console.log('Response:', response.data);
-      Alert.alert('Success', 'Warehouse added successfully!');
+      Alert.alert('Success', response?.data?.message);
       setWarehouseName('');
     } catch (error) {
-      console.log('Error adding warehouse:', error);
+      console.log('Error adding warehouse:', error?.response?.data?.message);
       const errorMessage =
         error.response?.data?.message ||
         'Warehouse already exists or there was an error.';
@@ -41,7 +41,7 @@ const AddWareHouse = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Add Warehouse:</Text>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000'
+    color: '#000',
   },
   input: {
     color: 'black',

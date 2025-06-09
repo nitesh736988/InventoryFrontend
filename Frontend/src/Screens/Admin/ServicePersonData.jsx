@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,9 @@ import {
   Dimensions,
 } from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const ServicePersonData = () => {
   const [orders, setOrders] = useState([]);
@@ -23,11 +23,11 @@ const ServicePersonData = () => {
 
     try {
       const response = await axios.get(`${API_URL}/admin/incoming-items-data`);
-      console.log(response.data.data);
+      // console.log(response.data.data);
       setOrders(response.data.data);
     } catch (error) {
-      Alert.alert('Error', 'Unable to fetch orders');
-      console.log('Error fetching orders:', error);
+      Alert.alert('Error fetching orders', error?.response?.data?.message);
+      // console.log('Error fetching orders:', error?.response?.data?.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -43,7 +43,7 @@ const ServicePersonData = () => {
     fetchOrders();
   };
 
-  const renderOrderItem = ({ item }) => (
+  const renderOrderItem = ({item}) => (
     <View key={item._id} style={styles.card}>
       <View style={styles.infoRow}>
         <Text style={styles.infoTextBold}>
@@ -55,19 +55,18 @@ const ServicePersonData = () => {
           Contact: {item.servicePerson?.contact || 'N/A'}
         </Text>
       </View>
-  
+
       <View style={styles.itemContainer}>
         <Text style={styles.infoTextBold}>Product:</Text>
-        {item.items?.map(({ _id, itemName, quantity }) => (
+        {item.items?.map(({_id, itemName, quantity}) => (
           <View key={_id} style={styles.itemRow}>
-            <Text style={styles.itemName}>{itemName}:{' '}</Text>
-            <Text style={styles.itemQuantity}>{quantity}  {' '}</Text>
+            <Text style={styles.itemName}>{itemName}: </Text>
+            <Text style={styles.itemQuantity}>{quantity} </Text>
           </View>
         ))}
       </View>
     </View>
   );
-  
 
   return (
     <View style={styles.container}>
@@ -82,7 +81,7 @@ const ServicePersonData = () => {
         <FlatList
           data={orders}
           renderItem={renderOrderItem}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           refreshing={refreshing}
           onRefresh={handleRefresh}
           ListEmptyComponent={
@@ -104,7 +103,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
-    
+
     textAlign: 'center',
   },
   card: {
@@ -113,14 +112,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-
   },
   contactRow: {
     flexDirection: 'row',
@@ -138,18 +136,15 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-
   },
   itemName: {
     color: '#000',
     fontSize: width * 0.04,
     // fontWeight: 'bold',
-
   },
   itemQuantity: {
     color: '#000',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,15 @@ import {
   FlatList,
   Dimensions,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
-import { API_URL } from '@env';
+import {API_URL} from '@env';
 import SidebarModal from './SidebarModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ const Dashboard = () => {
       while (retries > 0) {
         try {
           const response = await axios.get(
-            `${API_URL}/admin/dashboard?option=${selectedWarehouse}`
+            `${API_URL}/admin/dashboard?option=${selectedWarehouse}`,
           );
           setResponseData(response.data.data || []);
           break;
@@ -42,7 +42,12 @@ const Dashboard = () => {
           console.log(
             'Error fetching dashboard data:',
             error.message,
-            error.response?.data || error
+            error.response?.data || error,
+          );
+
+          Alert.alert(
+            'Error fetching dashboard data',
+            error?.response?.data?.message,
           );
           retries -= 1;
           if (retries === 0) {
@@ -50,14 +55,9 @@ const Dashboard = () => {
           }
         }
       }
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        'There was an issue fetching data. Please try again later.'
-      );
     } finally {
       setLoading(false);
-      setRefreshing(false); 
+      setRefreshing(false);
       setIsRefreshClicked(false);
     }
   };
@@ -74,7 +74,7 @@ const Dashboard = () => {
       console.log(
         'Error fetching warehouse names:',
         error.message,
-        error.response?.data || error
+        error.response?.data || error,
       );
       setAllWarehouses([]);
     }
@@ -96,7 +96,7 @@ const Dashboard = () => {
         await AsyncStorage.clear();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'LoginPage' }],
+          routes: [{name: 'LoginPage'}],
         });
       } else {
         Alert.alert('Logout Failed', response.data.message || 'Unknown error');
@@ -105,7 +105,7 @@ const Dashboard = () => {
       console.log(
         'Error logging out:',
         error.message,
-        error.response?.data || error
+        error.response?.data || error,
       );
       Alert.alert('Error', 'Failed to logout. Please try again.');
     }
@@ -126,18 +126,17 @@ const Dashboard = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-      <SidebarModal />
+        <SidebarModal />
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Icon name="sign-out" size={20} color="white" />
         </TouchableOpacity>
       </View>
 
-      <Picker     
+      <Picker
         selectedValue={selectedWarehouse}
         style={styles.picker}
-        onValueChange={(value) => setSelectedWarehouse(value)}
-      >
-        {allWarehouses.map((warehouse) => (
+        onValueChange={value => setSelectedWarehouse(value)}>
+        {allWarehouses.map(warehouse => (
           <Picker.Item
             key={warehouse._id}
             label={warehouse.warehouseName}
@@ -148,8 +147,8 @@ const Dashboard = () => {
       {responseData.length > 0 ? (
         <FlatList
           data={responseData}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
+          keyExtractor={item => item._id}
+          renderItem={({item}) => (
             <View style={styles.card}>
               <View style={styles.cardContent}>
                 <Text style={styles.cardTitle}>{item.itemName}</Text>
@@ -159,15 +158,21 @@ const Dashboard = () => {
                     ? item.stock
                     : item.quantity}
                 </Text>
-                <Text style={styles.cardDetails}>Defective: {item.defective}</Text>
-                <Text style={styles.cardDetails}>Repaired: {item.repaired}</Text>
-                <Text style={styles.cardDetails}>Rejected: {item.rejected}</Text>
+                <Text style={styles.cardDetails}>
+                  Defective: {item.defective}
+                </Text>
+                <Text style={styles.cardDetails}>
+                  Repaired: {item.repaired}
+                </Text>
+                <Text style={styles.cardDetails}>
+                  Rejected: {item.rejected}
+                </Text>
               </View>
             </View>
           )}
           showsVerticalScrollIndicator={false}
           refreshing={refreshing}
-          onRefresh={onRefresh} 
+          onRefresh={onRefresh}
         />
       ) : (
         <Text style={styles.noDataText}>
@@ -213,7 +218,7 @@ const styles = StyleSheet.create({
     marginVertical: width * 0.03,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
