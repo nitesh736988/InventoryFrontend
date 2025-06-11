@@ -379,7 +379,6 @@
 //     try {
 //       const mainItemsList = selectedItems.map(itemId => ({
 //         systemItemId: itemId,
-//         quantity: 1,
 //       }));
 
 //       const extraItemsList = selectedItems
@@ -428,20 +427,20 @@
 //       console.log('Payload to submit:', payload);
 
 //       setLoading(true);
-//       // const response = await axios.post(
-//       //   `${API_URL}/warehouse-admin/add-new-installation`,
-//       //   payload,
-//       //   {headers: {'Content-Type': 'application/json'}}
-//       // );
+//       const response = await axios.post(
+//         `${API_URL}/warehouse-admin/add-new-installation`,
+//         payload);
 
-//       // Alert.alert('Success', 'Transaction saved successfully');
-//       // resetForm();
-//       // } catch (error) {
-//       //   console.log('Submission error:', error.response?.data || error.message);
-//       //   Alert.alert(
-//       //     'Error',
-//       //     error.response?.data?.message || 'Failed to submit data'
-//       //   );
+//         console.log("Response Data", response.data)
+
+//       Alert.alert('Success', 'Transaction saved successfully');
+//       resetForm();
+//       } catch (error) {
+//         console.log('Submission error:', error?.response?.data?.message);
+//         Alert.alert(
+//           'Error',
+//           error.response?.data?.message
+//         );
 //     } finally {
 //       setLoading(false);
 //     }
@@ -1059,18 +1058,16 @@ import {API_URL} from '@env';
 import {useNavigation, useRoute} from '@react-navigation/native';
 
 const OutgoingDataInServiceMh = () => {
-  // State declarations
   const [servicePerson, setServicePerson] = useState([]);
   const [systems, setSystems] = useState([]);
   const [items, setItems] = useState([]);
   const [selectedServicePerson, setSelectedServicePerson] = useState('');
   const [selectedSystem, setSelectedSystem] = useState('');
   const [selectedSystemName, setSelectedSystemName] = useState('');
+  const [selectedPump, setSelectedPump] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
-  const [selectedExtraItems, setSelectedExtraItems] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [selectedSubItems, setSelectedSubItems] = useState({});
-  const [selectedExtraSubItems, setSelectedExtraSubItems] = useState([]);
   const [subItemQuantities, setSubItemQuantities] = useState({});
   const [pumpNumber, setPumpNumber] = useState('');
   const [controllerNumber, setControllerNumber] = useState('');
@@ -1086,12 +1083,9 @@ const OutgoingDataInServiceMh = () => {
   const [availablePumps, setAvailablePumps] = useState([]);
   const [panelNumbers, setPanelNumbers] = useState([]);
   const [extraPanelNumbers, setExtraPanelNumbers] = useState([]);
-  const [pumpModel, setPumpModel] = useState('');
-  
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Effect for handling barcode scanning
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       if (route.params?.scannedBarcode && route.params?.barcodeType) {
@@ -1139,7 +1133,6 @@ const OutgoingDataInServiceMh = () => {
     return unsubscribe;
   }, [navigation, route.params, allScannedBarcodes]);
 
-  // Fetch service persons and systems on mount
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
@@ -1167,14 +1160,18 @@ const OutgoingDataInServiceMh = () => {
     fetchSystems();
   }, []);
 
-  // Fetch items and pumps when system is selected
   useEffect(() => {
     if (selectedSystem) {
       fetchAvailablePumps();
-      fetchItemsForSystem();
       initializePanelNumbers();
     }
   }, [selectedSystem]);
+
+  useEffect(() => {
+    if (selectedPump) {
+      fetchItemsForSystem(selectedPump);
+    }
+  }, [selectedPump]);
 
   const initializePanelNumbers = () => {
     setPanelNumbers([]);
@@ -1201,6 +1198,7 @@ const OutgoingDataInServiceMh = () => {
         `${API_URL}/warehouse-admin/show-pump-data?systemId=${selectedSystem}`,
       );
       setAvailablePumps(response?.data?.data || []);
+      setSelectedPump(''); // Reset pump selection when system changes
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response?.data?.message));
     } finally {
@@ -1208,25 +1206,24 @@ const OutgoingDataInServiceMh = () => {
     }
   };
 
-  const fetchItemsForSystem = async () => {
+  const fetchItemsForSystem = async (pumpId = '') => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${API_URL}/warehouse-admin/show-items-subItems?systemId=${selectedSystem}`,
-      );
+      let url = `${API_URL}/warehouse-admin/show-items-subItems?systemId=${selectedSystem}`;
+      if (pumpId) {
+        url += `&pumpId=${pumpId}`;
+      }
+
+      const response = await axios.get(url);
       setItems(response?.data?.data);
       setSelectedItems([]);
-      setSelectedExtraItems([]);
       setQuantities({});
-      setPumpNumber('');
       setControllerNumber('');
       setRmuNumber('');
       setMotorNumber('');
       setSelectedSubItems({});
-      setSelectedExtraSubItems([]);
       setSubItemQuantities({});
       setExtraPanelNumbers([]);
-      setPumpModel('');
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response?.data?.message));
     } finally {
@@ -1280,8 +1277,6 @@ const OutgoingDataInServiceMh = () => {
   const toggleItemSelection = itemId => {
     setSelectedItems(prev => {
       if (prev.includes(itemId)) {
-        setSelectedExtraItems(prevExtra => prevExtra.filter(id => id !== itemId));
-        
         const newQuantities = {...quantities};
         delete newQuantities[itemId];
         setQuantities(newQuantities);
@@ -1305,21 +1300,11 @@ const OutgoingDataInServiceMh = () => {
     });
   };
 
-  const toggleSubItemSelection = (subItemId, isExtra = false) => {
-    if (isExtra) {
-      setSelectedExtraSubItems(prev => {
-        if (prev.includes(subItemId)) {
-          return prev.filter(id => id !== subItemId);
-        } else {
-          return [...prev, subItemId];
-        }
-      });
-    } else {
-      setSelectedSubItems(prev => ({
-        ...prev,
-        [subItemId]: !prev[subItemId],
-      }));
-    }
+  const toggleSubItemSelection = subItemId => {
+    setSelectedSubItems(prev => ({
+      ...prev,
+      [subItemId]: !prev[subItemId],
+    }));
   };
 
   const handleQuantityChange = (itemId, value) => {
@@ -1375,6 +1360,7 @@ const OutgoingDataInServiceMh = () => {
       Alert.alert('Error', 'Please select a system');
       return false;
     }
+
     if (!farmerSaralId) {
       Alert.alert('Error', 'Please enter Farmer Saral ID');
       return false;
@@ -1386,53 +1372,45 @@ const OutgoingDataInServiceMh = () => {
 
     const system = systems.find(sys => sys._id === selectedSystem);
     if (system) {
-      if (system.systemName.includes('7.5HP')) {
-        const filledPanelCount = panelNumbers.filter(
-          num => num.trim() !== '',
-        ).length;
-        if (filledPanelCount !== 13) {
-          Alert.alert(
-            'Error',
-            'Please enter all 13 panel numbers for 7.5HP system',
-          );
-          return false;
-        }
-      } else if (system.systemName.includes('5HP')) {
-        const filledPanelCount = panelNumbers.filter(
-          num => num.trim() !== '',
-        ).length;
-        if (filledPanelCount !== 9) {
-          Alert.alert(
-            'Error',
-            'Please enter all 9 panel numbers for 5HP system',
-          );
-          return false;
-        }
-      } else if (system.systemName.includes('3HP')) {
-        const filledPanelCount = panelNumbers.filter(
-          num => num.trim() !== '',
-        ).length;
-        if (filledPanelCount !== 6) {
-          Alert.alert(
-            'Error',
-            'Please enter all 6 panel numbers for 3HP system',
-          );
-          return false;
-        }
+      if (system.systemName.includes('7.5HP') && panelNumbers.length !== 13) {
+        Alert.alert(
+          'Error',
+          'Please enter all 13 panel numbers for 7.5HP system',
+        );
+        return false;
+      } else if (
+        system.systemName.includes('5HP') &&
+        panelNumbers.length !== 9
+      ) {
+        Alert.alert('Error', 'Please enter all 9 panel numbers for 5HP system');
+        return false;
+      } else if (
+        system.systemName.includes('3HP') &&
+        panelNumbers.length !== 6
+      ) {
+        Alert.alert('Error', 'Please enter all 6 panel numbers for 3HP system');
+        return false;
       }
     }
 
+    for (const itemId of selectedItems) {
+      if (!quantities[itemId] || isNaN(quantities[itemId])) {
+        Alert.alert(
+          'Error',
+          `Please enter a valid quantity for ${getItemName(itemId)}`,
+        );
+        return false;
+      }
 
-    for (const item of items) {
-      if (item.subItems) {
+      const item = items.find(i => i.systemItemId._id === itemId);
+      if (item?.subItems) {
         for (const subItem of item.subItems) {
-          const subItemId = subItem.subItemId._id;
-          if (selectedSubItems[subItemId] || selectedExtraSubItems.includes(subItemId)) {
-            const subItemQty = subItemQuantities[subItemId];
-            if (!subItemQty || isNaN(subItemQty) || subItemQty < 1) {
+          if (selectedSubItems[subItem.subItemId._id]) {
+            const subItemQty = subItemQuantities[subItem.subItemId._id];
+            if (!subItemQty || isNaN(subItemQty)) {
               Alert.alert(
                 'Error',
-                `Please enter a valid quantity (minimum 1) for sub-item ${subItem.subItemId.itemName}`,
+                `Please enter a valid quantity for sub-item ${subItem.subItemId.itemName}`,
               );
               return false;
             }
@@ -1445,109 +1423,85 @@ const OutgoingDataInServiceMh = () => {
   };
 
   const handleSubmit = async () => {
-  if (!validateInput()) return;
+    if (!validateInput()) return;
 
-  try {
-    // Main items list - contains only systemItemId (no quantity)
-    // const mainItemsList = selectedItems
-    //   .filter(itemId => !selectedExtraItems.includes(itemId))
-    //   .map(itemId => ({
-    //     systemItemId: itemId
-    //   }));
+    try {
+      // Create itemsList with the selected pump
+      const mainItemsList = selectedPump ? [{systemItemId: selectedPump}] : [];
 
-        const mainItemsList = selectedItems.map(itemId => ({
-        systemItemId: itemId,
-        quantity: 1,
-      }));
+      const extraItemsList = selectedItems
+        .filter(itemId => quantities[itemId] > 1)
+        .map(itemId => ({
+          systemItemId: itemId,
+          quantity: parseInt(quantities[itemId], 10),
+        }));
 
-    // Extra items list - contains systemItemId and quantity
-    const extraItemsList = selectedExtraItems.map(itemId => ({
-      systemItemId: itemId,
-      quantity: parseInt(quantities[itemId] || 1)
-    }));
-
-    // Process sub-items
-    const allSubItems = [];
-    
-    // Get all selected sub-items (both regular and extra)
-    for (const item of items) {
-      if (item.subItems) {
-        for (const subItem of item.subItems) {
-          const subItemId = subItem.subItemId._id;
-          if (selectedSubItems[subItemId] || selectedExtraSubItems.includes(subItemId)) {
-            allSubItems.push({
-              systemItemId: subItemId,
-              quantity: parseInt(subItemQuantities[subItemId] || 1),
-              isExtra: selectedExtraSubItems.includes(subItemId)
-            });
+      const subItemsList = [];
+      for (const itemId of selectedItems) {
+        const item = items.find(i => i.systemItemId._id === itemId);
+        if (item?.subItems) {
+          for (const subItem of item.subItems) {
+            if (selectedSubItems[subItem.subItemId._id]) {
+              subItemsList.push({
+                systemItemId: subItem.subItemId._id,
+                quantity: parseInt(
+                  subItemQuantities[subItem.subItemId._id],
+                  10,
+                ),
+              });
+            }
           }
         }
       }
+
+      const allExtraItems = [...extraItemsList, ...subItemsList];
+
+      const payload = {
+        farmerSaralId: farmerSaralId,
+        empId: selectedServicePerson,
+        systemId: selectedSystem,
+        itemsList: mainItemsList,
+        panelNumbers: panelNumbers.filter(num => num.trim() !== ''),
+        ...(pumpNumber && {pumpNumber}),
+        ...(controllerNumber && {controllerNumber}),
+        ...(rmuNumber && {rmuNumber}),
+        ...(motorNumber && {motorNumber}),
+        ...(extraPanelNumbers.length > 0 && {
+          extraPanelNumbers: extraPanelNumbers.filter(num => num.trim() !== ''),
+        }),
+        ...(allExtraItems.length > 0 && {extraItemsList: allExtraItems}),
+      };
+
+      console.log('Payload to submit:', payload);
+
+      return
+
+      setLoading(true);
+      const response = await axios.post(
+        `${API_URL}/warehouse-admin/add-new-installation`,
+        payload,
+      );
+
+      console.log('Response Data', response.data);
+      Alert.alert('Success', 'Transaction saved successfully');
+      resetForm();
+    } catch (error) {
+      console.log('Submission error:', error?.response?.data?.message);
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to submit data',
+      );
+    } finally {
+      setLoading(false);
     }
-
-    // Separate sub-items into regular and extra
-    // Regular sub-items go to itemsList without quantity
-    const regularSubItems = allSubItems
-      .filter(subItem => !subItem.isExtra)
-      .map(({systemItemId}) => ({systemItemId}));
-      
-    // Extra sub-items go to extraItemsList with quantity
-    const extraSubItems = allSubItems
-      .filter(subItem => subItem.isExtra)
-      .map(({systemItemId, quantity}) => ({systemItemId, quantity}));
-
-    // Prepare the payload
-    const payload = {
-      farmerSaralId: farmerSaralId,
-      empId: selectedServicePerson,
-      systemId: selectedSystem,
-      itemsList: [
-        ...mainItemsList,
-        ...regularSubItems
-      ],
-      extraItemsList: [
-        ...extraItemsList,
-        ...extraSubItems
-      ],
-      panelNumbers: panelNumbers.filter(num => num.trim() !== ''),
-      ...(pumpNumber && { pumpNumber }),
-      ...(controllerNumber && { controllerNumber }),
-      ...(rmuNumber && { rmuNumber }),
-      ...(motorNumber && { motorNumber }),
-      ...(pumpModel && { pumpModel }),
-      ...(extraPanelNumbers.length > 0 && {
-        extraPanelNumbers: extraPanelNumbers.filter(num => num.trim() !== '')
-      })
-    };
-
-    console.log('Final Payload:', JSON.stringify(payload, null, 2));
-
-    setLoading(true);
-    const response = await axios.post(
-      `${API_URL}/warehouse-admin/add-new-installation`,
-      payload,
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-
-    Alert.alert('Success', 'Transaction saved successfully');
-    resetForm();
-  } catch (error) {
-    console.error('Submission error:', error);
-    Alert.alert(
-      'Error',
-      error.response?.data?.message || 'Failed to submit data'
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const resetForm = () => {
     setSelectedServicePerson('');
     setSelectedSystem('');
     setSelectedSystemName('');
+    setSelectedPump('');
     setSelectedItems([]);
-    setSelectedExtraItems([]);
     setQuantities({});
     setPumpNumber('');
     setControllerNumber('');
@@ -1556,7 +1510,6 @@ const OutgoingDataInServiceMh = () => {
     setFarmerSaralId('');
     setItems([]);
     setSelectedSubItems({});
-    setSelectedExtraSubItems([]);
     setSubItemQuantities({});
     setIsSaralIdValid(false);
     setSaralIdValidationMessage('');
@@ -1564,13 +1517,11 @@ const OutgoingDataInServiceMh = () => {
     setPanelNumbers([]);
     setExtraPanelNumbers([]);
     setAvailablePumps([]);
-    setPumpModel('');
   };
 
   const renderItem = ({item}) => {
     const itemId = item.systemItemId._id;
     const isSelected = selectedItems.includes(itemId);
-    const isExtra = selectedExtraItems.includes(itemId);
     const hasSubItems = item.subItems && item.subItems.length > 0;
     const itemName = item.systemItemId.itemName;
     const isPanelItem = isSolarPanel(itemName);
@@ -1583,21 +1534,6 @@ const OutgoingDataInServiceMh = () => {
             onValueChange={() => toggleItemSelection(itemId)}
           />
           <Text style={styles.itemText}>{itemName}</Text>
-          {isSelected && (
-            <View style={styles.extraCheckboxContainer}>
-              <Text style={styles.extraLabel}>Extra:</Text>
-              <CheckBox
-                value={isExtra}
-                onValueChange={() => {
-                  if (isExtra) {
-                    setSelectedExtraItems(prev => prev.filter(id => id !== itemId));
-                  } else {
-                    setSelectedExtraItems(prev => [...prev, itemId]);
-                  }
-                }}
-              />
-            </View>
-          )}
         </View>
 
         {isSelected && (
@@ -1605,11 +1541,10 @@ const OutgoingDataInServiceMh = () => {
             <Text style={styles.label}>Quantity:</Text>
             <TextInput
               style={styles.input}
-              value={quantities[itemId]?.toString()}
+              value={quantities[itemId]?.toString() || ''}
               onChangeText={text => handleQuantityChange(itemId, text)}
               keyboardType="numeric"
               placeholder="Enter quantity"
-              // min="1"
             />
 
             {isPanelItem && parseInt(quantities[itemId] || 0) > 0 && (
@@ -1644,49 +1579,17 @@ const OutgoingDataInServiceMh = () => {
                   <View key={subIndex} style={styles.subItemContainer}>
                     <View style={styles.subItemRow}>
                       <CheckBox
-                        value={!!selectedSubItems[subItem.subItemId._id] || 
-                               selectedExtraSubItems.includes(subItem.subItemId._id)}
-                        onValueChange={() => {
-                          // Toggle between regular and extra selection
-                          if (selectedExtraSubItems.includes(subItem.subItemId._id)) {
-                            setSelectedExtraSubItems(prev => 
-                              prev.filter(id => id !== subItem.subItemId._id));
-                            setSelectedSubItems(prev => ({
-                              ...prev,
-                              [subItem.subItemId._id]: true
-                            }));
-                          } else if (selectedSubItems[subItem.subItemId._id]) {
-                            setSelectedSubItems(prev => ({
-                              ...prev,
-                              [subItem.subItemId._id]: false
-                            }));
-                          } else {
-                            setSelectedSubItems(prev => ({
-                              ...prev,
-                              [subItem.subItemId._id]: true
-                            }));
-                          }
-                        }}
+                        value={!!selectedSubItems[subItem.subItemId._id]}
+                        onValueChange={() =>
+                          toggleSubItemSelection(subItem.subItemId._id)
+                        }
                       />
                       <Text style={styles.subItemText}>
                         {subItem.subItemId.itemName}
                       </Text>
-                      {(!!selectedSubItems[subItem.subItemId._id] || 
-                       selectedExtraSubItems.includes(subItem.subItemId._id)) && (
-                        <View style={styles.subItemExtraContainer}>
-                          <Text style={styles.extraLabel}>Extra:</Text>
-                          <CheckBox
-                            value={selectedExtraSubItems.includes(subItem.subItemId._id)}
-                            onValueChange={() => 
-                              toggleSubItemSelection(subItem.subItemId._id, true)
-                            }
-                          />
-                        </View>
-                      )}
                     </View>
 
-                    {(selectedSubItems[subItem.subItemId._id] || 
-                     selectedExtraSubItems.includes(subItem.subItemId._id)) && (
+                    {selectedSubItems[subItem.subItemId._id] && (
                       <View style={styles.subItemQuantityContainer}>
                         <Text style={styles.subItemLabel}>Quantity:</Text>
                         <TextInput
@@ -1694,7 +1597,7 @@ const OutgoingDataInServiceMh = () => {
                           value={
                             subItemQuantities[
                               subItem.subItemId._id
-                            ]?.toString() || '1'
+                            ]?.toString() || ''
                           }
                           onChangeText={text =>
                             handleSubItemQuantityChange(
@@ -1704,7 +1607,6 @@ const OutgoingDataInServiceMh = () => {
                           }
                           keyboardType="numeric"
                           placeholder="Enter quantity"
-                          min="1"
                         />
                       </View>
                     )}
@@ -1723,24 +1625,16 @@ const OutgoingDataInServiceMh = () => {
 
     return (
       <>
-        <Text style={styles.label}>Select Pump Model:</Text>
+        <Text style={styles.label}>Select Pump:</Text>
         <Picker
-          selectedValue={pumpModel}
-          onValueChange={(itemValue) => {
-            setPumpModel(itemValue);
-            const selectedPump = availablePumps.find(pump => pump.itemName === itemValue);
-            if (selectedPump && selectedPump.pumpNumber) {
-              setPumpNumber(selectedPump.pumpNumber);
-            }
+          selectedValue={selectedPump}
+          onValueChange={itemValue => {
+            setSelectedPump(itemValue);
           }}
           style={styles.picker}>
-          <Picker.Item label="Select Pump Model" value="" />
+          <Picker.Item label="Select Pump" value="" />
           {availablePumps.map((pump, index) => (
-            <Picker.Item
-              key={index}
-              label={pump.itemName}
-              value={pump.itemName}
-            />
+            <Picker.Item key={index} label={pump.itemName} value={pump._id} />
           ))}
         </Picker>
 
@@ -1907,7 +1801,7 @@ const OutgoingDataInServiceMh = () => {
 
           {items.length > 0 && (
             <>
-              <Text style={styles.label}>Select Items:</Text>
+              <Text style={styles.label}>Extra Items Select:</Text>
               <FlatList
                 data={items}
                 renderItem={renderItem}
@@ -1981,42 +1875,174 @@ const OutgoingDataInServiceMh = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   scrollContainer: {
-    padding: 20,
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   form: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowRadius: 4,
     elevation: 3,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
-    color: '#444',
+    color: '#333',
   },
-  input: {
+  picker: {
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 6,
+    marginBottom: 15,
+    color: '#000',
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
     padding: 12,
     marginBottom: 15,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  itemContainer: {
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 15,
+    backgroundColor: '#fff',
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    color: '#333',
+  },
+  itemText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  itemDetails: {
+    marginLeft: 30,
+    marginTop: 10,
+  },
+  subItemHeader: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginTop: 15,
+    marginBottom: 8,
+    color: '#555',
+  },
+  subItemContainer: {
+    marginBottom: 10,
+    paddingLeft: 10,
+  },
+  subItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+    color: '#000',
+  },
+  subItemText: {
+    marginLeft: 10,
+    fontSize: 15,
+    color: '#555',
+  },
+  subItemQuantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 30,
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  subItemLabel: {
+    fontSize: 14,
+    marginRight: 10,
+    color: '#555',
+  },
+  subItemInput: {
+    flex: 1,
+    marginBottom: 0,
+    padding: 10,
+  },
+  barcodeInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  barcodeInput: {
+    flex: 1,
+    marginRight: 10,
+  },
+  scanButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  scanButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  validInput: {
+    borderColor: 'green',
+  },
+  invalidInput: {
+    borderColor: 'red',
+  },
+  validMessage: {
+    color: 'green',
+    marginBottom: 15,
+  },
+  invalidMessage: {
+    color: 'red',
+    marginBottom: 15,
+  },
+  validationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  validatingText: {
+    marginLeft: 8,
+    color: '#555',
   },
   saralIdContainer: {
     flexDirection: 'row',
@@ -2028,162 +2054,35 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   validateButton: {
-    backgroundColor: '#3498db',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 6,
+    backgroundColor: '#007AFF',
+    padding: 12,
+    borderRadius: 8,
+    minWidth: 100,
+    alignItems: 'center',
   },
   validateButtonText: {
     color: '#fff',
+    fontSize: 16,
     fontWeight: '600',
-  },
-  validInput: {
-    borderColor: '#2ecc71',
-  },
-  invalidInput: {
-    borderColor: '#e74c3c',
-  },
-  validationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  validatingText: {
-    marginLeft: 10,
-    color: '#3498db',
-  },
-  validMessage: {
-    color: '#2ecc71',
-    marginBottom: 15,
-  },
-  invalidMessage: {
-    color: '#e74c3c',
-    marginBottom: 15,
   },
   farmerDetailsContainer: {
     backgroundColor: '#f0f8ff',
     padding: 15,
-    borderRadius: 6,
+    borderRadius: 8,
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#d3d3d3',
   },
   farmerDetailText: {
-    fontSize: 15,
+    fontSize: 16,
     marginBottom: 5,
+    color: '#333',
   },
   farmerDetailLabel: {
-    fontWeight: '600',
-  },
-  picker: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 6,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9',
-  },
-  itemContainer: {
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 6,
-    padding: 10,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  itemText: {
-    fontSize: 16,
-    marginLeft: 10,
-    flex: 1,
-  },
-  itemDetails: {
-    marginTop: 10,
-    paddingLeft: 10,
-  },
-  extraCheckboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 10,
-  },
-  extraLabel: {
-    marginRight: 5,
-    fontSize: 14,
-    color: '#666',
-  },
-  subItemHeader: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginTop: 10,
-    marginBottom: 5,
-    color: '#555',
-  },
-  subItemContainer: {
-    marginLeft: 20,
-    marginBottom: 10,
-  },
-  subItemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  subItemText: {
-    fontSize: 15,
-    marginLeft: 10,
-    flex: 1,
-  },
-  subItemExtraContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 10,
-  },
-  subItemQuantityContainer: {
-    marginLeft: 30,
-    marginTop: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  subItemLabel: {
-    fontSize: 14,
-    marginRight: 10,
-    color: '#555',
-  },
-  subItemInput: {
-    flex: 1,
-    padding: 8,
-    fontSize: 14,
-  },
-  barcodeInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  barcodeInput: {
-    flex: 1,
-    marginRight: 10,
-  },
-  scanButton: {
-    backgroundColor: '#3498db',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 6,
-  },
-  scanButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  button: {
-    backgroundColor: '#2ecc71',
-    padding: 15,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 20,
+    fontWeight: 'bold',
   },
   disabledButton: {
-    backgroundColor: '#95a5a6',
-  },
-   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
+    backgroundColor: '#cccccc',
   },
 });
 
