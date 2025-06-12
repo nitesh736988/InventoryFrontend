@@ -1173,23 +1173,41 @@ const OutgoingDataInServiceMh = () => {
     }
   }, [selectedPump]);
 
+  // const initializePanelNumbers = () => {
+  //   setPanelNumbers([]);
+  //   setExtraPanelNumbers([]);
+
+  //   const system = systems.find(sys => sys._id === selectedSystem);
+  //   if (system) {
+  //     setSelectedSystemName(system.systemName);
+
+  //     if (system.systemName.includes('7.5HP')) {
+  //       setPanelNumbers(Array(13).fill(''));
+  //     } else if (system.systemName.includes('5HP')) {
+  //       setPanelNumbers(Array(9).fill(''));
+  //     } else if (system.systemName.includes('3HP')) {
+  //       setPanelNumbers(Array(6).fill(''));
+  //     }
+  //   }
+  // };
+
   const initializePanelNumbers = () => {
-    setPanelNumbers([]);
-    setExtraPanelNumbers([]);
+  setPanelNumbers([]);
+  setExtraPanelNumbers([]);
 
-    const system = systems.find(sys => sys._id === selectedSystem);
-    if (system) {
-      setSelectedSystemName(system.systemName);
+  const system = systems.find(sys => sys._id === selectedSystem);
+  if (system) {
+    setSelectedSystemName(system.systemName);
 
-      if (system.systemName.includes('7.5HP')) {
-        setPanelNumbers(Array(13).fill(''));
-      } else if (system.systemName.includes('5HP')) {
-        setPanelNumbers(Array(9).fill(''));
-      } else if (system.systemName.includes('3HP')) {
-        setPanelNumbers(Array(6).fill(''));
-      }
+    if (system.systemName.includes('7.5HP')) {
+      setPanelNumbers(Array(13).fill('')); // Initialize with 13 empty strings
+    } else if (system.systemName.includes('5HP')) {
+      setPanelNumbers(Array(9).fill('')); // Initialize with 9 empty strings
+    } else if (system.systemName.includes('3HP')) {
+      setPanelNumbers(Array(6).fill('')); // Initialize with 6 empty strings
     }
-  };
+  }
+};
 
   const fetchAvailablePumps = async () => {
     try {
@@ -1351,76 +1369,160 @@ const OutgoingDataInServiceMh = () => {
     return itemName.toLowerCase().includes('solar panel');
   };
 
+  // const validateInput = () => {
+  //   if (!selectedServicePerson) {
+  //     Alert.alert('Error', 'Please select a service person');
+  //     return false;
+  //   }
+  //   if (!selectedSystem) {
+  //     Alert.alert('Error', 'Please select a system');
+  //     return false;
+  //   }
+
+  //   if (!farmerSaralId) {
+  //     Alert.alert('Error', 'Please enter Farmer Saral ID');
+  //     return false;
+  //   }
+  //   if (!isSaralIdValid) {
+  //     Alert.alert('Error', 'Please validate Farmer Saral ID');
+  //     return false;
+  //   }
+
+  //   const system = systems.find(sys => sys._id === selectedSystem);
+  //   if (system) {
+  //     if (system.systemName.includes('7.5HP') && panelNumbers.length !== 13) {
+  //       Alert.alert(
+  //         'Error',
+  //         'Please enter all 13 panel numbers for 7.5HP system',
+  //       );
+  //       return false;
+  //     } else if (
+  //       system.systemName.includes('5HP') &&
+  //       panelNumbers.length !== 9
+  //     ) {
+  //       Alert.alert('Error', 'Please enter all 9 panel numbers for 5HP system');
+  //       return false;
+  //     } else if (
+  //       system.systemName.includes('3HP') &&
+  //       panelNumbers.length !== 6
+  //     ) {
+  //       Alert.alert('Error', 'Please enter all 6 panel numbers for 3HP system');
+  //       return false;
+  //     }
+  //   }
+
+  //   for (const itemId of selectedItems) {
+  //     if (!quantities[itemId] || isNaN(quantities[itemId])) {
+  //       Alert.alert(
+  //         'Error',
+  //         `Please enter a valid quantity for ${getItemName(itemId)}`,
+  //       );
+  //       return false;
+  //     }
+
+  //     const item = items.find(i => i.systemItemId._id === itemId);
+  //     if (item?.subItems) {
+  //       for (const subItem of item.subItems) {
+  //         if (selectedSubItems[subItem.subItemId._id]) {
+  //           const subItemQty = subItemQuantities[subItem.subItemId._id];
+  //           if (!subItemQty || isNaN(subItemQty)) {
+  //             Alert.alert(
+  //               'Error',
+  //               `Please enter a valid quantity for sub-item ${subItem.subItemId.itemName}`,
+  //             );
+  //             return false;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   return true;
+  // };
+
   const validateInput = () => {
-    if (!selectedServicePerson) {
-      Alert.alert('Error', 'Please select a service person');
-      return false;
-    }
-    if (!selectedSystem) {
-      Alert.alert('Error', 'Please select a system');
-      return false;
-    }
+  if (!selectedServicePerson) {
+    Alert.alert('Error', 'Please select a service person');
+    return false;
+  }
+  if (!selectedSystem) {
+    Alert.alert('Error', 'Please select a system');
+    return false;
+  }
 
-    if (!farmerSaralId) {
-      Alert.alert('Error', 'Please enter Farmer Saral ID');
-      return false;
-    }
-    if (!isSaralIdValid) {
-      Alert.alert('Error', 'Please validate Farmer Saral ID');
-      return false;
-    }
+  if (!farmerSaralId) {
+    Alert.alert('Error', 'Please enter Farmer Saral ID');
+    return false;
+  }
+  if (!isSaralIdValid) {
+    Alert.alert('Error', 'Please validate Farmer Saral ID');
+    return false;
+  }
 
-    const system = systems.find(sys => sys._id === selectedSystem);
-    if (system) {
-      if (system.systemName.includes('7.5HP') && panelNumbers.length !== 13) {
+  const system = systems.find(sys => sys._id === selectedSystem);
+  if (system) {
+    if (system.systemName.includes('7.5HP')) {
+      // Check if all 13 panel numbers are entered for 7.5HP
+      const enteredPanelCount = panelNumbers.filter(num => num.trim() !== '').length;
+      if (enteredPanelCount !== 13) {
         Alert.alert(
           'Error',
-          'Please enter all 13 panel numbers for 7.5HP system',
-        );
-        return false;
-      } else if (
-        system.systemName.includes('5HP') &&
-        panelNumbers.length !== 9
-      ) {
-        Alert.alert('Error', 'Please enter all 9 panel numbers for 5HP system');
-        return false;
-      } else if (
-        system.systemName.includes('3HP') &&
-        panelNumbers.length !== 6
-      ) {
-        Alert.alert('Error', 'Please enter all 6 panel numbers for 3HP system');
-        return false;
-      }
-    }
-
-    for (const itemId of selectedItems) {
-      if (!quantities[itemId] || isNaN(quantities[itemId])) {
-        Alert.alert(
-          'Error',
-          `Please enter a valid quantity for ${getItemName(itemId)}`,
+          'Please enter all 13 panel numbers for 7.5HP system'
         );
         return false;
       }
+    } else if (system.systemName.includes('5HP')) {
+      // Check if all 9 panel numbers are entered for 5HP
+      const enteredPanelCount = panelNumbers.filter(num => num.trim() !== '').length;
+      if (enteredPanelCount !== 9) {
+        Alert.alert(
+          'Error',
+          'Please enter all 9 panel numbers for 5HP system'
+        );
+        return false;
+      }
+    } else if (system.systemName.includes('3HP')) {
+      // Check if all 6 panel numbers are entered for 3HP
+      const enteredPanelCount = panelNumbers.filter(num => num.trim() !== '').length;
+      if (enteredPanelCount !== 6) {
+        Alert.alert(
+          'Error',
+          'Please enter all 6 panel numbers for 3HP system'
+        );
+        return false;
+      }
+    }
+  }
 
-      const item = items.find(i => i.systemItemId._id === itemId);
-      if (item?.subItems) {
-        for (const subItem of item.subItems) {
-          if (selectedSubItems[subItem.subItemId._id]) {
-            const subItemQty = subItemQuantities[subItem.subItemId._id];
-            if (!subItemQty || isNaN(subItemQty)) {
-              Alert.alert(
-                'Error',
-                `Please enter a valid quantity for sub-item ${subItem.subItemId.itemName}`,
-              );
-              return false;
-            }
+  // Validate quantities for selected items
+  for (const itemId of selectedItems) {
+    if (!quantities[itemId] || isNaN(quantities[itemId])) {
+      Alert.alert(
+        'Error',
+        `Please enter a valid quantity for ${getItemName(itemId)}`
+      );
+      return false;
+    }
+
+    const item = items.find(i => i.systemItemId._id === itemId);
+    if (item?.subItems) {
+      for (const subItem of item.subItems) {
+        if (selectedSubItems[subItem.subItemId._id]) {
+          const subItemQty = subItemQuantities[subItem.subItemId._id];
+          if (!subItemQty || isNaN(subItemQty)) {
+            Alert.alert(
+              'Error',
+              `Please enter a valid quantity for sub-item ${subItem.subItemId.itemName}`
+            );
+            return false;
           }
         }
       }
     }
+  }
 
-    return true;
-  };
+  return true;
+};
 
   const handleSubmit = async () => {
     if (!validateInput()) return;
@@ -1429,38 +1531,48 @@ const OutgoingDataInServiceMh = () => {
       // Create itemsList with the selected pump
       const mainItemsList = selectedPump ? [{systemItemId: selectedPump}] : [];
 
-      const extraItemsList = selectedItems
-        .filter(itemId => quantities[itemId] > 1)
-        .map(itemId => ({
+      const extraItemsList = selectedItems.map(itemId => {
+        const item = items.find(i => i.systemItemId._id === itemId);
+
+        const itemData = {
           systemItemId: itemId,
           quantity: parseInt(quantities[itemId], 10),
-        }));
+        };
 
-      const subItemsList = [];
-      for (const itemId of selectedItems) {
-        const item = items.find(i => i.systemItemId._id === itemId);
-        if (item?.subItems) {
-          for (const subItem of item.subItems) {
-            if (selectedSubItems[subItem.subItemId._id]) {
-              subItemsList.push({
-                systemItemId: subItem.subItemId._id,
-                quantity: parseInt(
-                  subItemQuantities[subItem.subItemId._id],
-                  10,
-                ),
-              });
-            }
+        if (item.subItems && item.subItems.length > 0) {
+          const selectedSubs = item.subItems
+            .filter(subItem => selectedSubItems[subItem.subItemId._id])
+            .map(subItem => ({
+              subItemId: subItem.subItemId._id,
+              quantity: parseInt(subItemQuantities[subItem.subItemId._id], 10),
+            }));
+
+          if (selectedSubs.length > 0) {
+            itemData.subItems = selectedSubs;
           }
         }
-      }
 
-      const allExtraItems = [...extraItemsList, ...subItemsList];
+        return itemData;
+      });
+
+      const formattedItemsList = extraItemsList.flatMap(item => {
+        const base = [
+          {systemItemId: item.systemItemId, quantity: item.quantity},
+        ];
+        const subs =
+          item.subItems?.map(sub => ({
+            systemItemId: sub.subItemId,
+            quantity: sub.quantity,
+          })) || [];
+        return base.concat(subs);
+      });
 
       const payload = {
         farmerSaralId: farmerSaralId,
         empId: selectedServicePerson,
         systemId: selectedSystem,
         itemsList: mainItemsList,
+        extraItemsList: formattedItemsList,
         panelNumbers: panelNumbers.filter(num => num.trim() !== ''),
         ...(pumpNumber && {pumpNumber}),
         ...(controllerNumber && {controllerNumber}),
@@ -1469,12 +1581,9 @@ const OutgoingDataInServiceMh = () => {
         ...(extraPanelNumbers.length > 0 && {
           extraPanelNumbers: extraPanelNumbers.filter(num => num.trim() !== ''),
         }),
-        ...(allExtraItems.length > 0 && {extraItemsList: allExtraItems}),
       };
 
       console.log('Payload to submit:', payload);
-
-      return
 
       setLoading(true);
       const response = await axios.post(
