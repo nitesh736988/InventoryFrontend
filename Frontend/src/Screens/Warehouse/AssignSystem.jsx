@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
+import {API_URL} from '@env';
 
 const AssignSystem = () => {
   const [servicePerson, setServicePerson] = useState('');
@@ -18,7 +19,7 @@ const AssignSystem = () => {
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
-        const response = await axios.get('http://88.222.214.93:5000/service-team/all-service-persons');
+        const response = await axios.get('${API_URL}/service-team/all-service-persons');
         console.log("Service persons data", response.data.data);
         const persons = response.data.data.map((person) => ({
           _id: person._id,

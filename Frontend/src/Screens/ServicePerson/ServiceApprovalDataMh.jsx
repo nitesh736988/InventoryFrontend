@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import axios from 'axios';
+import {API_URL} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ServiceApprovalDataMh = () => {
@@ -22,14 +23,14 @@ const ServiceApprovalDataMh = () => {
 
   const fetchData = async () => {
     try {
-      const empId = await AsyncStorage.getItem('_id');
+      
       const response = await axios.get(
-        `http://88.222.214.93:5000/service-person/show-new-install-data`,
+        `${API_URL}/service-person/show-new-install-data`,
       );
       setServiceData(response.data.data);
     } catch (error) {
-      Alert.alert("Error", error.response?.data?.message || "Failed to fetch data");
-      setServiceData([]); // Set to empty array instead of null
+      Alert.alert("Error", error.response?.data?.message);
+      setServiceData([]);
     } finally {                 
       setLoading(false);
       setRefreshing(false);
@@ -49,7 +50,7 @@ const ServiceApprovalDataMh = () => {
     try {
       const empId = await AsyncStorage.getItem('_id');
       const response = await axios.post(
-        `http://88.222.214.93:5000/service-person/update-incoming-item-status`,
+        `${API_URL}/service-person/update-incoming-item-status`,
         {
           installationId: installation._id,
           farmerSaralId: installation.farmerSaralId,

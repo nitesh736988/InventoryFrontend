@@ -106,7 +106,7 @@ const ApprovalNewInstallation = () => {
             style={styles.fillFormButton}
             onPress={() => navigation.navigate('NewInstallation', { pickupItemId: item._id })}
           >
-            <Text style={styles.fillFormText}>Fill Form</Text>
+            {/* <Text style={styles.fillFormText}>Fill Form</Text> */}
           </TouchableOpacity>
         )}
         {!item.accepted && (
@@ -119,7 +119,7 @@ const ApprovalNewInstallation = () => {
         )}
       </View>
     </View>
-  );
+  );   
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />;

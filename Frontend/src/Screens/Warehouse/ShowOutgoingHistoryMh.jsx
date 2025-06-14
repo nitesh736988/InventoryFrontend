@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
+import {API_URL} from '@env';
 
 const ShowOutgoingHistoryMh = () => {
     const [outgoingHistory, setOutgoingHistory] = useState([]);
@@ -10,7 +11,7 @@ const ShowOutgoingHistoryMh = () => {
     useEffect(() => {
         const fetchOutgoingHistory = async () => {
             try {
-                const response = await axios.get("http://88.222.214.93:5000/warehouse-admin/show-outgoing-item");
+                const response = await axios.get(`${API_URL}/warehouse-admin/show-outgoing-item`);
                 if (response.data.success) {
                     setOutgoingHistory(response.data.data);
                 } else {

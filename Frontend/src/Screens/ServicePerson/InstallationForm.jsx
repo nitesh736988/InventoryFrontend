@@ -19,6 +19,7 @@ import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
 import ImageResizer from 'react-native-image-resizer';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {API_URL} from '@env';
 
 const requestCameraPermission = async () => {
   try {
@@ -223,7 +224,7 @@ const InstallationForm = ({route}) => {
       console.log('Submitting form data:', formData);
 
       const response = await axios.post(
-        'http://88.222.214.93:5000/service-person/new-system-installation',
+        `${API_URL}/service-person/new-system-installation`,
         formData,
         {
           headers: {

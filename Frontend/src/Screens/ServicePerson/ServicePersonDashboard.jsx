@@ -21,8 +21,10 @@
 // const ServicePersonDashboard = ({navigation}) => {
 //   const [servicePersons, setServicePersons] = useState([]);
 //   const [servicePersonOutgoing, setServicePersonOutgoing] = useState([]);
+//   const [maharashtraData, setMaharashtraData] = useState(null);
 //   const [isRefreshing, setIsRefreshing] = useState(false);
-//   const [empId, setEmpId] = useState(null); //
+//   const [activeTab, setActiveTab] = useState('service');
+//   const [loading, setLoading] = useState(false);
 
 //   const fetchServicePersons = async () => {
 //     try {
@@ -30,11 +32,9 @@
 //       console.log('API Response:', response.data);
 
 //       const incoming =
-//         response.data.mergedData?.filter(item => item.type === 'incoming') ||
-//         [];
+//         response.data.mergedData?.filter(item => item.type === 'incoming') || [];
 //       const outgoing =
-//         response.data.mergedData?.filter(item => item.type === 'outgoing') ||
-//         [];
+//         response.data.mergedData?.filter(item => item.type === 'outgoing') || [];
 
 //       setServicePersons(incoming.flatMap(item => item.items || []));
 //       setServicePersonOutgoing(outgoing.flatMap(item => item.items || []));
@@ -46,9 +46,30 @@
 //     }
 //   };
 
+//   const fetchMaharashtraData = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await axios.get(`${API_URL}/service-person/show-emp-dashboard`);
+//       console.log('Maharashtra API Response:', response.data);
+//       setMaharashtraData(response.data.data);
+//     } catch (error) {
+//       console.log(
+//         'Error:',
+//         error?.response?.data?.message,
+//       );
+//       Alert.alert('Error', error?.response?.data?.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
 //   const handleRefresh = () => {
 //     setIsRefreshing(true);
-//     fetchServicePersons();
+//     if (activeTab === 'service') {
+//       fetchServicePersons();
+//     } else {
+//       fetchMaharashtraData();
+//     }
 //   };
 
 //   const handleLogout = async () => {
@@ -75,8 +96,12 @@
 //   };
 
 //   useEffect(() => {
-//     fetchServicePersons();
-//   }, []);
+//     if (activeTab === 'service') {
+//       fetchServicePersons();
+//     } else {
+//       fetchMaharashtraData();
+//     }
+//   }, [activeTab]);
 
 //   const renderItems = useMemo(
 //     () => items =>
@@ -93,6 +118,37 @@
 //     [],
 //   );
 
+//   const renderMaharashtraData = () => {
+//     if (loading) {
+//       return <ActivityIndicator size="large" color="#000" />;
+//     }
+
+//     if (!maharashtraData) {
+//       return <Text style={{color: 'black'}}>No Data Available</Text>;
+//     }
+
+//     return (
+//       <View>
+//         <View style={styles.infoCard}>
+//           <Text style={styles.infoLabel}>Employee Name:</Text>
+//           <Text style={styles.infoValue}>{maharashtraData.empId.name}</Text>
+//         </View>
+        
+//         <Text style={styles.sectionTitle}>Items List</Text>
+//         {maharashtraData.itemsList.length > 0 ? (
+//           maharashtraData.itemsList.map((item, index) => (
+//             <View key={index} style={styles.card}>
+//               <Text style={styles.cardTitle}>{item.systemItemId.itemName}</Text>
+//               <Text style={styles.cardValue}>{item.quantity || 0}</Text>
+//             </View>
+//           ))
+//         ) : (
+//           <Text style={{color: 'black'}}>No Items Available</Text>
+//         )}
+//       </View>
+//     );
+//   };
+
 //   return (
 //     <View style={styles.container}>
 //       <View style={styles.headerContainer}>
@@ -108,16 +164,43 @@
 //         </View>
 //       </View>
 
+//       {/* Tab Navigation */}
+//       <View style={styles.tabContainer}>
+//         <TouchableOpacity
+//           style={[
+//             styles.tabButton,
+//             activeTab === 'service' && styles.activeTab,
+//           ]}
+//           onPress={() => setActiveTab('service')}>
+//           <Text style={styles.tabText}>Service</Text>
+//         </TouchableOpacity>
+        
+//         <TouchableOpacity
+//           style={[
+//             styles.tabButton,
+//             activeTab === 'maharashtra' && styles.activeTab,
+//           ]}
+//           onPress={() => setActiveTab('maharashtra')}>
+//           <Text style={styles.tabText}>Maharashtra Service</Text>
+//         </TouchableOpacity>
+//       </View>
+
 //       <ScrollView
 //         contentContainerStyle={styles.scrollViewContent}
 //         refreshControl={
 //           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
 //         }>
-//         <Text style={styles.sectionTitle}>Incoming Items</Text>
-//         {renderItems(servicePersons)}
+//         {activeTab === 'service' ? (
+//           <>
+//             <Text style={styles.sectionTitle}>Incoming Items</Text>
+//             {renderItems(servicePersons)}
 
-//         <Text style={styles.sectionTitle}>Outgoing Items</Text>
-//         {renderItems(servicePersonOutgoing)}
+//             <Text style={styles.sectionTitle}>Outgoing Items</Text>
+//             {renderItems(servicePersonOutgoing)}
+//           </>
+//         ) : (
+//           renderMaharashtraData()
+//         )}
 //       </ScrollView>
 //     </View>
 //   );
@@ -141,11 +224,9 @@
 //     padding: 10,
 //     borderRadius: 20,
 //   },
-
 //   scrollViewContent: {
 //     paddingBottom: 20,
 //   },
-
 //   sectionTitle: {
 //     color: '#070604',
 //     fontSize: 28,
@@ -174,6 +255,45 @@
 //     fontWeight: 'bold',
 //     color: '#000',
 //   },
+//   tabContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-around',
+//     marginVertical: 10,
+//     backgroundColor: '#fff',
+//     borderRadius: 10,
+//     padding: 5,
+//   },
+//   tabButton: {
+//     padding: 10,
+//     borderRadius: 5,
+//     flex: 1,
+//     alignItems: 'center',
+//   },
+//   activeTab: {
+//     backgroundColor: '#fbd33b',
+//   },
+//   tabText: {
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//     color: '#000',
+//   },
+//   infoCard: {
+//     backgroundColor: '#fff',
+//     borderRadius: 10,
+//     padding: 20,
+//     marginVertical: 10,
+//     elevation: 3,
+//   },
+//   infoLabel: {
+//     fontSize: 14,
+//     color: '#888',
+//   },
+//   infoValue: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     color: '#000',
+//     marginTop: 5,
+//   },
 // });
 
 // export default ServicePersonDashboard;
@@ -190,6 +310,7 @@ import {
   Dimensions,
   RefreshControl,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -206,6 +327,7 @@ const ServicePersonDashboard = ({navigation}) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('service');
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchServicePersons = async () => {
     try {
@@ -230,15 +352,15 @@ const ServicePersonDashboard = ({navigation}) => {
   const fetchMaharashtraData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://88.222.214.93:5000/service-person/show-emp-dashboard');
+      const response = await axios.get(`${API_URL}/service-person/show-emp-dashboard`);
       console.log('Maharashtra API Response:', response.data);
       setMaharashtraData(response.data.data);
     } catch (error) {
       console.log(
-        'Error submitting form:',
-        error.response?.data || error.message,
+        'Error:',
+        error?.response?.data?.message,
       );
-      Alert.alert('Error', JSON.stringify(error.response.data?.message));
+      Alert.alert('Error', error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -284,6 +406,27 @@ const ServicePersonDashboard = ({navigation}) => {
     }
   }, [activeTab]);
 
+  const filteredServicePersons = useMemo(() => {
+    if (!searchQuery) return servicePersons;
+    return servicePersons.filter(item => 
+      item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [servicePersons, searchQuery]);
+
+  const filteredServicePersonOutgoing = useMemo(() => {
+    if (!searchQuery) return servicePersonOutgoing;
+    return servicePersonOutgoing.filter(item => 
+      item.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [servicePersonOutgoing, searchQuery]);
+
+  const filteredMaharashtraItems = useMemo(() => {
+    if (!maharashtraData || !searchQuery) return maharashtraData?.itemsList || [];
+    return maharashtraData.itemsList.filter(item => 
+      item.systemItemId.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [maharashtraData, searchQuery]);
+
   const renderItems = useMemo(
     () => items =>
       items.length > 0 ? (
@@ -316,15 +459,17 @@ const ServicePersonDashboard = ({navigation}) => {
         </View>
         
         <Text style={styles.sectionTitle}>Items List</Text>
-        {maharashtraData.itemsList.length > 0 ? (
-          maharashtraData.itemsList.map((item, index) => (
+        {filteredMaharashtraItems.length > 0 ? (
+          filteredMaharashtraItems.map((item, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.cardTitle}>{item.systemItemId.itemName}</Text>
               <Text style={styles.cardValue}>{item.quantity || 0}</Text>
             </View>
           ))
         ) : (
-          <Text style={{color: 'black'}}>No Items Available</Text>
+          <Text style={{color: 'black'}}>
+            {searchQuery ? 'No matching items found' : 'No Items Available'}
+          </Text>
         )}
       </View>
     );
@@ -366,6 +511,18 @@ const ServicePersonDashboard = ({navigation}) => {
         </TouchableOpacity>
       </View>
 
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search items..."
+          placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <Icon name="search" size={20} color="#888" style={styles.searchIcon} />
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         refreshControl={
@@ -374,10 +531,10 @@ const ServicePersonDashboard = ({navigation}) => {
         {activeTab === 'service' ? (
           <>
             <Text style={styles.sectionTitle}>Incoming Items</Text>
-            {renderItems(servicePersons)}
+            {renderItems(filteredServicePersons)}
 
             <Text style={styles.sectionTitle}>Outgoing Items</Text>
-            {renderItems(servicePersonOutgoing)}
+            {renderItems(filteredServicePersonOutgoing)}
           </>
         ) : (
           renderMaharashtraData()
@@ -474,6 +631,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginTop: 5,
+  },
+  searchContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 3,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#000',
+    fontSize: 16,
+  },
+  searchIcon: {
+    marginLeft: 10,
   },
 });
 

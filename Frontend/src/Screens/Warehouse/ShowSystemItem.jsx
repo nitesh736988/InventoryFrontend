@@ -1,6 +1,7 @@
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {API_URL} from '@env';
 
 const ShowSystemItem = () => {
   const [systemItems, setSystemItems] = useState([]);
@@ -10,7 +11,7 @@ const ShowSystemItem = () => {
   useEffect(() => {
     const fetchSystemItems = async () => {
       try {
-        const response = await axios.get('http://88.222.214.93:5000/warehouse-admin/show-system-items');
+        const response = await axios.get(`${API_URL}/warehouse-admin/show-system-items`);
         if (response.data.success) {
           setSystemItems(response.data.data);
         } else {

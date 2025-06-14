@@ -9,6 +9,7 @@ import {
   import axios from 'axios';
   import { Dropdown } from 'react-native-element-dropdown';
   import AntDesign from 'react-native-vector-icons/AntDesign';
+  import {API_URL} from '@env';
   
   const BomData = () => {
     const [systems, setSystems] = useState([]);
@@ -22,7 +23,7 @@ import {
       const fetchSystems = async () => {
         try {
           const response = await axios.get(
-            'http://88.222.214.93:5000/warehouse-admin/show-systems'
+            `${API_URL}//warehouse-admin/show-systems`
           );
           if (response.data.success) {
             setSystems(response.data.data);
@@ -45,7 +46,7 @@ import {
           setSystemLoading(true);
           try {
             const response = await axios.get(
-              `http://88.222.214.93:5000/warehouse-admin/show-system-item-map?systemId=${selectedSystem}`
+              `${API_URL}/warehouse-admin/show-system-item-map?systemId=${selectedSystem}`
             );
             if (response.data.success) {
               setSystemItems(response.data.data);
