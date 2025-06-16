@@ -1624,8 +1624,7 @@ const OutgoingDataInServiceMh = () => {
       };
 
       console.log('Final Payload:', payload);
-      return
-
+      
       setLoading(true);
       const response = await axios.post(
         `${API_URL}/warehouse-admin/add-new-installation`,

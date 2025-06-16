@@ -93,6 +93,11 @@ const Sidebarmodal = () => {
     navigation.navigate('ApproveDataMh');
   };
 
+  const openTravelsData = () => {
+    closeModal();
+    navigation.navigate('TravelsData');
+  };
+
 
 
   useEffect(() => {
@@ -159,11 +164,11 @@ const Sidebarmodal = () => {
             <Text style={styles.optionText}>New Installation</Text>
           </TouchableOpacity> */}
 
-          {/* <TouchableOpacity
-            onPress={openApprovalNewInstallation}
+          <TouchableOpacity
+            onPress={openTravelsData}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Approval NewInstallation</Text>
-          </TouchableOpacity> */}
+            <Text style={styles.optionText}>Travels Data</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={openServicePersonLocation}

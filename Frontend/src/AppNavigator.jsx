@@ -85,6 +85,7 @@ import InstallationForm from './Screens/ServicePerson/InstallationForm';
 import ShowPath from './Component/Map/ShowPath';
 import BarcodeScanner from './Screens/Warehouse/BarcodeScanner';
 import NewInstallationTransactionData from './Screens/Warehouse/NewInstallationTransactionData';
+import TravelsData from './Screens/ServicePerson/TravelsData';
 
 
 const Stack = createStackNavigator();
@@ -95,41 +96,6 @@ const AppNavigator = () => {
   const [loading, setLoading] = useState(true);
 
 
-  // useEffect(() => {
-  //   const checkToken = async () => {
-  //     try {
-  //       const role = await AsyncStorage.getItem('role');
-  //       if (role) {
-  //         if (role === 'serviceperson') {
-  //           setInitialRoute('ServicePersonNavigation');
-  //         } else if (role === 'warehouseAdmin') {
-  //           setInitialRoute('WarehouseNavigation');
-  //         } else if (role === 'admin') {
-  //           setInitialRoute('AdminNavigation');
-  //         } else if (role === 'surveyperson') {
-  //           setInitialRoute('SurvayNavigation');
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log('Error checking token:', error);
-
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   checkToken();
-  // }, []);
-
-  // if (loading) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <ActivityIndicator size="large" color="#000" />
-  //     </View>
-  //   );
-  // }
-   
-  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRoute} >
@@ -619,6 +585,12 @@ const AppNavigator = () => {
           name="NewInstallationTransactionData"
           component={NewInstallationTransactionData}
           options={{title: 'NewInstallationTransactionData', headerShown: false}}
+          />
+
+          <Stack.Screen
+          name="TravelsData"
+          component={TravelsData}
+          options={{title: 'TravelsData', headerShown: false}}
           />
 
 
