@@ -455,7 +455,7 @@ const ServicePersonDashboard = ({navigation}) => {
       <View>
         <View style={styles.infoCard}>
           <Text style={styles.infoLabel}>Employee Name:</Text>
-          <Text style={styles.infoValue}>{maharashtraData.empId.name}</Text>
+          <Text style={styles.infoValue}>{maharashtraData?.empId?.name}</Text>
         </View>
         
         <Text style={styles.sectionTitle}>Items List</Text>

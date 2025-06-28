@@ -491,24 +491,46 @@ const InOrder = ({route}) => {
     farmerSaralId,
   } = formData;
 
-  useEffect(() => {
-    const fetchAllWarehouses = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/service-person/all-warehouses`,
-        );
-        // Filter out Sirsa warehouse
-        const filteredWarehouses = response.data.allWarehouses.filter(
-          warehouse => warehouse.warehouseName !== "Sirsa"
-        );
-        setWarehouses(filteredWarehouses);
-      } catch (error) {
-        console.log('Failed to fetch warehouses:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAllWarehouses = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${API_URL}/service-person/all-warehouses`,
+  //       );
+  //       // Filter out Sirsa warehouse
+  //       const filteredWarehouses = response.data.allWarehouses.filter(
+  //         warehouse => warehouse.warehouseName !== "Sirsa", 
+  //       );
+  //       setWarehouses(filteredWarehouses);
+  //     } catch (error) {
+  //       console.log('Failed to fetch warehouses:', error);
+  //     }
+  //   };
 
-    fetchAllWarehouses();
-  }, []);
+  //   fetchAllWarehouses();
+  // }, []);
+
+  useEffect(() => {
+  const fetchAllWarehouses = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/service-person/all-warehouses`,
+      );
+      // Filter out Sirsa, Jind, and Fatehabad warehouses
+      const filteredWarehouses = response.data.allWarehouses.filter(
+        warehouse => 
+          warehouse.warehouseName !== "Sirsa" && 
+          warehouse.warehouseName !== "Jind" &&
+          warehouse.warehouseName !== "Fatehabad"
+      );
+      setWarehouses(filteredWarehouses);
+    } catch (error) {
+      console.log('Failed to fetch warehouses:', error);
+    }
+  };
+
+  fetchAllWarehouses();
+}, []);
 
   useEffect(() => {
     const selectedItemList = async () => {

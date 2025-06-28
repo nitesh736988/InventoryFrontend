@@ -76,11 +76,10 @@ const InstallationForm = ({route}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filesNameList = [
-    'borePhoto',
-    // 'challanPhoto',
-    // 'landDocPhoto',
-    // 'sprinklerPhoto',
-    'boreFarmerPhoto',
+    'pitPhoto',
+    'earthingFarmerPhoto',
+    'antiTheftNutBoltPhoto',
+    'lightingArresterInstallationPhoto',
     'finalFoundationFarmerPhoto',
     'panelFarmerPhoto',
     'controllerBoxFarmerPhoto',
@@ -88,11 +87,10 @@ const InstallationForm = ({route}) => {
   ];
 
   const fileLabels = {
-    borePhoto: 'Bore Photo',
-    // challanPhoto: 'Challan Photo',
-    // landDocPhoto: 'Land Document Photo',
-    // sprinklerPhoto: 'Sprinkler Photo',
-    boreFarmerPhoto: 'Bore Farmer Photo',
+    pitPhoto: 'Gaddhe Ki Photo',
+    earthingFarmerPhoto: 'Earthing Farmer Photo',
+    antiTheftNutBoltPhoto: 'Anti Theft Nut Bolt Photo',
+    lightingArresterInstallationPhoto: 'Lighting Arrester Installation Photo',
     finalFoundationFarmerPhoto: 'Final Foundation Farmer Photo',
     panelFarmerPhoto: 'Panel Farmer Photo',
     controllerBoxFarmerPhoto: 'Controller Box Farmer Photo',
@@ -119,7 +117,6 @@ const InstallationForm = ({route}) => {
         }
       }
 
-      // Initialize photos object with empty arrays for each category
       const initialPhotos = {};
       filesNameList.forEach(category => {
         initialPhotos[category] = [];
@@ -202,8 +199,7 @@ const InstallationForm = ({route}) => {
       }
 
       const formData = new FormData();
-      
-      // Add all required fields to formData
+
       formData.append('farmerSaralId', farmerSaralId);
       formData.append('latitude', latitude);
       formData.append('longitude', longitude);
