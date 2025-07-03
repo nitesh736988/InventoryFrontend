@@ -15,7 +15,7 @@ import axios from 'axios';
 import { API_URL } from '@env';
 import RNPickerSelect from 'react-native-picker-select';
 
-const MaharastraW2W = () => {
+const InstallationW2W = () => {
   const [systemItems, setSystemItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -430,4 +430,4 @@ const pickerSelectStyles = StyleSheet.create({
   },
 });
 
-export default MaharastraW2W;
+export default InstallationW2W;

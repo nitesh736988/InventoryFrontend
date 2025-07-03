@@ -3,7 +3,7 @@
 // import axios from 'axios';
 // import {API_URL} from '@env';
 
-// const ShowIncomingHistoryMh = () => {
+// const InstallationIncomingHistory = () => {
 //     const [outgoingHistory, setOutgoingHistory] = useState([]);
 //     const [loading, setLoading] = useState(true);
 //     const [error, setError] = useState('');
@@ -185,14 +185,14 @@
 //     },
 // });
 
-// export default ShowIncomingHistoryMh;
+// export default InstallationIncomingHistory;
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import {API_URL} from '@env';
 
-const ShowIncomingHistoryMh = () => {
+const InstallationIncomingHistory = () => {
     const [incomingHistory, setIncomingHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -408,4 +408,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ShowIncomingHistoryMh;
+export default InstallationIncomingHistory;

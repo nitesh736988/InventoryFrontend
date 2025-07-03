@@ -4,6 +4,7 @@ import {
     StyleSheet,
     ScrollView,
     ActivityIndicator,
+    Alert,
   } from 'react-native';
   import React, { useState, useEffect } from 'react';
   import axios from 'axios';
@@ -23,7 +24,7 @@ import {
       const fetchSystems = async () => {
         try {
           const response = await axios.get(
-            `${API_URL}//warehouse-admin/show-systems`
+            `${API_URL}/warehouse-admin/show-systems`
           );
           if (response.data.success) {
             setSystems(response.data.data);
@@ -32,6 +33,7 @@ import {
           }
         } catch (err) {
           setError(err.message);
+          Alert.alert("error: ", err?.response?.data?.message)
         } finally {
           setLoading(false);
         }
@@ -55,6 +57,7 @@ import {
             }
           } catch (err) {
             setError(err.message);
+            Alert.alert("error: ", err?.response?.data?.message)
           } finally {
             setSystemLoading(false);
           }

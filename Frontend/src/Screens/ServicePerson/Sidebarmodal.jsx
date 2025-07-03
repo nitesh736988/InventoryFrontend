@@ -179,7 +179,7 @@ const Sidebarmodal = () => {
           <TouchableOpacity
             onPress={openApproveDataMh}
             style={styles.optionButton}>
-            <Text style={styles.optionText}>Approve Data Mh</Text>
+            <Text style={styles.optionText}>Approve Installation</Text>
           </TouchableOpacity>
 
 

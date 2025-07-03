@@ -70,7 +70,7 @@ const TabNavigator = () => {
       <Tab.Screen
         name="ServiceApprovalDataMh"
         component={ ServiceApprovalDataMh}
-        options={{title: ' Maharastra Approval Data'}}
+        options={{title: 'Installation Approval'}}
       />
     </Tab.Navigator>
   );

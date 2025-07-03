@@ -17,7 +17,7 @@
 // import {useNavigation, useRoute} from '@react-navigation/native';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// const OutgoingDataInServiceMh = () => {
+// const OutgoingInstallation = () => {
 //   const [servicePerson, setServicePerson] = useState([]);
 //   const [systems, setSystems] = useState([]);
 //   const [items, setItems] = useState([]);
@@ -42,7 +42,7 @@
 //   const [saralIdValidationMessage, setSaralIdValidationMessage] = useState('');
 //   const [farmerDetails, setFarmerDetails] = useState(null);
 //   const [validatingSaralId, setValidatingSaralId] = useState(false);
-  
+
 //   // Extra items state
 //   const [showExtraItems, setShowExtraItems] = useState(false);
 //   const [extraSelectedItems, setExtraSelectedItems] = useState([]);
@@ -50,6 +50,7 @@
 //   const [extraPanelNumbers, setExtraPanelNumbers] = useState([]);
 //   const [extraSelectedSubItems, setExtraSelectedSubItems] = useState({});
 //   const [extraSubItemQuantities, setExtraSubItemQuantities] = useState({});
+//   const placeholderTextColor = '#000000';
 
 //   const navigation = useNavigation();
 //   const route = useRoute();
@@ -200,7 +201,9 @@
 //       }
 //     } catch (error) {
 //       setIsSaralIdValid(false);
-//       setSaralIdValidationMessage(error?.response?.data?.message || 'Error validating Saral ID');
+//       setSaralIdValidationMessage(
+//         error?.response?.data?.message || 'Error validating Saral ID',
+//       );
 //       setFarmerDetails(null);
 //     } finally {
 //       setValidatingSaralId(false);
@@ -335,7 +338,7 @@
 //     navigation.navigate('BarcodeScanner', {
 //       barcodeType: type,
 //       existingBarcodes: allScannedBarcodes,
-//       returnScreen: 'OutgoingDataInServiceMh',
+//       returnScreen: 'OutgoingInstallation',
 //       panelIndex: index,
 //     });
 //   };
@@ -439,7 +442,7 @@
 //       // Prepare main items list
 //       const itemsList = selectedItems.map(itemId => {
 //         const item = items.find(i => i.systemItemId._id === itemId);
-        
+
 //         const itemData = {
 //           systemItemId: itemId,
 //           quantity: parseInt(quantities[itemId], 10),
@@ -465,7 +468,7 @@
 //       // Prepare extra items list if any
 //       const extraItemsList = extraSelectedItems.map(itemId => {
 //         const item = items.find(i => i.systemItemId._id === itemId);
-        
+
 //         const itemData = {
 //           systemItemId: itemId,
 //           quantity: parseInt(extraQuantities[itemId], 10),
@@ -477,7 +480,10 @@
 //             .filter(subItem => extraSelectedSubItems[subItem.subItemId._id])
 //             .map(subItem => ({
 //               subItemId: subItem.subItemId._id,
-//               quantity: parseInt(extraSubItemQuantities[subItem.subItemId._id], 10),
+//               quantity: parseInt(
+//                 extraSubItemQuantities[subItem.subItemId._id],
+//                 10,
+//               ),
 //             }));
 
 //           if (selectedSubs.length > 0) {
@@ -542,7 +548,7 @@
 //       };
 
 //       console.log('Final Payload:', payload);
-      
+
 //       setLoading(true);
 //       const response = await axios.post(
 //         `${API_URL}/warehouse-admin/add-new-installation`,
@@ -616,6 +622,7 @@
 //             value={pumpNumber}
 //             onChangeText={setPumpNumber}
 //             placeholder="Enter Pump Number"
+//             placeholderTextColor={placeholderTextColor}
 //           />
 //           <TouchableOpacity
 //             style={styles.scanButton}
@@ -640,6 +647,10 @@
 //           <CheckBox
 //             value={isSelected}
 //             onValueChange={() => toggleItemSelection(itemId)}
+//             tintColors={{true: '#000000', false: '#000000'}}
+//             onCheckColor="#000000"
+//             onTintColor="#000000"
+//             tintColor="#000000"
 //           />
 //           <Text style={styles.itemText}>{itemName}</Text>
 //         </View>
@@ -653,6 +664,7 @@
 //               onChangeText={text => handleQuantityChange(itemId, text)}
 //               keyboardType="numeric"
 //               placeholder="Enter quantity"
+//               placeholderTextColor={placeholderTextColor}
 //             />
 
 //             {isPanel && (
@@ -668,6 +680,7 @@
 //                           handlePanelNumberChange(index, text)
 //                         }
 //                         placeholder={`Panel ${index + 1} Serial Number`}
+//                         placeholderTextColor={placeholderTextColor}
 //                       />
 //                       <TouchableOpacity
 //                         style={styles.scanButton}
@@ -691,6 +704,10 @@
 //                         onValueChange={() =>
 //                           toggleSubItemSelection(subItem.subItemId._id)
 //                         }
+//                         tintColors={{true: '#000000', false: '#000000'}}
+//                         onCheckColor="#000000"
+//                         onTintColor="#000000"
+//                         tintColor="#000000"
 //                       />
 //                       <Text style={styles.subItemText}>
 //                         {subItem.subItemId.itemName}
@@ -703,8 +720,9 @@
 //                         <TextInput
 //                           style={[styles.input, styles.subItemInput]}
 //                           value={
-//                             subItemQuantities[subItem.subItemId._id]?.toString() ||
-//                             ''
+//                             subItemQuantities[
+//                               subItem.subItemId._id
+//                             ]?.toString() || ''
 //                           }
 //                           onChangeText={text =>
 //                             handleSubItemQuantityChange(
@@ -714,6 +732,7 @@
 //                           }
 //                           keyboardType="numeric"
 //                           placeholder="Enter quantity"
+//                           placeholderTextColor={placeholderTextColor}
 //                         />
 //                       </View>
 //                     )}
@@ -740,6 +759,10 @@
 //           <CheckBox
 //             value={isSelected}
 //             onValueChange={() => toggleExtraItemSelection(itemId)}
+//             tintColors={{true: '#000000', false: '#000000'}}
+//             onCheckColor="#000000"
+//             onTintColor="#000000"
+//             tintColor="#000000"
 //           />
 //           <Text style={styles.itemText}>{itemName}</Text>
 //         </View>
@@ -753,30 +776,32 @@
 //               onChangeText={text => handleExtraQuantityChange(itemId, text)}
 //               keyboardType="numeric"
 //               placeholder="Enter quantity"
+//               placeholderTextColor={placeholderTextColor}
 //             />
 
 //             {isPanel && (
 //               <>
 //                 <Text style={styles.label}>Enter Panel Numbers:</Text>
-//                 {Array.from({length: parseInt(extraQuantities[itemId] || 0)}).map(
-//                   (_, index) => (
-//                     <View key={index} style={styles.barcodeInputContainer}>
-//                       <TextInput
-//                         style={[styles.input, styles.barcodeInput]}
-//                         value={extraPanelNumbers[index] || ''}
-//                         onChangeText={text =>
-//                           handleExtraPanelNumberChange(index, text)
-//                         }
-//                         placeholder={`Panel ${index + 1} Serial Number`}
-//                       />
-//                       <TouchableOpacity
-//                         style={styles.scanButton}
-//                         onPress={() => handleScanBarcode('extraPanel', index)}>
-//                         <Text style={styles.scanButtonText}>Scan</Text>
-//                       </TouchableOpacity>
-//                     </View>
-//                   ),
-//                 )}
+//                 {Array.from({
+//                   length: parseInt(extraQuantities[itemId] || 0),
+//                 }).map((_, index) => (
+//                   <View key={index} style={styles.barcodeInputContainer}>
+//                     <TextInput
+//                       style={[styles.input, styles.barcodeInput]}
+//                       value={extraPanelNumbers[index] || ''}
+//                       onChangeText={text =>
+//                         handleExtraPanelNumberChange(index, text)
+//                       }
+//                       placeholder={`Panel ${index + 1} Serial Number`}
+//                       placeholderTextColor={placeholderTextColor}
+//                     />
+//                     <TouchableOpacity
+//                       style={styles.scanButton}
+//                       onPress={() => handleScanBarcode('extraPanel', index)}>
+//                       <Text style={styles.scanButtonText}>Scan</Text>
+//                     </TouchableOpacity>
+//                   </View>
+//                 ))}
 //               </>
 //             )}
 
@@ -791,6 +816,10 @@
 //                         onValueChange={() =>
 //                           toggleExtraSubItemSelection(subItem.subItemId._id)
 //                         }
+//                         tintColors={{true: '#000000', false: '#000000'}}
+//                         onCheckColor="#000000"
+//                         onTintColor="#000000"
+//                         tintColor="#000000"
 //                       />
 //                       <Text style={styles.subItemText}>
 //                         {subItem.subItemId.itemName}
@@ -803,8 +832,9 @@
 //                         <TextInput
 //                           style={[styles.input, styles.subItemInput]}
 //                           value={
-//                             extraSubItemQuantities[subItem.subItemId._id]?.toString() ||
-//                             ''
+//                             extraSubItemQuantities[
+//                               subItem.subItemId._id
+//                             ]?.toString() || ''
 //                           }
 //                           onChangeText={text =>
 //                             handleExtraSubItemQuantityChange(
@@ -814,6 +844,7 @@
 //                           }
 //                           keyboardType="numeric"
 //                           placeholder="Enter quantity"
+//                           placeholderTextColor={placeholderTextColor}
 //                         />
 //                       </View>
 //                     )}
@@ -851,6 +882,7 @@
 //               value={farmerSaralId}
 //               onChangeText={handleSaralIdChange}
 //               placeholder="Enter Farmer Saral ID"
+//               placeholderTextColor={placeholderTextColor}
 //             />
 //             <TouchableOpacity
 //               style={styles.validateButton}
@@ -934,7 +966,7 @@
 //               <View style={styles.itemsHeader}>
 //                 <Text style={styles.label}>Items List:</Text>
 //                 {!showExtraItems && (
-//                   <TouchableOpacity 
+//                   <TouchableOpacity
 //                     style={styles.addButton}
 //                     onPress={() => setShowExtraItems(true)}>
 //                     <Icon name="add" size={24} color="#4CAF50" />
@@ -954,7 +986,7 @@
 //             <>
 //               <View style={styles.itemsHeader}>
 //                 <Text style={styles.label}>Extra Items List:</Text>
-//                 <TouchableOpacity 
+//                 <TouchableOpacity
 //                   style={styles.addButton}
 //                   onPress={() => setShowExtraItems(false)}>
 //                   <Icon name="close" size={24} color="#F44336" />
@@ -976,6 +1008,7 @@
 //               value={controllerNumber}
 //               onChangeText={setControllerNumber}
 //               placeholder="Enter Controller Number"
+//               placeholderTextColor={placeholderTextColor}
 //             />
 //             <TouchableOpacity
 //               style={styles.scanButton}
@@ -991,6 +1024,7 @@
 //               value={rmuNumber}
 //               onChangeText={setRmuNumber}
 //               placeholder="Enter RMU Number"
+//               placeholderTextColor={placeholderTextColor}
 //             />
 //             <TouchableOpacity
 //               style={styles.scanButton}
@@ -1006,6 +1040,7 @@
 //               value={motorNumber}
 //               onChangeText={setMotorNumber}
 //               placeholder="Enter Motor Number"
+//               placeholderTextColor={placeholderTextColor}
 //             />
 //             <TouchableOpacity
 //               style={styles.scanButton}
@@ -1059,7 +1094,7 @@
 //     fontSize: 16,
 //     fontWeight: '600',
 //     marginBottom: 8,
-//     color: '#333',
+//     color: '#000',
 //   },
 //   picker: {
 //     height: 50,
@@ -1068,6 +1103,7 @@
 //     borderWidth: 1,
 //     borderColor: '#ddd',
 //     marginBottom: 15,
+//     color: '#000',
 //   },
 //   input: {
 //     backgroundColor: '#fff',
@@ -1242,7 +1278,8 @@
 //   },
 // });
 
-// export default OutgoingDataInServiceMh;
+// export default OutgoingInstallation;
+
 
 import React, {useState, useEffect} from 'react';
 import {
@@ -1263,7 +1300,7 @@ import {API_URL} from '@env';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const OutgoingDataInServiceMh = () => {
+const OutgoingInstallation = () => {
   const [servicePerson, setServicePerson] = useState([]);
   const [systems, setSystems] = useState([]);
   const [items, setItems] = useState([]);
@@ -1288,7 +1325,15 @@ const OutgoingDataInServiceMh = () => {
   const [saralIdValidationMessage, setSaralIdValidationMessage] = useState('');
   const [farmerDetails, setFarmerDetails] = useState(null);
   const [validatingSaralId, setValidatingSaralId] = useState(false);
-  
+  const [selectedState, setSelectedState] = useState('Maharashtra');
+  const [states] = useState([
+    'Maharashtra',
+    'Haryana',
+    'Punjab',
+    'Chattisgarh',
+    'Rajasthan',
+  ]);
+
   // Extra items state
   const [showExtraItems, setShowExtraItems] = useState(false);
   const [extraSelectedItems, setExtraSelectedItems] = useState([]);
@@ -1352,9 +1397,10 @@ const OutgoingDataInServiceMh = () => {
     const fetchServicePersons = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/warehouse-admin/service-survey-persons?state=Maharashtra`,
+          `${API_URL}/warehouse-admin/service-survey-persons?state=${selectedState}`,
         );
         setServicePerson(response?.data?.data);
+        setSelectedServicePerson('');
       } catch (error) {
         Alert.alert('Error', JSON.stringify(error.response?.data?.message));
       }
@@ -1373,7 +1419,7 @@ const OutgoingDataInServiceMh = () => {
 
     fetchServicePersons();
     fetchSystems();
-  }, []);
+  }, [selectedState]);
 
   useEffect(() => {
     if (selectedSystem) {
@@ -1447,7 +1493,9 @@ const OutgoingDataInServiceMh = () => {
       }
     } catch (error) {
       setIsSaralIdValid(false);
-      setSaralIdValidationMessage(error?.response?.data?.message || 'Error validating Saral ID');
+      setSaralIdValidationMessage(
+        error?.response?.data?.message || 'Error validating Saral ID',
+      );
       setFarmerDetails(null);
     } finally {
       setValidatingSaralId(false);
@@ -1467,12 +1515,10 @@ const OutgoingDataInServiceMh = () => {
   const toggleItemSelection = itemId => {
     setSelectedItems(prev => {
       if (prev.includes(itemId)) {
-        // Remove item if already selected
         const newQuantities = {...quantities};
         delete newQuantities[itemId];
         setQuantities(newQuantities);
 
-        // Remove any selected sub-items for this item
         const item = items.find(i => i.systemItemId._id === itemId);
         if (item?.subItems?.length > 0) {
           const newSelectedSubItems = {...selectedSubItems};
@@ -1532,12 +1578,10 @@ const OutgoingDataInServiceMh = () => {
   const toggleExtraItemSelection = itemId => {
     setExtraSelectedItems(prev => {
       if (prev.includes(itemId)) {
-        // Remove item if already selected
         const newQuantities = {...extraQuantities};
         delete newQuantities[itemId];
         setExtraQuantities(newQuantities);
 
-        // Remove any selected sub-items for this item
         const item = items.find(i => i.systemItemId._id === itemId);
         if (item?.subItems?.length > 0) {
           const newSelectedSubItems = {...extraSelectedSubItems};
@@ -1582,7 +1626,7 @@ const OutgoingDataInServiceMh = () => {
     navigation.navigate('BarcodeScanner', {
       barcodeType: type,
       existingBarcodes: allScannedBarcodes,
-      returnScreen: 'OutgoingDataInServiceMh',
+      returnScreen: 'OutgoingInstallation',
       panelIndex: index,
     });
   };
@@ -1622,7 +1666,6 @@ const OutgoingDataInServiceMh = () => {
       return false;
     }
 
-    // Validate main items quantities
     for (const itemId of selectedItems) {
       if (!quantities[itemId]) {
         Alert.alert(
@@ -1649,7 +1692,6 @@ const OutgoingDataInServiceMh = () => {
       }
     }
 
-    // Validate extra items quantities
     for (const itemId of extraSelectedItems) {
       if (!extraQuantities[itemId]) {
         Alert.alert(
@@ -1683,16 +1725,14 @@ const OutgoingDataInServiceMh = () => {
     if (!validateInput()) return;
 
     try {
-      // Prepare main items list
       const itemsList = selectedItems.map(itemId => {
         const item = items.find(i => i.systemItemId._id === itemId);
-        
+
         const itemData = {
           systemItemId: itemId,
           quantity: parseInt(quantities[itemId], 10),
         };
 
-        // Add subItems if any are selected
         if (item.subItems && item.subItems.length > 0) {
           const selectedSubs = item.subItems
             .filter(subItem => selectedSubItems[subItem.subItemId._id])
@@ -1709,22 +1749,23 @@ const OutgoingDataInServiceMh = () => {
         return itemData;
       });
 
-      // Prepare extra items list if any
       const extraItemsList = extraSelectedItems.map(itemId => {
         const item = items.find(i => i.systemItemId._id === itemId);
-        
+
         const itemData = {
           systemItemId: itemId,
           quantity: parseInt(extraQuantities[itemId], 10),
         };
 
-        // Add subItems if any are selected
         if (item.subItems && item.subItems.length > 0) {
           const selectedSubs = item.subItems
             .filter(subItem => extraSelectedSubItems[subItem.subItemId._id])
             .map(subItem => ({
               subItemId: subItem.subItemId._id,
-              quantity: parseInt(extraSubItemQuantities[subItem.subItemId._id], 10),
+              quantity: parseInt(
+                extraSubItemQuantities[subItem.subItemId._id],
+                10,
+              ),
             }));
 
           if (selectedSubs.length > 0) {
@@ -1735,7 +1776,6 @@ const OutgoingDataInServiceMh = () => {
         return itemData;
       });
 
-      // Filter out empty panel numbers
       const filteredPanelNumbers = panelNumbers.filter(
         num => num && num.trim() !== '',
       );
@@ -1743,7 +1783,6 @@ const OutgoingDataInServiceMh = () => {
         num => num && num.trim() !== '',
       );
 
-      // Format the items lists correctly
       const formattedItemsList = itemsList.flatMap(item => {
         const base = [
           {systemItemId: item.systemItemId, quantity: item.quantity},
@@ -1788,8 +1827,6 @@ const OutgoingDataInServiceMh = () => {
         }),
       };
 
-      console.log('Final Payload:', payload);
-      
       setLoading(true);
       const response = await axios.post(
         `${API_URL}/warehouse-admin/add-new-installation`,
@@ -1800,7 +1837,6 @@ const OutgoingDataInServiceMh = () => {
       Alert.alert('Success', 'Transaction saved successfully');
       resetForm();
     } catch (error) {
-      console.log('Submission error:', error.response?.data || error.message);
       Alert.alert(
         'Error',
         error.response?.data?.message || 'Failed to submit data',
@@ -1863,7 +1899,7 @@ const OutgoingDataInServiceMh = () => {
             value={pumpNumber}
             onChangeText={setPumpNumber}
             placeholder="Enter Pump Number"
-             placeholderTextColor={placeholderTextColor}
+            placeholderTextColor={placeholderTextColor}
           />
           <TouchableOpacity
             style={styles.scanButton}
@@ -1888,7 +1924,7 @@ const OutgoingDataInServiceMh = () => {
           <CheckBox
             value={isSelected}
             onValueChange={() => toggleItemSelection(itemId)}
-            tintColors={{ true: '#000000', false: '#000000' }}
+            tintColors={{true: '#000000', false: '#000000'}}
             onCheckColor="#000000"
             onTintColor="#000000"
             tintColor="#000000"
@@ -1905,7 +1941,7 @@ const OutgoingDataInServiceMh = () => {
               onChangeText={text => handleQuantityChange(itemId, text)}
               keyboardType="numeric"
               placeholder="Enter quantity"
-               placeholderTextColor={placeholderTextColor}
+              placeholderTextColor={placeholderTextColor}
             />
 
             {isPanel && (
@@ -1921,7 +1957,7 @@ const OutgoingDataInServiceMh = () => {
                           handlePanelNumberChange(index, text)
                         }
                         placeholder={`Panel ${index + 1} Serial Number`}
-                         placeholderTextColor={placeholderTextColor}
+                        placeholderTextColor={placeholderTextColor}
                       />
                       <TouchableOpacity
                         style={styles.scanButton}
@@ -1945,7 +1981,7 @@ const OutgoingDataInServiceMh = () => {
                         onValueChange={() =>
                           toggleSubItemSelection(subItem.subItemId._id)
                         }
-                        tintColors={{ true: '#000000', false: '#000000' }}
+                        tintColors={{true: '#000000', false: '#000000'}}
                         onCheckColor="#000000"
                         onTintColor="#000000"
                         tintColor="#000000"
@@ -1961,8 +1997,9 @@ const OutgoingDataInServiceMh = () => {
                         <TextInput
                           style={[styles.input, styles.subItemInput]}
                           value={
-                            subItemQuantities[subItem.subItemId._id]?.toString() ||
-                            ''
+                            subItemQuantities[
+                              subItem.subItemId._id
+                            ]?.toString() || ''
                           }
                           onChangeText={text =>
                             handleSubItemQuantityChange(
@@ -1972,7 +2009,7 @@ const OutgoingDataInServiceMh = () => {
                           }
                           keyboardType="numeric"
                           placeholder="Enter quantity"
-                           placeholderTextColor={placeholderTextColor}
+                          placeholderTextColor={placeholderTextColor}
                         />
                       </View>
                     )}
@@ -1999,7 +2036,7 @@ const OutgoingDataInServiceMh = () => {
           <CheckBox
             value={isSelected}
             onValueChange={() => toggleExtraItemSelection(itemId)}
-            tintColors={{ true: '#000000', false: '#000000' }}
+            tintColors={{true: '#000000', false: '#000000'}}
             onCheckColor="#000000"
             onTintColor="#000000"
             tintColor="#000000"
@@ -2016,32 +2053,32 @@ const OutgoingDataInServiceMh = () => {
               onChangeText={text => handleExtraQuantityChange(itemId, text)}
               keyboardType="numeric"
               placeholder="Enter quantity"
-               placeholderTextColor={placeholderTextColor}
+              placeholderTextColor={placeholderTextColor}
             />
 
             {isPanel && (
               <>
                 <Text style={styles.label}>Enter Panel Numbers:</Text>
-                {Array.from({length: parseInt(extraQuantities[itemId] || 0)}).map(
-                  (_, index) => (
-                    <View key={index} style={styles.barcodeInputContainer}>
-                      <TextInput
-                        style={[styles.input, styles.barcodeInput]}
-                        value={extraPanelNumbers[index] || ''}
-                        onChangeText={text =>
-                          handleExtraPanelNumberChange(index, text)
-                        }
-                        placeholder={`Panel ${index + 1} Serial Number`}
-                         placeholderTextColor={placeholderTextColor}
-                      />
-                      <TouchableOpacity
-                        style={styles.scanButton}
-                        onPress={() => handleScanBarcode('extraPanel', index)}>
-                        <Text style={styles.scanButtonText}>Scan</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ),
-                )}
+                {Array.from({
+                  length: parseInt(extraQuantities[itemId] || 0),
+                }).map((_, index) => (
+                  <View key={index} style={styles.barcodeInputContainer}>
+                    <TextInput
+                      style={[styles.input, styles.barcodeInput]}
+                      value={extraPanelNumbers[index] || ''}
+                      onChangeText={text =>
+                        handleExtraPanelNumberChange(index, text)
+                      }
+                      placeholder={`Panel ${index + 1} Serial Number`}
+                      placeholderTextColor={placeholderTextColor}
+                    />
+                    <TouchableOpacity
+                      style={styles.scanButton}
+                      onPress={() => handleScanBarcode('extraPanel', index)}>
+                      <Text style={styles.scanButtonText}>Scan</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
               </>
             )}
 
@@ -2056,7 +2093,7 @@ const OutgoingDataInServiceMh = () => {
                         onValueChange={() =>
                           toggleExtraSubItemSelection(subItem.subItemId._id)
                         }
-                        tintColors={{ true: '#000000', false: '#000000' }}
+                        tintColors={{true: '#000000', false: '#000000'}}
                         onCheckColor="#000000"
                         onTintColor="#000000"
                         tintColor="#000000"
@@ -2072,8 +2109,9 @@ const OutgoingDataInServiceMh = () => {
                         <TextInput
                           style={[styles.input, styles.subItemInput]}
                           value={
-                            extraSubItemQuantities[subItem.subItemId._id]?.toString() ||
-                            ''
+                            extraSubItemQuantities[
+                              subItem.subItemId._id
+                            ]?.toString() || ''
                           }
                           onChangeText={text =>
                             handleExtraSubItemQuantityChange(
@@ -2083,7 +2121,7 @@ const OutgoingDataInServiceMh = () => {
                           }
                           keyboardType="numeric"
                           placeholder="Enter quantity"
-                           placeholderTextColor={placeholderTextColor}
+                          placeholderTextColor={placeholderTextColor}
                         />
                       </View>
                     )}
@@ -2101,9 +2139,21 @@ const OutgoingDataInServiceMh = () => {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.header}>
-          Outgoing Data in Service (Maharashtra)
+          Outgoing Installation Data
         </Text>
         <View style={styles.form}>
+          <Text style={styles.label}>Select State:</Text>
+          <Picker
+            selectedValue={selectedState}
+            onValueChange={itemValue => {
+              setSelectedState(itemValue);
+            }}
+            style={styles.picker}>
+            {states.map((state, index) => (
+              <Picker.Item key={index} label={state} value={state} />
+            ))}
+          </Picker>
+
           <Text style={styles.label}>Farmer Saral ID:</Text>
           <View style={styles.saralIdContainer}>
             <TextInput
@@ -2121,7 +2171,7 @@ const OutgoingDataInServiceMh = () => {
               value={farmerSaralId}
               onChangeText={handleSaralIdChange}
               placeholder="Enter Farmer Saral ID"
-               placeholderTextColor={placeholderTextColor}
+              placeholderTextColor={placeholderTextColor}
             />
             <TouchableOpacity
               style={styles.validateButton}
@@ -2205,7 +2255,7 @@ const OutgoingDataInServiceMh = () => {
               <View style={styles.itemsHeader}>
                 <Text style={styles.label}>Items List:</Text>
                 {!showExtraItems && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.addButton}
                     onPress={() => setShowExtraItems(true)}>
                     <Icon name="add" size={24} color="#4CAF50" />
@@ -2225,7 +2275,7 @@ const OutgoingDataInServiceMh = () => {
             <>
               <View style={styles.itemsHeader}>
                 <Text style={styles.label}>Extra Items List:</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.addButton}
                   onPress={() => setShowExtraItems(false)}>
                   <Icon name="close" size={24} color="#F44336" />
@@ -2247,7 +2297,7 @@ const OutgoingDataInServiceMh = () => {
               value={controllerNumber}
               onChangeText={setControllerNumber}
               placeholder="Enter Controller Number"
-               placeholderTextColor={placeholderTextColor}
+              placeholderTextColor={placeholderTextColor}
             />
             <TouchableOpacity
               style={styles.scanButton}
@@ -2263,7 +2313,7 @@ const OutgoingDataInServiceMh = () => {
               value={rmuNumber}
               onChangeText={setRmuNumber}
               placeholder="Enter RMU Number"
-               placeholderTextColor={placeholderTextColor}
+              placeholderTextColor={placeholderTextColor}
             />
             <TouchableOpacity
               style={styles.scanButton}
@@ -2279,7 +2329,7 @@ const OutgoingDataInServiceMh = () => {
               value={motorNumber}
               onChangeText={setMotorNumber}
               placeholder="Enter Motor Number"
-               placeholderTextColor={placeholderTextColor}
+              placeholderTextColor={placeholderTextColor}
             />
             <TouchableOpacity
               style={styles.scanButton}
@@ -2342,7 +2392,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     marginBottom: 15,
-    color: '#000'
+    color: '#000',
   },
   input: {
     backgroundColor: '#fff',
@@ -2517,4 +2567,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OutgoingDataInServiceMh;
+export default OutgoingInstallation;

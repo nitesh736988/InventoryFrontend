@@ -87,7 +87,7 @@ const BarcodeScanner = () => {
   const handleDone = useCallback(() => {
     if (scannedData) {
       navigation.navigate({
-        name: route.params?.returnScreen || 'OutgoingDataInServiceMh',
+        name: route.params?.returnScreen || 'OutgoingInstallation',
         params: { 
           scannedBarcode: scannedData,
           barcodeType: route.params?.barcodeType,

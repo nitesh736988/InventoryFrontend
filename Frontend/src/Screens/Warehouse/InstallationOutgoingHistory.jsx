@@ -9,7 +9,7 @@
 // import axios from 'axios';
 // import {API_URL} from '@env';
 
-// const ShowOutgoingHistoryMh = () => {
+// const InstallationOutgoingHistory = () => {
 //   const [outgoingHistory, setOutgoingHistory] = useState([]);
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState('');
@@ -203,7 +203,7 @@
 //   },
 // });
 
-// export default ShowOutgoingHistoryMh;
+// export default InstallationOutgoingHistory;
 
 import React, {useState, useEffect} from 'react';
 import {
@@ -216,7 +216,7 @@ import {
 import axios from 'axios';
 import {API_URL} from '@env';
 
-const ShowOutgoingHistoryMh = () => {
+const InstallationOutgoingHistory = () => {
   const [outgoingHistory, setOutgoingHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -439,4 +439,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ShowOutgoingHistoryMh;
+export default InstallationOutgoingHistory;

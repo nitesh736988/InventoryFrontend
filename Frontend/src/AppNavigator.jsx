@@ -70,15 +70,15 @@ import ShowSystem from './Screens/Warehouse/ShowSystem';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ShowSystemItem from './Screens/Warehouse/ShowSystemItem';
 import BomData from './Screens/Warehouse/BomData';
-import MaharastraW2W from './Screens/Warehouse/MaharastraW2W';
+import InstallationW2W from './Screens/Warehouse/InstallationW2W'
 import W2WmhApproval from './Screens/Warehouse/W2WmhApproval';
 import AllStockUpdateHistory from './Screens/Admin/AllStockUpdateHistory';
-import ApprovalIncomingItemMh from './Screens/Warehouse/ApprovalIncomingItemMh';
-import ApprovalOutgoingItemMh from './Screens/Warehouse/ApprovalOutgoingItemMh';
-import ShowOutgoingHistoryMh from './Screens/Warehouse/ShowOutgoingHistoryMh';
-import ShowIncomingHistoryMh from './Screens/Warehouse/ShowIncomingHistoryMh';
-import UpperIncomingItemsMh from './Screens/Warehouse/UpperIncomingItemsMh';
-import OutgoingDataInServiceMh from './Screens/Warehouse/OutgoingDataInServiceMh';
+import ApprovalIncomingInstallation from './Screens/Warehouse/ApprovalIncomingInstallation';
+import ApprovalOutgoingInstallation from './Screens/Warehouse/ApprovalOutgoingInstallation';
+import InstallationOutgoingHistory from './Screens/Warehouse/InstallationOutgoingHistory';
+import InstallationIncomingHistory from './Screens/Warehouse/InstallationIncomingHistory';
+import UpperIncomingItems from './Screens/Warehouse/UpperIncomingItems';
+import OutgoingInstallation from './Screens/Warehouse/OutgoingInstallation';
 import ServiceApprovalDataMh from './Screens/ServicePerson/ServiceApprovalDataMh';
 import ApproveDataMh from './Screens/ServicePerson/ApproveDataMh';
 import InstallationForm from './Screens/ServicePerson/InstallationForm';
@@ -498,9 +498,9 @@ const AppNavigator = () => {
         />
 
         <Stack.Screen
-          name="MaharastraW2W"
-          component={MaharastraW2W}
-          options={{title: 'MaharastraW2W', headerShown: false}}
+          name="InstallationW2W"
+          component={InstallationW2W}
+          options={{title: 'InstallationW2W', headerShown: false}}
         />
 
         <Stack.Screen
@@ -516,39 +516,39 @@ const AppNavigator = () => {
         />
 
         <Stack.Screen
-          name="ApprovalOutgoingItemMh"
-          component={ApprovalOutgoingItemMh}
-          options={{title: 'ApprovalOutgoingItemMh', headerShown: false}}
+          name="ApprovalOutgoingInstallation"
+          component={ApprovalOutgoingInstallation}
+          options={{title: 'ApprovalOutgoingInstallation', headerShown: false}}
         />
 
         <Stack.Screen
-          name="ApprovalIncomingItemMh"
-          component={ApprovalIncomingItemMh}
-          options={{title: 'ApprovalIncomingItemMh', headerShown: false}}
+          name="ApprovalIncomingInstallation"
+          component={ApprovalIncomingInstallation}
+          options={{title: 'ApprovalIncomingInstallation', headerShown: false}}
         />
 
         <Stack.Screen
-          name="ShowOutgoingHistoryMh"
-          component={ShowOutgoingHistoryMh}
-          options={{title: 'ShowOutgoingHistoryMh', headerShown: false}}
+          name="InstallationOutgoingHistory"
+          component={InstallationOutgoingHistory}
+          options={{title: 'InstallationOutgoingHistory', headerShown: false}}
         />
 
         <Stack.Screen
-          name="ShowIncomingHistoryMh"
-          component={ShowIncomingHistoryMh}
-          options={{title: 'ShowIncomingHistoryMh', headerShown: false}}
+          name="InstallationIncomingHistory"
+          component={InstallationIncomingHistory}
+          options={{title: 'InstallationIncomingHistory', headerShown: false}}
           />
 
           <Stack.Screen
-          name="UpperIncomingItemsMh"
-          component={UpperIncomingItemsMh}
-          options={{title: 'UpperIncomingItemsMh', headerShown: false}}
+          name="UpperIncomingItems"
+          component={UpperIncomingItems}
+          options={{title: 'UpperIncomingItems', headerShown: false}}
           />
 
           <Stack.Screen
-          name="OutgoingDataInServiceMh"
-          component={OutgoingDataInServiceMh}
-          options={{title: 'OutgoingDataInServiceMh', headerShown: false}}
+          name="OutgoingInstallation"
+          component={OutgoingInstallation}
+          options={{title: 'OutgoingInstallation', headerShown: false}}
           />
 
           <Stack.Screen

@@ -15,7 +15,7 @@ import {Picker} from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import {useNavigation} from '@react-navigation/native';
 
-const UpperIncomingItemsMh = () => {
+const UpperIncomingItems = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [allWarehouses, setAllWarehouses] = useState([]);
@@ -399,4 +399,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UpperIncomingItemsMh;
+export default UpperIncomingItems;

@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 import {API_URL} from '@env';
 
-const ApprovalIncomingItemMh = () => {
+const ApprovalIncomingInstallation = () => {
   const [outgoingHistory, setOutgoingHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -280,4 +280,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ApprovalIncomingItemMh;
+export default ApprovalIncomingInstallation;

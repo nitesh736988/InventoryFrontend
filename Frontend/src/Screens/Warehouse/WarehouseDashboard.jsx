@@ -190,7 +190,7 @@ const WarehouseDashboard = () => {
             activeCard === 'New Installation' && styles.activeButton,
           ]}
           onPress={() => setActiveCard('New Installation')}>
-          <Text style={styles.switchButtonText}>Maharastra Data</Text>
+          <Text style={styles.switchButtonText}>Installation Data</Text>
         </TouchableOpacity>
       </View>
 
