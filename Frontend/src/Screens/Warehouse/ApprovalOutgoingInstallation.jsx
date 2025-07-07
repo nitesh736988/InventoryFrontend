@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
 import {API_URL} from '@env';
@@ -26,19 +27,15 @@ const ApprovalOutgoingInstallation = () => {
       const response = await axios.get(
         `${API_URL}/warehouse-admin/show-incoming-item`,
       );
-      if (response.data.success) {
         setOutgoingHistory(response.data.data);
-      } else {
-        setError(response.data.message || 'Failed to fetch data');
-      }
     } catch (err) {
-      console.log('Show Error', err);
+      Alert.alert("Error: ", err?.response?.data?.message)
+      console.log('Show Error', err?.response?.data?.message);
       setError('An error occurred while fetching data');
     } finally {
       setLoading(false);
     }
   };
-
   const handleApprove = async (transferId) => {
     try {
       setApprovingId(transferId);
@@ -62,7 +59,7 @@ const ApprovalOutgoingInstallation = () => {
       if (response.data.success) {
         fetchOutgoingHistory();
       } else {
-        setError(response.data.message || 'Failed to approve transfer');
+        setError(response?.data?.message || 'Failed to approve transfer');
       }
     } catch (err) {
       console.log('Approve Error', err);

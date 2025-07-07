@@ -47,23 +47,29 @@
 //     controllerSelected,
 //     withoutRMU,
 //     rmuRemark,
-//   farmerSaralId,
+//     farmerSaralId,
 //   } = formData;
 
 //   useEffect(() => {
-//     const fetchAllWarehouses = async () => {
-//       try {
-//         const response = await axios.get(
-//           `${API_URL}/service-person/all-warehouses`,
-//         );
-//         setWarehouses(response.data.allWarehouses);
-//       } catch (error) {
-//         console.log('Failed to fetch warehouses:', error);
-//       }
-//     };
+//   const fetchAllWarehouses = async () => {
+//     try {
+//       const response = await axios.get(
+//         `${API_URL}/service-person/all-warehouses`,
+//       );
+//       const filteredWarehouses = response.data.allWarehouses.filter(
+//         warehouse => 
+//           warehouse.warehouseName !== "Sirsa" && 
+//           warehouse.warehouseName !== "Jind" &&
+//           warehouse.warehouseName !== "Fatehabad"
+//       );
+//       setWarehouses(filteredWarehouses);
+//     } catch (error) {
+//       console.log('Failed to fetch warehouses:', error);
+//     }
+//   };
 
-//     fetchAllWarehouses();
-//   }, []);
+//   fetchAllWarehouses();
+// }, []);
 
 //   useEffect(() => {
 //     const selectedItemList = async () => {
@@ -160,9 +166,7 @@
 //       farmerSaralId: saralId,
 //       farmerName, 
 //       farmerVillage: village,
-
 //     };
-//     console.log("Form Data", data)
 
 //     if (!controllerSelected) {
 //       data.withoutRMU = null;
@@ -179,13 +183,12 @@
 //           },
 //         },
 //       );
-//       console.log("Form Data",data)
 //       resetForm();
 //       setFormData(prevState => ({...prevState, modalVisible: false}));
 //       Alert.alert('Success', 'Transaction saved successfully');
 //       navigation.goBack();
 //     } catch (error) {
-//        Alert.alert("Error", JSON.stringify(error.response.data?.message));
+//       Alert.alert("Error", JSON.stringify(error.response.data?.message));
 //     } finally {
 //       setLoading(false);
 //     }
@@ -361,19 +364,15 @@
 //             placeholderTextColor={'#000'}
 //           />
 
-//           {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-//               <Text style={styles.buttonText}>Submit</Text>
-//             </TouchableOpacity> */}
-
-//          {buttonVisible && (
-//           <TouchableOpacity
-//             style={[styles.button, loading && styles.disabledButton]}
-//             onPress={handleSubmit}
-//             disabled={loading}>
-//             <Text style={styles.buttonText}>
-//               {loading ? 'Submitting...' : 'Submit'}
-//             </Text>
-//           </TouchableOpacity>
+//           {buttonVisible && (
+//             <TouchableOpacity
+//               style={[styles.button, loading && styles.disabledButton]}
+//               onPress={handleSubmit}
+//               disabled={loading}>
+//               <Text style={styles.buttonText}>
+//                 {loading ? 'Submitting...' : 'Submit'}
+//               </Text>
+//             </TouchableOpacity>
 //           )}
 //         </View>
 //       </ScrollView>
@@ -435,9 +434,16 @@
 //   itemText: {
 //     fontWeight: 'bold',
 //   },
+//   nonEditable: {
+//     backgroundColor: '#e0e0e0',
+//   },
+//   disabledButton: {
+//     opacity: 0.6,
+//   },
 // });
 
 // export default InOrder;
+
 
 import React, {useState, useEffect} from 'react';
 import {
@@ -458,6 +464,7 @@ import {useNavigation} from '@react-navigation/native';
 
 const InOrder = ({route}) => {
   const {id, name, farmerContact, saralId, farmerName, village} = route.params;
+  console.log("Farmer Contact: ", farmerContact)
   const [items, setItems] = useState([{}]);
   const [warehouses, setWarehouses] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
@@ -469,8 +476,8 @@ const InOrder = ({route}) => {
     remarks: '',
     selectedItems: [],
     quantities: {},
+    serialNumbers: {}, // Changed from single serialNumber to object for multiple items
     status: '',
-    serialNumber: '',
     selectedWarehouse: 'Bhiwani',
     controllerSelected: false,
     withoutRMU: null,
@@ -482,8 +489,8 @@ const InOrder = ({route}) => {
     remarks,
     selectedItems,
     quantities,
+    serialNumbers,
     status,
-    serialNumber,
     selectedWarehouse,
     controllerSelected,
     withoutRMU,
@@ -491,46 +498,26 @@ const InOrder = ({route}) => {
     farmerSaralId,
   } = formData;
 
-  // useEffect(() => {
-  //   const fetchAllWarehouses = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `${API_URL}/service-person/all-warehouses`,
-  //       );
-  //       // Filter out Sirsa warehouse
-  //       const filteredWarehouses = response.data.allWarehouses.filter(
-  //         warehouse => warehouse.warehouseName !== "Sirsa", 
-  //       );
-  //       setWarehouses(filteredWarehouses);
-  //     } catch (error) {
-  //       console.log('Failed to fetch warehouses:', error);
-  //     }
-  //   };
-
-  //   fetchAllWarehouses();
-  // }, []);
-
   useEffect(() => {
-  const fetchAllWarehouses = async () => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/service-person/all-warehouses`,
-      );
-      // Filter out Sirsa, Jind, and Fatehabad warehouses
-      const filteredWarehouses = response.data.allWarehouses.filter(
-        warehouse => 
-          warehouse.warehouseName !== "Sirsa" && 
-          warehouse.warehouseName !== "Jind" &&
-          warehouse.warehouseName !== "Fatehabad"
-      );
-      setWarehouses(filteredWarehouses);
-    } catch (error) {
-      console.log('Failed to fetch warehouses:', error);
-    }
-  };
+    const fetchAllWarehouses = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/service-person/all-warehouses`,
+        );
+        const filteredWarehouses = response.data.allWarehouses.filter(
+          warehouse => 
+            warehouse.warehouseName !== "Sirsa" && 
+            warehouse.warehouseName !== "Jind" &&
+            warehouse.warehouseName !== "Fatehabad"
+        );
+        setWarehouses(filteredWarehouses);
+      } catch (error) {
+        console.log('Failed to fetch warehouses:', error);
+      }
+    };
 
-  fetchAllWarehouses();
-}, []);
+    fetchAllWarehouses();
+  }, []);
 
   useEffect(() => {
     const selectedItemList = async () => {
@@ -562,10 +549,19 @@ const InOrder = ({route}) => {
       item.toLowerCase().includes('controller'),
     );
 
+    // Initialize quantities and serialNumbers for each selected item
+    const newQuantities = {};
+    const newSerialNumbers = {};
+    validItems.forEach(item => {
+      newQuantities[item] = quantities[item] || '';
+      newSerialNumbers[item] = serialNumbers[item] || '';
+    });
+
     setFormData(prevState => ({
       ...prevState,
       selectedItems: validItems,
-      quantities: validItems.reduce((acc, item) => ({...acc, [item]: ''}), {}),
+      quantities: newQuantities,
+      serialNumbers: newSerialNumbers,
       controllerSelected: isControllerSelected,
       withoutRMU: isControllerSelected ? null : prevState.withoutRMU,
     }));
@@ -578,6 +574,13 @@ const InOrder = ({route}) => {
     }));
   };
 
+  const handleSerialNumberChange = (itemName, serialNumber) => {
+    setFormData(prevState => ({
+      ...prevState,
+      serialNumbers: {...prevState.serialNumbers, [itemName]: serialNumber},
+    }));
+  };
+
   const validateInput = () => {
     if (!farmerContact) {
       Alert.alert('Error', 'Please fill in all fields.');
@@ -587,6 +590,10 @@ const InOrder = ({route}) => {
     for (const item of selectedItems) {
       if (!quantities[item]) {
         Alert.alert('Error', `Please enter quantity for ${item}.`);
+        return false;
+      }
+      if (!serialNumbers[item]) {
+        Alert.alert('Error', `Please enter serial number for ${item}.`);
         return false;
       }
     }
@@ -610,6 +617,7 @@ const InOrder = ({route}) => {
     const itemSelected = selectedItems.map(item => ({
       itemName: item,
       quantity: parseInt(quantities[item]),
+      serialNumber: serialNumbers[item],
     }));
 
     const data = {
@@ -619,7 +627,6 @@ const InOrder = ({route}) => {
       items: itemSelected,
       warehouse: selectedWarehouse,
       remark: remarks,
-      serialNumber,
       incoming: true,
       pickupDate: new Date(),
       withoutRMU,
@@ -659,8 +666,8 @@ const InOrder = ({route}) => {
     setFormData({
       selectedItems: [],
       quantities: {},
+      serialNumbers: {},
       remarks: '',
-      serialNumber: '',
       selectedWarehouse: 'Bhiwani',
       controllerSelected: false,
       withoutRMU: null,
@@ -733,19 +740,19 @@ const InOrder = ({route}) => {
                 style={styles.input}
                 placeholderTextColor={'#000'}
               />
+
+              <Text style={{color: 'black'}}>
+                Serial Number for <Text style={styles.itemText}>{item}</Text>:
+              </Text>
+              <TextInput
+                value={serialNumbers[item]}
+                onChangeText={value => handleSerialNumberChange(item, value)}
+                placeholder="Enter Serial Number"
+                style={styles.input}
+                placeholderTextColor={'#000'}
+              />
             </View>
           ))}
-
-          <Text style={{color: 'black'}}>Serial Number:</Text>
-          <TextInput
-            value={serialNumber}
-            onChangeText={text =>
-              setFormData(prevState => ({...prevState, serialNumber: text}))
-            }
-            placeholder="Enter Serial Number"
-            style={styles.input}
-            placeholderTextColor={'#000'}
-          />
 
           <Text style={{color: 'black'}}>Warehouse:</Text>
           <Picker

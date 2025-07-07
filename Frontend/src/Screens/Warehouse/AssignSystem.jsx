@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,20 +8,22 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {API_URL} from '@env';
 
 const AssignSystem = () => {
   const [servicePerson, setServicePerson] = useState('');
-  const [servicePersons, setServicePersons] = useState([]);  
-     
+  const [servicePersons, setServicePersons] = useState([]);
+
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
-        const response = await axios.get('${API_URL}/service-team/all-service-persons');
-        console.log("Service persons data", response.data.data);
-        const persons = response.data.data.map((person) => ({
+        const response = await axios.get(
+          '${API_URL}/service-team/all-service-persons',
+        );
+        console.log('Service persons data', response.data.data);
+        const persons = response.data.data.map(person => ({
           _id: person._id,
           name: person.name,
         }));
@@ -31,7 +33,7 @@ const AssignSystem = () => {
       }
     };
 
-    fetchServicePersons(); 
+    fetchServicePersons();
   }, []);
 
   const handleSubmit = async () => {
@@ -56,15 +58,17 @@ const AssignSystem = () => {
         <Text style={styles.label}>Service Person:</Text>
         <Picker
           selectedValue={servicePerson}
-          onValueChange={(itemValue) => setServicePerson(itemValue)}
-          style={styles.input}
-        >
+          onValueChange={itemValue => setServicePerson(itemValue)}
+          style={styles.input}>
           <Picker.Item label="Select Service Person" value="" />
-          {servicePersons.map((person) => (
-            <Picker.Item key={person._id} label={person.name} value={person.name} />
+          {servicePersons.map(person => (
+            <Picker.Item
+              key={person._id}
+              label={person.name}
+              value={person.name}
+            />
           ))}
         </Picker>
-
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Assign System</Text>
@@ -93,7 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
