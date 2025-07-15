@@ -34,7 +34,7 @@
     "pod-install": "^0.3.2",
     "react": "18.3.1",
     "react-devtools": "^6.0.0",
-    "react-hook-form": "^7.55.0",
+    "react-hook-form": "^7.60.0",
     "react-native": "^0.75.4",
     "react-native-actionsheet": "^2.4.2",
     "react-native-background-timer": "^2.4.1",
@@ -60,7 +60,8 @@
     "react-native-skeleton-placeholder": "^5.2.4",
     "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^6.6.4",
-    "react-native-vision-camera": "^4.6.4"
+    "react-native-vision-camera": "^4.6.4",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

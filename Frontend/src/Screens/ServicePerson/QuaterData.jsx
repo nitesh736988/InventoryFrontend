@@ -82,7 +82,7 @@ const QuaterData = () => {
         {item?.quarterlyVisit === false ? (
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('QuarterlyVisit', {farmerId: item?._id})
+              navigation.navigate('QuarterlyVisit', {farmerId: item?._id, farmerName: item?.farmerName,saralId: item?.saralId})
             }>
             <Text style={styles.approvedText}>Fill Form</Text>
           </TouchableOpacity>
