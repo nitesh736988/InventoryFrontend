@@ -60,10 +60,10 @@ const Sidebarmodal = () => {
     closeModal();
     navigation.navigate('ShowComplaints');
   };
-  const openShowInstallationData = () => {
-    closeModal();
-    navigation.navigate('InstallationData');
-  };
+  // const openShowInstallationData = () => {
+  //   closeModal();
+  //   navigation.navigate('InstallationData');
+  // };
 
 
   const openShowQuaterData = () => {
@@ -137,12 +137,6 @@ const Sidebarmodal = () => {
             onPress={openShowComplaints}
             style={styles.optionButton}>
             <Text style={styles.optionText}>Show Complaint</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={openShowInstallationData}
-            style={styles.optionButton}>
-            <Text style={styles.optionText}>Service Data</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

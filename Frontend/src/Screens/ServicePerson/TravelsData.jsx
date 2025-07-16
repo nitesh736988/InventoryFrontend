@@ -592,6 +592,9 @@ import Geolocation from '@react-native-community/geolocation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
+// NOTE: For true background tracking (when app is closed or in background), use a library like
+// react-native-background-geolocation (transistorsoft). This code only works reliably when the app is open or in the foreground.
+
 const TravelsData = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -1086,9 +1089,8 @@ const styles = StyleSheet.create({
   },
   inactiveText: {
     color: '#e74c3c',
-    fontWeight: 'bold',
+     fontWeight: 'bold',
   },
 });
-     
+
 export default TravelsData;
-     

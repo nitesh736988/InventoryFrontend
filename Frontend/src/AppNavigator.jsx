@@ -30,7 +30,6 @@ import Sidebarmodal from './Screens/ServicePerson/Sidebarmodal';
 import ApprovedData from './Screens/ServicePerson/ApprovedData';
 import ShowComplaints from './Screens/ServicePerson/ShowComplaints';
 import InstallationPart from './Screens/ServicePerson/InstallationPart';
-import InstallationData from './Screens/ServicePerson/InstallationData';
 import InstallationHistoryData from './Screens/Warehouse/InstallationHistoryData';
 import InstallationHistory from './Screens/Admin/InstallationHistory';
 import ShowComplaintData from './Screens/ServicePerson/ShowComplaintData';
@@ -271,12 +270,6 @@ const AppNavigator = () => {
           name="ShowComplaints"
           component={ShowComplaints}
           options={{title: 'ShowComplaints', headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="InstallationData"
-          component={InstallationData}
-          options={{title: 'InstallationData', headerShown: false}}
         />
 
        <Stack.Screen
