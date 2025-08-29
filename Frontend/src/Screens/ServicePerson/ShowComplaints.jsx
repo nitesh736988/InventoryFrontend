@@ -30,22 +30,24 @@
 //       const response = await axios.get(
 //         `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
 //       );
+//       console.log("fetch data", response.data)
 //       setComplaints(response.data.data);
 //     } catch (error) {
-//       console.log('Error fetching complaints:', error);
+//       Alert.alert("Error", JSON.stringify(error.response.data?.message));
 //     } finally {                 
 //       setLoading(false);
 //       setRefreshing(false);
 //     }
 //   };
 
+
 //   const filterComplaints = () => {
-//     return complaints.filter(
-//       complaint =>
-//         complaint.complainantName
-//           .toLowerCase()
-//           .includes(searchQuery.toLowerCase()) ||
-//         complaint.trackingId.toLowerCase().includes(searchQuery.toLowerCase()),
+//     return complaints?.filter(item =>
+//       item?.Farmer[0]?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//       item?.Farmer[0]?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//       item?.Farmer[0]?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//       item?.Farmer[0]?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//       item?.Farmer[0]?.saralId?.toLowerCase().includes(searchQuery.toLowerCase())
 //     );
 //   };
 
@@ -58,55 +60,36 @@
 //     fetchComplaints();
 //   };
 
-//   // const handleApproveBtn = async (sendTransactionId, status) => {
-//   //   setLoading(true);
-//   //   try {
-//   //     const fieldEmpId = await AsyncStorage.getItem('_id');
-
-//   //     const sendRequest = await axios.post(
-//   //       `http://88.222.214.93:8001/filedService/complaintAccept`,
-//   //       {
-//   //         stageId: status,
-//   //         complaintId: sendTransactionId,
-//   //         empId: fieldEmpId,
-//   //       },
-//   //     );
-//   //     console.log(sendRequest.data);
-//   //   } catch (error) {
-//   //     Alert.alert(JSON.stringify(error));
-//   //   } finally {
-//   //     setLoading(false);
-//   //   }
-//   // };
-
+ 
 //   const renderComplaintItem = ({item}) => (
 //     <View key={item._id} style={styles.card}>
 //       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
 //         <Text style={styles.infoText}>
 //           <Text style={styles.label}>Complainant Name:</Text>{' '}
-//           <View style={{ flexDirection: 'row', alignItems: 'flex-end', width: 130 }}>
+//           <View style={{ flexDirection: 'row', alignItems: 'flex-end', width: 130, }}>
 //             <Text
 //               numberOfLines={1}
 //               ellipse="tail"
+//               style={{color: '#000'}}
 //             >{item.complainantName}</Text>
 //           </View>
 //         </Text>
 
-//         {item?.Stage[0]?._id === '675aaf9c44c74418017c1dae' ? (
+//         {/* { ( */}
 //           <OpenMap
 //             longitude={item?.Farmer[0]?.longitude}
 //             latitude={item?.Farmer[0]?.latitude}
 //           />
-//         ) : item?.Stage[0]._id === '675aaf9c44c74418017c1daf' ? (
-//           <EntypoIcon name="squared-cross" color="red" size={25} />
-//         ) : null}
+       
 //         {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
 //           onPress={() =>
-//             {navigation.navigate('ShowComplaintData', {
+//             {console.log('complaint id from showComplaint page', item?._id)
+//               navigation.navigate('ShowComplaintData', {
 //               complaintId: item?._id,
 //               farmerName: item?.Farmer[0]?.farmerName,
 //               farmerContact: item?.Farmer[0]?.contact,
-//               fatherOrHusbandName: item?.Farmer[0]?.fatherOrHusbandName,
+//               village: item?.Farmer[0]?.village,
+//               saralId: item?.Farmer[0]?.saralId,
 //               pump_type: item?.Farmer[0]?.pump_type,
 //               HP: item?.Farmer[0]?.HP,
 //               AC_DC: item?.Farmer[0]?.AC_DC, 
@@ -151,32 +134,19 @@
 //         {new Date(item.created_At).toLocaleDateString()}
 //       </Text>
 
-//       <View style={styles.actionContainer}>
-//         {item?.Stage[0]?.stage === 'Assigned' && (
-//           <>
-//             <TouchableOpacity
-//               onPress={() =>
-//                 handleApproveBtn(item._id, '675aaf9c44c74418017c1daf')
-//               }
-//               style={styles.declineButton}>
-//               <Text style={styles.buttonText}>Decline</Text>
-//             </TouchableOpacity>
-//             <TouchableOpacity
-//               style={styles.approveButton}
-//               onPress={() =>
-//                 handleApproveBtn(item._id, '675aaf9c44c74418017c1dae')
-//               }>
-//               <Text style={styles.buttonText}>Approve</Text>
-//             </TouchableOpacity>
-//           </>
-//         )}
-//       </View>
 //     </View>
 //   );
 
 //   return (
 //     <View style={styles.container}>
-//       <Text style={styles.header}>Complaints</Text>
+//       <Text style={styles.header}>All Complaints</Text>
+//       <TextInput
+//         style={styles.searchBar}
+//         placeholder="Search by Village, Block, Farmer Name, Contact, Saral ID"
+//         value={searchQuery}
+//         onChangeText={setSearchQuery}
+//         placeholderTextColor='#000'
+//       />
 //       <FlatList
 //         data={filterComplaints()}
 //         renderItem={renderComplaintItem}
@@ -226,6 +196,8 @@
 //   },
 //   label: {
 //     fontWeight: 'bold',
+//     color: '#000',
+    
 //   },
 //   loadingIndicator: {
 //     flex: 1,
@@ -263,18 +235,17 @@
 //   },
 //   searchBar: {
 //     height: 40,
-//     borderColor: '#ccc',
+//     borderColor: '#000',
 //     borderWidth: 1,
 //     borderRadius: 8,
-//     // marginBottom: 16,
+//     marginBottom: 16,
 //     paddingHorizontal: 10,
 //     fontSize: 16,
-//     backgroundColor: '#fff',
+//     // backgroundColor: '#fff',
 //   },
 // });
 
 // export default ShowComplaints;
-
 
 import React, {useState, useEffect} from 'react';
 import {
@@ -291,7 +262,6 @@ import {
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OpenMap from '../../Component/OpenMap/index';
-import EntypoIcon from 'react-native-vector-icons/Entypo';
 import {useNavigation} from '@react-navigation/native';
 
 const ShowComplaints = () => {
@@ -303,116 +273,172 @@ const ShowComplaints = () => {
 
   const fetchComplaints = async () => {
     try {
-      const serviceId = await AsyncStorage.getItem('_id');
-      console.log(serviceId);
-      const response = await axios.get(
-        `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
+      const fieldEmpId = await AsyncStorage.getItem('_id');
+      const blockListString = await AsyncStorage.getItem('block');
+      
+      // Parse blockList if it's stored as a JSON string
+      let parsedBlockList = [];
+      try {
+        parsedBlockList = blockListString ? JSON.parse(blockListString) : [];
+      } catch (e) {
+        console.error("Error parsing block list:", e);
+        parsedBlockList = [];
+      }
+      
+      console.log("Field Emp ID:", fieldEmpId);
+      console.log("Block List:", parsedBlockList);
+      
+      // Make API call with proper parameters
+      const response = await axios.post(
+        'https://service.galosolar.com/api/filedService/complaintList',
+        {
+          blockList: parsedBlockList,
+          fieldEmpId: fieldEmpId
+        }
       );
-      console.log("fetch data", response.data)
-      setComplaints(response.data.data);
+      
+      console.log("fetch data", response.data);
+      if (response.data.success) {
+        setComplaints(response.data.data || []);
+      } else {
+        Alert.alert("Error", "Failed to fetch complaints");
+      }
     } catch (error) {
-      Alert.alert("Error", JSON.stringify(error.response.data?.message));
+      console.error("Error fetching complaints:", error);
+      Alert.alert("Error", error.response?.data?.message || "Failed to fetch complaints");
     } finally {                 
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-
   const filterComplaints = () => {
-    return complaints?.filter(item =>
-      item?.Farmer[0]?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.Farmer[0]?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.Farmer[0]?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.Farmer[0]?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.Farmer[0]?.saralId?.toLowerCase().includes(searchQuery.toLowerCase())
+    if (!complaints || complaints.length === 0) return [];
+    
+    return complaints.filter(item =>
+      item?.farmerData?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.farmerData?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.farmerData?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.farmerData?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.farmerData?.saralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.complainantName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item?.trackingId?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
   useEffect(() => {
     fetchComplaints();
-  }, [loading]);
+  }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchComplaints();
   };
 
- 
   const renderComplaintItem = ({item}) => (
     <View key={item._id} style={styles.card}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Complainant Name:</Text>{' '}
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end', width: 130 }}>
-            <Text
-              numberOfLines={1}
-              ellipse="tail"
-            >{item.complainantName}</Text>
-          </View>
-        </Text>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+        <View style={{flex: 1}}>
+          <Text style={styles.infoText}>
+            <Text style={styles.label}>Complainant:</Text>{' '}
+            <Text numberOfLines={1} ellipsizeMode="tail" style={{color: '#000'}}>
+              {item.complainantName}
+            </Text>
+          </Text>
+        </View>
 
-        {/* { ( */}
+        {item?.farmerData?.longitude && item?.farmerData?.latitude && (
           <OpenMap
-            longitude={item?.Farmer[0]?.longitude}
-            latitude={item?.Farmer[0]?.latitude}
+            longitude={item.farmerData.longitude}
+            latitude={item.farmerData.latitude}
           />
+        )}
        
-        {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
-          onPress={() =>
-            {console.log('complaint id from showComplaint page', item?._id)
+        {!(item?.StageData?.stage === "Resolved" || item?.StageData?.stage === "Rejected") && (
+          <TouchableOpacity
+            onPress={() => {
+              console.log('complaint id from showComplaint page', item?._id);
               navigation.navigate('ShowComplaintData', {
-              complaintId: item?._id,
-              farmerName: item?.Farmer[0]?.farmerName,
-              farmerContact: item?.Farmer[0]?.contact,
-              village: item?.Farmer[0]?.village,
-              saralId: item?.Farmer[0]?.saralId,
-              pump_type: item?.Farmer[0]?.pump_type,
-              HP: item?.Farmer[0]?.HP,
-              AC_DC: item?.Farmer[0]?.AC_DC, 
-              longitude2: item?.Farmer[0]?.longitude,
-              latitude2: item?.Farmer[0]?.latitude
-            }); setLoading(true)
-          }
-          }>
-          <Text style={styles.approvedText}>Fill Form</Text>
-        </TouchableOpacity>}
+                complaintId: item?._id,
+                farmerName: item?.farmerData?.farmerName,
+                farmerContact: item?.farmerData?.contact,
+                village: item?.farmerData?.village,
+                saralId: item?.farmerData?.saralId,
+                pump_type: item?.farmerData?.pump_type,
+                HP: item?.farmerData?.HP,
+                AC_DC: item?.farmerData?.AC_DC, 
+                longitude2: item?.farmerData?.longitude,
+                latitude2: item?.farmerData?.latitude,
+                trackingId: item?.trackingId
+              }); 
+            }}
+            
+            style={styles.fillFormButton}
+          >
+            <Text style={styles.approvedText}>Fill Form</Text>
+          </TouchableOpacity>
+        )}
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+      
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
         <Text style={styles.infoText}>
           <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
         </Text>
-        {item?.Stage[0]?._id === "675be30222ae6f63bf772dcf" && <Text style={{ color: 'red' }}>Pending</Text>}
-        {item?.Stage[0]?._id === "675be30222ae6f63bf772dd1" && <Text style={{ color: 'red'}}>Rejected</Text>}
-        {item?.Stage[0]?._id === "675be30222ae6f63bf772dd0" && <Text style={{ color: 'rgb(0, 200, 0)'}}>Resolved</Text>}
+        <Text style={[
+          styles.statusText,
+          item?.StageData?.stage?.includes("Pending") && styles.pendingStatus,
+          item?.StageData?.stage?.includes("Resolved") && styles.resolvedStatus,
+          item?.StageData?.stage?.includes("Rejected") && styles.rejectedStatus
+        ]}>
+          {item.StageData?.stage || "Unknown Status"}
+        </Text>
       </View>
+      
       <Text style={styles.infoText}>
         <Text style={styles.label}>Contact:</Text> {item.contact}
       </Text>      
+      
       <Text style={styles.infoText}>
-        <Text style={styles.label}>Company:</Text> {item.company}
-      </Text>     
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>ComplaintDetails:</Text>{' '}
+        <Text style={styles.label}>Complaint Details:</Text>{' '}
         {item.complaintDetails}
       </Text>
            
       <Text style={styles.infoText}>
+        <Text style={styles.label}>Farmer:</Text>{' '}
+        {item.farmerData?.farmerName || 'N/A'}
+      </Text>
+
+      <Text style={styles.infoText}>
         <Text style={styles.label}>Village:</Text>{' '}
-        {item.Farmer[0].village}
+        {item.farmerData?.village || 'N/A'}
       </Text>
 
       <Text style={styles.infoText}>
         <Text style={styles.label}>Block:</Text>{' '}
-        {item.Farmer[0].block}
+        {item.farmerData?.block || 'N/A'}
       </Text>
+      
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Saral ID:</Text>{' '}
+        {item.farmerData?.saralId || 'N/A'}
+      </Text>
+      
       <Text style={styles.infoText}>
         <Text style={styles.label}>Created At:</Text>{' '}
-        {new Date(item.created_At).toLocaleDateString()}
+        {item.create_At ? new Date(item.create_At).toLocaleDateString() : 'N/A'}
       </Text>
-
     </View>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={{marginTop: 10}}>Loading complaints...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -422,13 +448,17 @@ const ShowComplaints = () => {
         placeholder="Search by Village, Block, Farmer Name, Contact, Saral ID"
         value={searchQuery}
         onChangeText={setSearchQuery}
+        placeholderTextColor='#000'
       />
+      
       <FlatList
         data={filterComplaints()}
         renderItem={renderComplaintItem}
         keyExtractor={item => item._id}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No complaints found.</Text>
+          <Text style={styles.emptyText}>
+            {complaints.length === 0 ? "No complaints available" : "No matching complaints found"}
+          </Text>
         }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -443,6 +473,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fbd33b',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     fontSize: 24,
@@ -464,43 +499,34 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: '#000',
+    marginBottom: 4,
   },
-
-    approvedText: {
+  approvedText: {
     color: 'green',
     fontWeight: 'bold',
   },
   label: {
     fontWeight: 'bold',
+    color: '#000',
   },
-  loadingIndicator: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  statusText: {
+    fontWeight: 'bold',
   },
-  actionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    // marginVertical: 5,
+  pendingStatus: {
+    color: 'red',
   },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
+  resolvedStatus: {
+    color: 'rgb(0, 200, 0)',
   },
-
-  declineButton: {
-    width: '49%',
+  rejectedStatus: {
+    color: 'red',
+  },
+  fillFormButton: {
+    padding: 5,
+    backgroundColor: '#e8f5e8',
     borderRadius: 5,
-    backgroundColor: 'red',
-    padding: 8,
+    marginLeft: 10,
   },
-  approveButton: {
-    width: '49%',
-    borderRadius: 5,
-    backgroundColor: 'green',
-    padding: 8,
-  },
-
   emptyText: {
     textAlign: 'center',
     fontSize: 16,
@@ -509,7 +535,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 16,

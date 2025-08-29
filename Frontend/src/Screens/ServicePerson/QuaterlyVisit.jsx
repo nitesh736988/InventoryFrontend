@@ -21,7 +21,7 @@
 
 // const requestCameraPermission = async () => {
 //   if (Platform.OS === 'android') {
-//     try {
+//     try { 
 //       const granted = await PermissionsAndroid.request(
 //         PermissionsAndroid.PERMISSIONS.CAMERA,
 //         {
@@ -335,23 +335,20 @@ import axios from 'axios';
 import { launchCamera } from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import RNFS from 'react-native-fs';
 
 const requestCameraPermission = async () => {
   if (Platform.OS === 'android') {
     try {
-      const granted = await PermissionsAndroid.request(
+      const granted = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: 'Camera Permission',
-          message: 'This app needs access to your camera to take photos.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES // Android 13+
+      ]);
 
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+      return (
+        granted['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED
+      );
     } catch (err) {
       Alert.alert('Error', 'Failed to request camera permission.');
       return false;
@@ -369,8 +366,8 @@ const QuarterlyVisit = ({ route }) => {
       selectedCompany: '',
     }
   });
-  
-  const [images, setImages] = useState([]);
+
+  const [quarterlyPhoto, setQuarterlyPhoto] = useState([]);
   const [companyList, setCompanyList] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submitDate = new Date().toISOString();
@@ -383,9 +380,13 @@ const QuarterlyVisit = ({ route }) => {
     const fetchCompanies = async () => {
       try {
         const response = await axios.get(
-          'http://88.222.214.93:8001/common/showCompany',
+          'http://88.222.214.93:8001/common/showCompany'
         );
-        setCompanyList(response.data.data);
+        if (Array.isArray(response.data.data)) {
+          setCompanyList(response.data.data);
+        } else {
+          setCompanyList([]);
+        }
       } catch (error) {
         console.log('Error fetching company list:', error);
         Alert.alert("Error", error.response?.data?.message || "Failed to fetch companies");
@@ -422,19 +423,23 @@ const QuarterlyVisit = ({ route }) => {
               originalPhoto.uri,
               800,
               800,
-              'JPEG',
+              'JPEG',  
               80,
               0,
               null,
             );
 
+            const uri = Platform.OS === 'android' && !resizedImage.uri.startsWith('file://')
+              ? `file://${resizedImage.uri}`
+              : resizedImage.uri;
+
             const newImage = {
-              uri: resizedImage.uri,
+              uri,
               type: originalPhoto.type || 'image/jpeg',
               name: `photo_${Date.now()}.jpg`
             };
 
-            setImages(prev => [...prev, newImage]);
+            setQuarterlyPhoto(prev => [...prev, newImage]);
           } catch (error) {
             console.log('Error processing image:', error);
             Alert.alert('Error', 'Failed to process image');
@@ -445,11 +450,11 @@ const QuarterlyVisit = ({ route }) => {
   };
 
   const removeImage = (uri) => {
-    setImages(prev => prev.filter(img => img.uri !== uri));
+    setQuarterlyPhoto(prev => prev.filter(img => img.uri !== uri));
   };
 
   const onSubmit = async () => {
-    if (images.length === 0) {
+    if (quarterlyPhoto.length === 0) {
       Alert.alert('Error', 'Please add at least one image');
       return;
     }
@@ -458,7 +463,7 @@ const QuarterlyVisit = ({ route }) => {
 
     try {
       const userId = await AsyncStorage.getItem('_id');
-      
+
       const formData = new FormData();
       formData.append('farmerId', farmerId);
       formData.append('currentStatus', currentStatus);
@@ -467,17 +472,18 @@ const QuarterlyVisit = ({ route }) => {
       formData.append('fieldEmpId', userId);
       formData.append('companyName', selectedCompany);
 
-      // Append each image to the form data
-      images.forEach((image, index) => {
-        formData.append('image', {
+      quarterlyPhoto.forEach((image, index) => {
+        formData.append('quarterlyPhoto', {
           uri: image.uri,
           type: image.type,
           name: image.name || `image_${index}.jpg`
         });
       });
 
-      const response = await axios.post(
-        'http://88.222.214.93:8001/filedService/addSurvey',
+      console.log("Form Data:", formData);
+
+      await axios.post(
+        'http://88.222.214.93:8001/filedService/quarterlySurvey',
         formData,
         {
           headers: {
@@ -493,7 +499,7 @@ const QuarterlyVisit = ({ route }) => {
             setValue('currentStatus', '');
             setValue('quarterly', '');
             setValue('selectedCompany', '');
-            setImages([]);
+            setQuarterlyPhoto([]);
           },
         },
       ]);
@@ -538,7 +544,7 @@ const QuarterlyVisit = ({ route }) => {
         />
         {errors.selectedCompany && <Text style={styles.errorText}>Company is required</Text>}
 
-        <Text style={styles.label}>Current State:</Text>
+        <Text style={styles.label}>Current Status:</Text>
         <Controller
           control={control}
           name="currentStatus"
@@ -549,7 +555,7 @@ const QuarterlyVisit = ({ route }) => {
               onValueChange={onChange}
               style={styles.dropdown}
             >
-              <Picker.Item label="Select Current State" value="" />
+              <Picker.Item label="Select Current Status" value="" />
               <Picker.Item label="Working" value="Working" />
               <Picker.Item label="Non-Working" value="Non-Working" />
               <Picker.Item label="Not Found" value="Not Found" />
@@ -579,14 +585,14 @@ const QuarterlyVisit = ({ route }) => {
         />
         {errors.quarterly && <Text style={styles.errorText}>Quarter is required</Text>}
 
-        <Text style={styles.label}>Images:</Text>
+        <Text style={styles.label}>Quarterly Form Images:</Text>
         <TouchableOpacity onPress={takePhoto} style={styles.imageButton}>
           <Icon name="camera-plus" size={28} color="#000" />
           <Text style={styles.buttonText}>Take Photo</Text>
         </TouchableOpacity>
 
         <ScrollView horizontal style={styles.imagePreviewContainer}>
-          {images.map((image, index) => (
+          {quarterlyPhoto.map((image, index) => (
             <View key={index} style={styles.imageWrapper}>
               <Image source={{ uri: image.uri }} style={styles.imagePreview} />
               <TouchableOpacity
@@ -620,11 +626,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbd33b',
   },
   card: {
-
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
-    // elevation: 3,
   },
   row: {
     flexDirection: 'row',

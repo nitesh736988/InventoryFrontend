@@ -79,23 +79,23 @@ const QuaterData = () => {
           justifyContent: 'space-between',
         }}>
         <Text style={styles.label}>Saral ID: {item.saralId}</Text>
-        {item?.quarterlyVisit === false ? (
+        {/* {item?.quarterlyVisit === false ? ( */}
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('QuarterlyVisit', {farmerId: item?._id, farmerName: item?.farmerName,saralId: item?.saralId})
             }>
             <Text style={styles.approvedText}>Fill Form</Text>
           </TouchableOpacity>
-        ) : (
-          <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text>
-        )}
+        {/* ) : ( */}
+          {/* <Text style={[styles.approvedText, {color: 'green'}]}>Done</Text> */}
+        {/* )} */}
       </View>
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+      <View style={{flexDirection: 'row', alignItems: 'center', gap: 4,}}>
         <View>
           <Text style={styles.label}>Farmer Name:</Text>
         </View>
         <View style={styles.ellipse}>
-          <Text numberOfLines={1} ellipsizeMode="tail">
+          <Text numberOfLines={1} ellipsizeMode="tail" style={{color: '#000'}}>
             {item.farmerName}
           </Text>
         </View>
@@ -127,6 +127,7 @@ const QuaterData = () => {
         placeholder="Search by Farmer Name, Saral Id, Contact"
         value={searchText}
         onChangeText={handleSearch}
+        placeholderTextColor='#000'
       />
 
       {loading && !refreshing ? (
@@ -155,16 +156,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000',
     textAlign: 'center',
   },
   searchBar: {
-    backgroundColor: '#fff',
     padding: 10,
     borderRadius: 8,
     marginVertical: 10,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
+
   },
   approvedText: {
     color: 'green',
@@ -198,3 +199,5 @@ const styles = StyleSheet.create({
 });
 
 export default QuaterData;
+
+

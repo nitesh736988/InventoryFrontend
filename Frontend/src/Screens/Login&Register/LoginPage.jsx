@@ -101,6 +101,8 @@ const LoginPage = () => {
           ["longitude", JSON.stringify(longitude)],
           ["Contact", JSON.stringify(contact)]
         ]);
+
+        console.log('Stored serviceperson data:', { id, block,});
       } else if (role === 'warehouseAdmin') {
         const { id, warehouse } = response.data;
         await AsyncStorage.multiSet([
