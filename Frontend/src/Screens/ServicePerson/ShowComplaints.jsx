@@ -275,6 +275,7 @@ const ShowComplaints = () => {
     try {
       const fieldEmpId = await AsyncStorage.getItem('_id');
       const blockListString = await AsyncStorage.getItem('block');
+      console.log("Retrieved block list string:", blockListString);
       
       // Parse blockList if it's stored as a JSON string
       let parsedBlockList = [];
@@ -297,9 +298,13 @@ const ShowComplaints = () => {
         }
       );
       
-      console.log("fetch data", response.data);
       if (response.data.success) {
-        setComplaints(response.data.data || []);
+        const data = response.data.data || [];
+        // Remove duplicates by _id
+        const uniqueData = data.filter((item, index, self) => 
+          index === self.findIndex(t => t._id === item._id)
+        );
+        setComplaints(uniqueData);
       } else {
         Alert.alert("Error", "Failed to fetch complaints");
       }
@@ -312,19 +317,43 @@ const ShowComplaints = () => {
     }
   };
 
+  // Add this useEffect to check for duplicates
+  useEffect(() => {
+    if (complaints.length > 0) {
+      const ids = complaints.map(item => item._id);
+      const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+      
+      if (duplicateIds.length > 0) {
+        console.log('Duplicate IDs found:', duplicateIds);
+        // Filter out duplicates
+        const uniqueComplaints = complaints.filter((item, index, self) => 
+          index === self.findIndex(t => t._id === item._id)
+        );
+        setComplaints(uniqueComplaints);
+      }
+    }
+  }, [complaints]);
+
   const filterComplaints = () => {
     if (!complaints || complaints.length === 0) return [];
     
-    return complaints.filter(item =>
-      item?.farmerData?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.farmerData?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.farmerData?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.farmerData?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.farmerData?.saralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.complainantName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.trackingId?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    if (!searchQuery.trim()) return complaints;
+    
+    const query = searchQuery.toLowerCase().trim();
+    
+    return complaints.filter(item => {
+      // Safely check each property with optional chaining and nullish coalescing
+      return (
+        (item?.farmerData?.village?.toLowerCase() ?? '').includes(query) ||
+        (item?.farmerData?.block?.toLowerCase() ?? '').includes(query) ||
+        (item?.farmerData?.farmerName?.toLowerCase() ?? '').includes(query) ||
+        (item?.farmerData?.contact?.toLowerCase() ?? '').includes(query) ||
+        (item?.farmerData?.saralId?.toLowerCase() ?? '').includes(query) ||
+        (item?.complainantName?.toLowerCase() ?? '').includes(query) ||
+        (item?.contact?.toLowerCase() ?? '').includes(query) ||
+        (item?.trackingId?.toLowerCase() ?? '').includes(query)
+      );
+    });
   };
 
   useEffect(() => {
@@ -336,8 +365,8 @@ const ShowComplaints = () => {
     fetchComplaints();
   };
 
-  const renderComplaintItem = ({item}) => (
-    <View key={item._id} style={styles.card}>
+  const renderComplaintItem = ({item, index}) => (
+    <View style={styles.card}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
         <View style={{flex: 1}}>
           <Text style={styles.infoText}>
@@ -358,7 +387,6 @@ const ShowComplaints = () => {
         {!(item?.StageData?.stage === "Resolved" || item?.StageData?.stage === "Rejected") && (
           <TouchableOpacity
             onPress={() => {
-              console.log('complaint id from showComplaint page', item?._id);
               navigation.navigate('ShowComplaintData', {
                 complaintId: item?._id,
                 farmerName: item?.farmerData?.farmerName,
@@ -382,9 +410,10 @@ const ShowComplaints = () => {
       </View>
       
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
-        </Text>
+      <Text style={styles.infoText}>
+        <Text style={styles.label}>Saral ID:</Text>{' '}
+        {item.farmerData?.saralId || 'N/A'}
+      </Text>
         <Text style={[
           styles.statusText,
           item?.StageData?.stage?.includes("Pending") && styles.pendingStatus,
@@ -396,7 +425,7 @@ const ShowComplaints = () => {
       </View>
       
       <Text style={styles.infoText}>
-        <Text style={styles.label}>Contact:</Text> {item.contact}
+        <Text style={styles.label}>Contact:</Text> {item?.farmerData?.contact}
       </Text>      
       
       <Text style={styles.infoText}>
@@ -419,15 +448,12 @@ const ShowComplaints = () => {
         {item.farmerData?.block || 'N/A'}
       </Text>
       
-      <Text style={styles.infoText}>
-        <Text style={styles.label}>Saral ID:</Text>{' '}
-        {item.farmerData?.saralId || 'N/A'}
-      </Text>
+
       
-      <Text style={styles.infoText}>
+      {/* <Text style={styles.infoText}>
         <Text style={styles.label}>Created At:</Text>{' '}
         {item.create_At ? new Date(item.create_At).toLocaleDateString() : 'N/A'}
-      </Text>
+      </Text> */}
     </View>
   );
 
@@ -454,7 +480,10 @@ const ShowComplaints = () => {
       <FlatList
         data={filterComplaints()}
         renderItem={renderComplaintItem}
-        keyExtractor={item => item._id}
+        keyExtractor={(item, index) => {
+          // Use _id if available and unique, otherwise fall back to index
+          return item._id ? `${item._id}-${index}` : `complaint-${index}`;
+        }}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             {complaints.length === 0 ? "No complaints available" : "No matching complaints found"}

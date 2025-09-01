@@ -432,7 +432,7 @@ const AddTransaction = ({route}) => {
   const [remarks, setRemarks] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
-  const [serialNumbers, setSerialNumbers] = useState({}); // Changed to object for multiple items
+  const [serialNumber, setSerialNumber] = useState(''); // Changed to single value
   const [allItems, setAllItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [allWarehouses, setAllWarehouses] = useState([]);
@@ -508,23 +508,16 @@ const AddTransaction = ({route}) => {
     );
     setSelectedItems(validItems);
 
-    // Initialize quantities and serialNumbers for each selected item
+    // Initialize quantities for each selected item
     const newQuantities = {};
-    const newSerialNumbers = {};
     validItems.forEach(item => {
       newQuantities[item] = quantities[item] || '';
-      newSerialNumbers[item] = serialNumbers[item] || '';
     });
     setQuantities(newQuantities);
-    setSerialNumbers(newSerialNumbers);
   };
 
   const handleQuantityChange = (item, value) => {
     setQuantities(prev => ({...prev, [item]: value}));
-  };
-
-  const handleSerialNumberChange = (item, value) => {
-    setSerialNumbers(prev => ({...prev, [item]: value}));
   };
 
   const validateInput = () => {
@@ -543,13 +536,14 @@ const AddTransaction = ({route}) => {
       return false;
     }
 
+    if (!serialNumber) {
+      Alert.alert('Error', 'Please enter a serial number.');
+      return false;
+    }
+
     for (const item of selectedItems) {
       if (!quantities[item]) {
         Alert.alert('Error', `Please enter quantity for ${item}.`);
-        return false;
-      }
-      if (!serialNumbers[item]) {
-        Alert.alert('Error', `Please enter serial number for ${item}.`);
         return false;
       }
     }
@@ -563,7 +557,6 @@ const AddTransaction = ({route}) => {
     const itemsData = selectedItems.map(item => ({
       itemName: item,
       quantity: parseInt(quantities[item], 10),
-      serialNumber: serialNumbers[item],
     }));
 
     const data = {
@@ -579,7 +572,10 @@ const AddTransaction = ({route}) => {
       pickupDate: new Date(),
       farmerSaralId,
       isNewStock: isNewStock === 'Yes',
+      serialNumber: serialNumber, // Added as a separate field
     };
+
+    console.log('Submitting data:', JSON.stringify(data, null, 2));
 
     try {
       setLoading(true);
@@ -592,6 +588,7 @@ const AddTransaction = ({route}) => {
       if (response.status === 200) {
         Alert.alert('Success', 'Transaction saved successfully');
         resetForm();
+        navigation.goBack();
       } else {
         Alert.alert('Error', 'Failed to save transaction');
       }
@@ -606,7 +603,7 @@ const AddTransaction = ({route}) => {
     setSelectedServicePerson('');
     setSelectedItems([]);
     setQuantities({});
-    setSerialNumbers({});
+    setSerialNumber('');
     setRemarks('');
     setSelectedWarehouse('');
     setIsNewStock('');
@@ -664,6 +661,13 @@ const AddTransaction = ({route}) => {
             editable={false}
           />
 
+          <Text style={styles.label}>Serial Number:</Text>
+          <TextInput
+            value={serialNumber}
+            onChangeText={setSerialNumber}
+            style={styles.input}
+          />
+
           {selectedItems.map(item => (
             <View key={item}>
               <Text style={styles.label}>Quantity for {item}:</Text>
@@ -672,13 +676,6 @@ const AddTransaction = ({route}) => {
                 onChangeText={value => handleQuantityChange(item, value)}
                 style={styles.input}
                 keyboardType="numeric"
-              />
-
-              <Text style={styles.label}>Serial Number for {item}:</Text>
-              <TextInput
-                value={serialNumbers[item]}
-                onChangeText={value => handleSerialNumberChange(item, value)}
-                style={styles.input}
               />
             </View>
           ))}
