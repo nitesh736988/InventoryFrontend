@@ -59,7 +59,11 @@ const QuaterData = () => {
       const filtered = data.filter((item) =>
         item.farmerName.toLowerCase().includes(text.toLowerCase()) ||
         item.saralId?.toString().includes(text) ||
-        item.contact?.toString().includes(text)
+        item.contact?.toString().includes(text)||
+         item.state.toLowerCase().includes(text.toLowerCase())||
+         item.district.toLowerCase().includes(text.toLowerCase())||
+         item.village.toLowerCase().includes(text.toLowerCase())||
+         item.block.toLowerCase().includes(text.toLowerCase())
       );
       setFilteredData(filtered);
     }
@@ -124,7 +128,7 @@ const QuaterData = () => {
       <Text style={styles.label}>QUARTERLY DATA</Text>
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by Farmer Name, Saral Id, Contact"
+        placeholder="Search by Farmer Name, Saral Id, Contact,State,District,Village,Block"
         value={searchText}
         onChangeText={handleSearch}
         placeholderTextColor='#000'
