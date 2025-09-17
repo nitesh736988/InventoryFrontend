@@ -368,6 +368,10 @@ const QuarterlyVisit = ({ route }) => {
   });
 
   const [quarterlyPhoto, setQuarterlyPhoto] = useState([]);
+  const [foundationWithFarmer, setFoundationWithFarmer] = useState([]);
+  const [structureWithFarmer, setStructureWithFarmer] = useState([]);
+  const [waterDischargeWithFarmer, setWaterDischargeWithFarmer] = useState([]);
+  const [panelWithFarmer, setPanelWithFarmer] = useState([]);
   const [companyList, setCompanyList] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submitDate = new Date().toISOString();
@@ -396,7 +400,7 @@ const QuarterlyVisit = ({ route }) => {
     fetchCompanies();
   }, []);
 
-  const takePhoto = async () => {
+  const takePhoto = async (setImageFunction) => {
     const hasPermission = await requestCameraPermission();
     if (!hasPermission) {
       Alert.alert('Permission Denied', 'Camera access is required.');
@@ -439,7 +443,7 @@ const QuarterlyVisit = ({ route }) => {
               name: `photo_${Date.now()}.jpg`
             };
 
-            setQuarterlyPhoto(prev => [...prev, newImage]);
+            setImageFunction(prev => [...prev, newImage]);
           } catch (error) {
             console.log('Error processing image:', error);
             Alert.alert('Error', 'Failed to process image');
@@ -449,13 +453,15 @@ const QuarterlyVisit = ({ route }) => {
     );
   };
 
-  const removeImage = (uri) => {
-    setQuarterlyPhoto(prev => prev.filter(img => img.uri !== uri));
+  const removeImage = (uri, setImageFunction) => {
+    setImageFunction(prev => prev.filter(img => img.uri !== uri));
   };
 
   const onSubmit = async () => {
-    if (quarterlyPhoto.length === 0) {
-      Alert.alert('Error', 'Please add at least one image');
+    if (quarterlyPhoto.length === 0 || foundationWithFarmer.length === 0 || 
+        structureWithFarmer.length === 0 || waterDischargeWithFarmer.length === 0 || 
+        panelWithFarmer.length === 0) {
+      Alert.alert('Error', 'Please add all required images');
       return;
     }
 
@@ -472,11 +478,48 @@ const QuarterlyVisit = ({ route }) => {
       formData.append('fieldEmpId', userId);
       formData.append('companyName', selectedCompany);
 
+      // Add quarterly photos (existing field)
       quarterlyPhoto.forEach((image, index) => {
         formData.append('quarterlyPhoto', {
           uri: image.uri,
           type: image.type,
-          name: image.name || `image_${index}.jpg`
+          name: image.name || `quarterly_${index}.jpg`
+        });
+      });
+
+      // Add foundation images
+      foundationWithFarmer.forEach((image, index) => {
+        formData.append('foundationWithFarmer', {
+          uri: image.uri,
+          type: image.type,
+          name: `foundation_${index}.jpg`
+        });
+      });
+
+      // Add panel structure images
+      structureWithFarmer.forEach((image, index) => {
+        formData.append('structureWithFarmer', {
+          uri: image.uri,
+          type: image.type,
+          name: `panel_structure_${index}.jpg`
+        });
+      });
+
+      // Add water discharge images
+      waterDischargeWithFarmer.forEach((image, index) => {
+        formData.append('waterDischargeWithFarmer', {
+          uri: image.uri,
+          type: image.type,
+          name: `water_discharge_${index}.jpg`
+        });
+      });
+
+      // Add controller images
+      panelWithFarmer.forEach((image, index) => {
+        formData.append('panelWithFarmer', {
+          uri: image.uri,
+          type: image.type,
+          name: `controller_${index}.jpg`
         });
       });
 
@@ -500,6 +543,10 @@ const QuarterlyVisit = ({ route }) => {
             setValue('quarterly', '');
             setValue('selectedCompany', '');
             setQuarterlyPhoto([]);
+            setFoundationWithFarmer([]);
+            setStructureWithFarmer([]);
+            setWaterDischargeWithFarmer([]);
+            setPanelWithFarmer([]);
           },
         },
       ]);
@@ -510,6 +557,33 @@ const QuarterlyVisit = ({ route }) => {
       setIsSubmitting(false);
     }
   };
+
+  const renderImageSection = (title, hindiTitle, images, setImageFunction, removeFunction) => (
+    <View style={styles.imageSection}>
+      <Text style={styles.label}>{title}</Text>
+      <Text style={styles.hindiLabel}>{hindiTitle}</Text>
+      <TouchableOpacity 
+        onPress={() => takePhoto(setImageFunction)} 
+        style={styles.imageButton}
+      >
+        <Icon name="camera-plus" size={28} color="#000" />
+        <Text style={styles.buttonText}>Take Photo</Text>
+      </TouchableOpacity>
+
+      <ScrollView horizontal style={styles.imagePreviewContainer}>
+        {images.map((image, index) => (
+          <View key={index} style={styles.imageWrapper}>
+            <Image source={{ uri: image.uri }} style={styles.imagePreview} />
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => removeFunction(image.uri, setImageFunction)}>
+              <Icon name="close-circle" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
 
   return (
     <ScrollView style={styles.container}>
@@ -585,8 +659,13 @@ const QuarterlyVisit = ({ route }) => {
         />
         {errors.quarterly && <Text style={styles.errorText}>Quarter is required</Text>}
 
-        <Text style={styles.label}>Quarterly Form Images:</Text>
-        <TouchableOpacity onPress={takePhoto} style={styles.imageButton}>
+        {/* Original Quarterly Form Images Section */}
+        <Text style={styles.label}>Quarterly Form Images</Text>
+        <Text style={styles.hindiLabel}>त्रैमासिक फॉर्म छवियां</Text>
+        <TouchableOpacity 
+          onPress={() => takePhoto(setQuarterlyPhoto)} 
+          style={styles.imageButton}
+        >
           <Icon name="camera-plus" size={28} color="#000" />
           <Text style={styles.buttonText}>Take Photo</Text>
         </TouchableOpacity>
@@ -597,12 +676,45 @@ const QuarterlyVisit = ({ route }) => {
               <Image source={{ uri: image.uri }} style={styles.imagePreview} />
               <TouchableOpacity
                 style={styles.deleteButton}
-                onPress={() => removeImage(image.uri)}>
+                onPress={() => removeImage(image.uri, setQuarterlyPhoto)}>
                 <Icon name="close-circle" size={24} color="red" />
               </TouchableOpacity>
             </View>
           ))}
         </ScrollView>
+
+        {/* New Image Sections */}
+        {renderImageSection(
+          "Final Foundation Image With Farmer",
+          "किसान के साथ अंतिम नींव की छवि",
+          foundationWithFarmer, 
+          setFoundationWithFarmer, 
+          removeImage
+        )}
+
+        {renderImageSection(
+          "Photograph With Structure",
+          "संरचना के साथ फोटोग्राफ",
+          structureWithFarmer, 
+          setStructureWithFarmer, 
+          removeImage
+        )}
+
+        {renderImageSection(
+          "Photograph With Water Discharge",
+          "पानी के निर्वहन के साथ फोटोग्राफ",
+          waterDischargeWithFarmer, 
+          setWaterDischargeWithFarmer, 
+          removeImage
+        )}
+
+        {renderImageSection(
+          "Photograph with Panel",
+          "पैनल के साथ फोटोग्राफ",
+          panelWithFarmer, 
+          setPanelWithFarmer, 
+          removeImage
+        )}
 
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
@@ -638,9 +750,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 5,
     marginTop: 10,
     color: 'black',
+  },
+  hindiLabel: {
+    fontSize: 14,
+    marginBottom: 10,
+    color: '#444',
+    fontFamily: Platform.OS === 'android' ? 'sans-serif' : 'System',
   },
   value: {
     fontSize: 16,
@@ -656,6 +774,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: 'black'
   },
+  imageSection: {
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#fff',
+  },
   imageButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -668,7 +794,7 @@ const styles = StyleSheet.create({
   },
   imagePreviewContainer: {
     flexDirection: 'row',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   imageWrapper: {
     marginRight: 10,

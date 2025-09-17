@@ -13,7 +13,6 @@
 // import axios from 'axios';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import OpenMap from '../../Component/OpenMap/index';
-// import EntypoIcon from 'react-native-vector-icons/Entypo';
 // import {useNavigation} from '@react-navigation/native';
 
 // const ShowComplaints = () => {
@@ -25,15 +24,42 @@
 
 //   const fetchComplaints = async () => {
 //     try {
-//       const serviceId = await AsyncStorage.getItem('_id');
-//       console.log(serviceId);
-//       const response = await axios.get(
-//         `http://88.222.214.93:8001/farmer/showComplaintForApp?assignEmployee=${serviceId}`,
+//       const fieldEmpId = await AsyncStorage.getItem('_id');
+//       const blockListString = await AsyncStorage.getItem('block');
+//       // console.log("Retrieved block list string:", blockListString);
+
+//       let parsedBlockList = [];
+//       try {
+//         parsedBlockList = blockListString ? JSON.parse(blockListString) : [];
+//       } catch (e) {
+//         console.log("Error parsing block list:", e);
+//         parsedBlockList = [];
+//       }
+      
+//       // console.log("Field Emp ID:", fieldEmpId);
+//       // console.log("Block List:", parsedBlockList);
+      
+//       const response = await axios.post(
+//         'https://service.galosolar.com/api/filedService/complaintList',
+//         {
+//           blockList: parsedBlockList,
+//           fieldEmpId: fieldEmpId
+//         }
 //       );
-//       console.log("fetch data", response.data)
-//       setComplaints(response.data.data);
+      
+//       if (response.data.success) {
+//         const data = response.data.data || [];
+
+//         const uniqueData = data.filter((item, index, self) => 
+//           index === self.findIndex(t => t._id === item._id)
+//         );
+//         setComplaints(uniqueData);
+//       } else {
+//         Alert.alert("Error", error?.response?.data?.message);
+//       }
 //     } catch (error) {
-//       Alert.alert("Error", JSON.stringify(error.response.data?.message));
+//       // console.log("Error fetching complaints:", error?.response?.data || error.message);
+//       Alert.alert("Error", error.response?.data?.message);
 //     } finally {                 
 //       setLoading(false);
 //       setRefreshing(false);
@@ -41,101 +67,151 @@
 //   };
 
 
+//   useEffect(() => {
+//     if (complaints.length > 0) {
+//       const ids = complaints.map(item => item._id);
+//       const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+      
+//       if (duplicateIds.length > 0) {
+//         // console.log('Duplicate IDs found:', duplicateIds);
+//         const uniqueComplaints = complaints.filter((item, index, self) => 
+//           index === self.findIndex(t => t._id === item._id)
+//         );
+//         setComplaints(uniqueComplaints);
+//       }
+//     }
+//   }, [complaints]);
+
 //   const filterComplaints = () => {
-//     return complaints?.filter(item =>
-//       item?.Farmer[0]?.village?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       item?.Farmer[0]?.block?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       item?.Farmer[0]?.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       item?.Farmer[0]?.contact?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       item?.Farmer[0]?.saralId?.toLowerCase().includes(searchQuery.toLowerCase())
-//     );
+//     if (!complaints || complaints.length === 0) return [];
+    
+//     if (!searchQuery.trim()) return complaints;
+    
+//     const query = searchQuery.toLowerCase().trim();
+    
+//     return complaints.filter(item => {
+//       return (
+//         (item?.farmerData?.village?.toLowerCase() ?? '').includes(query) ||
+//         (item?.farmerData?.block?.toLowerCase() ?? '').includes(query) ||
+//         (item?.farmerData?.farmerName?.toLowerCase() ?? '').includes(query) ||
+//         (item?.farmerData?.contact?.toLowerCase() ?? '').includes(query) ||
+//         (item?.farmerData?.saralId?.toLowerCase() ?? '').includes(query) ||
+//         (item?.complainantName?.toLowerCase() ?? '').includes(query) ||
+//         (item?.contact?.toLowerCase() ?? '').includes(query) ||
+//         (item?.trackingId?.toLowerCase() ?? '').includes(query)
+//       );
+//     });
 //   };
 
 //   useEffect(() => {
 //     fetchComplaints();
-//   }, [loading]);
+//   }, []);
 
 //   const onRefresh = () => {
 //     setRefreshing(true);
 //     fetchComplaints();
 //   };
 
- 
-//   const renderComplaintItem = ({item}) => (
-//     <View key={item._id} style={styles.card}>
-//       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-//         <Text style={styles.infoText}>
-//           <Text style={styles.label}>Complainant Name:</Text>{' '}
-//           <View style={{ flexDirection: 'row', alignItems: 'flex-end', width: 130, }}>
-//             <Text
-//               numberOfLines={1}
-//               ellipse="tail"
-//               style={{color: '#000'}}
-//             >{item.complainantName}</Text>
-//           </View>
-//         </Text>
+//   const renderComplaintItem = ({item, index}) => (
+//     <View style={styles.card}>
+//       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+//         <View style={{flex: 1}}>
+//           <Text style={styles.infoText}>
+//             <Text style={styles.label}>Complainant:</Text>{' '}
+//             <Text numberOfLines={1} ellipsizeMode="tail" style={{color: '#000'}}>
+//               {item.complainantName}
+//             </Text>
+//           </Text>
+//         </View>
 
-//         {/* { ( */}
+//         {item?.farmerData?.longitude && item?.farmerData?.latitude && (
 //           <OpenMap
-//             longitude={item?.Farmer[0]?.longitude}
-//             latitude={item?.Farmer[0]?.latitude}
+//             longitude={item.farmerData.longitude}
+//             latitude={item.farmerData.latitude}
 //           />
+//         )}
        
-//         {!(item?.Stage[0]._id == "675be30222ae6f63bf772dd1" || item?.Stage[0]._id == "675be30222ae6f63bf772dd0" || item?.Stage[0]?._id == "675aaf9c44c74418017c1daf") && <TouchableOpacity
-//           onPress={() =>
-//             {console.log('complaint id from showComplaint page', item?._id)
+//         {!(item?.StageData?.stage === "Resolved" || item?.StageData?.stage === "Rejected") && (
+//           <TouchableOpacity
+//             onPress={() => {
 //               navigation.navigate('ShowComplaintData', {
-//               complaintId: item?._id,
-//               farmerName: item?.Farmer[0]?.farmerName,
-//               farmerContact: item?.Farmer[0]?.contact,
-//               village: item?.Farmer[0]?.village,
-//               saralId: item?.Farmer[0]?.saralId,
-//               pump_type: item?.Farmer[0]?.pump_type,
-//               HP: item?.Farmer[0]?.HP,
-//               AC_DC: item?.Farmer[0]?.AC_DC, 
-//               longitude2: item?.Farmer[0]?.longitude,
-//               latitude2: item?.Farmer[0]?.latitude
-//             }); setLoading(true)
-//           }
-//           }>
-//           <Text style={styles.approvedText}>Fill Form</Text>
-//         </TouchableOpacity>}
+//                 complaintId: item?._id,
+//                 farmerName: item?.farmerData?.farmerName,
+//                 farmerContact: item?.farmerData?.contact,
+//                 village: item?.farmerData?.village,
+//                 saralId: item?.farmerData?.saralId,
+//                 pump_type: item?.farmerData?.pump_type,
+//                 HP: item?.farmerData?.HP,
+//                 AC_DC: item?.farmerData?.AC_DC, 
+//                 longitude2: item?.farmerData?.longitude,
+//                 latitude2: item?.farmerData?.latitude,
+//                 trackingId: item?.trackingId
+//               }); 
+//             }}
+            
+//             style={styles.fillFormButton}
+//           >
+//             <Text style={styles.approvedText}>Fill Form</Text>
+//           </TouchableOpacity>
+//         )}
 //       </View>
-//       <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
-//         <Text style={styles.infoText}>
-//           <Text style={styles.label}>Tracking ID:</Text> {item.trackingId}
+      
+//       <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5}}>
+//       <Text style={styles.infoText}>
+//         <Text style={styles.label}>Saral ID:</Text>{' '}
+//         {item.farmerData?.saralId || 'N/A'}
+//       </Text>
+//         <Text style={[
+//           styles.statusText,
+//           item?.StageData?.stage?.includes("Pending") && styles.pendingStatus,
+//           item?.StageData?.stage?.includes("Resolved") && styles.resolvedStatus,
+//           item?.StageData?.stage?.includes("Rejected") && styles.rejectedStatus
+//         ]}>
+//           {item.StageData?.stage || "Unknown Status"}
 //         </Text>
-//         {item?.Stage[0]?._id === "675be30222ae6f63bf772dcf" && <Text style={{ color: 'red' }}>Pending</Text>}
-//         {item?.Stage[0]?._id === "675be30222ae6f63bf772dd1" && <Text style={{ color: 'red'}}>Rejected</Text>}
-//         {item?.Stage[0]?._id === "675be30222ae6f63bf772dd0" && <Text style={{ color: 'rgb(0, 200, 0)'}}>Resolved</Text>}
 //       </View>
+      
 //       <Text style={styles.infoText}>
-//         <Text style={styles.label}>Contact:</Text> {item.contact}
+//         <Text style={styles.label}>Contact:</Text> {item?.farmerData?.contact}
 //       </Text>      
+      
 //       <Text style={styles.infoText}>
-//         <Text style={styles.label}>Company:</Text> {item.company}
-//       </Text>     
-//       <Text style={styles.infoText}>
-//         <Text style={styles.label}>ComplaintDetails:</Text>{' '}
+//         <Text style={styles.label}>Complaint Details:</Text>{' '}
 //         {item.complaintDetails}
 //       </Text>
            
 //       <Text style={styles.infoText}>
+//         <Text style={styles.label}>Farmer:</Text>{' '}
+//         {item.farmerData?.farmerName || 'N/A'}
+//       </Text>
+
+//       <Text style={styles.infoText}>
 //         <Text style={styles.label}>Village:</Text>{' '}
-//         {item.Farmer[0].village}
+//         {item.farmerData?.village || 'N/A'}
 //       </Text>
 
 //       <Text style={styles.infoText}>
 //         <Text style={styles.label}>Block:</Text>{' '}
-//         {item.Farmer[0].block}
+//         {item.farmerData?.block || 'N/A'}
 //       </Text>
-//       <Text style={styles.infoText}>
-//         <Text style={styles.label}>Created At:</Text>{' '}
-//         {new Date(item.created_At).toLocaleDateString()}
-//       </Text>
+      
 
+      
+//       {/* <Text style={styles.infoText}>
+//         <Text style={styles.label}>Created At:</Text>{' '}
+//         {item.create_At ? new Date(item.create_At).toLocaleDateString() : 'N/A'}
+//       </Text> */}
 //     </View>
 //   );
+
+//   if (loading) {
+//     return (
+//       <View style={styles.loadingContainer}>
+//         <ActivityIndicator size="large" color="#0000ff" />
+//         <Text style={{marginTop: 10}}>Loading complaints...</Text>
+//       </View>
+//     );
+//   }
 
 //   return (
 //     <View style={styles.container}>
@@ -147,12 +223,18 @@
 //         onChangeText={setSearchQuery}
 //         placeholderTextColor='#000'
 //       />
+      
 //       <FlatList
 //         data={filterComplaints()}
 //         renderItem={renderComplaintItem}
-//         keyExtractor={item => item._id}
+//         keyExtractor={(item, index) => {
+//           // Use _id if available and unique, otherwise fall back to index
+//           return item._id ? `${item._id}-${index}` : `complaint-${index}`;
+//         }}
 //         ListEmptyComponent={
-//           <Text style={styles.emptyText}>No complaints found.</Text>
+//           <Text style={styles.emptyText}>
+//             {complaints.length === 0 ? "No complaints available" : "No matching complaints found"}
+//           </Text>
 //         }
 //         refreshControl={
 //           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -167,6 +249,11 @@
 //     flex: 1,
 //     padding: 16,
 //     backgroundColor: '#fbd33b',
+//   },
+//   loadingContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
 //   },
 //   header: {
 //     fontSize: 24,
@@ -188,45 +275,34 @@
 //   },
 //   infoText: {
 //     color: '#000',
+//     marginBottom: 4,
 //   },
-
-//     approvedText: {
+//   approvedText: {
 //     color: 'green',
 //     fontWeight: 'bold',
 //   },
 //   label: {
 //     fontWeight: 'bold',
 //     color: '#000',
-    
 //   },
-//   loadingIndicator: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
+//   statusText: {
+//     fontWeight: 'bold',
 //   },
-//   actionContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     // marginVertical: 5,
+//   pendingStatus: {
+//     color: 'red',
 //   },
-//   buttonText: {
-//     color: '#fff',
-//     textAlign: 'center',
+//   resolvedStatus: {
+//     color: 'rgb(0, 200, 0)',
 //   },
-
-//   declineButton: {
-//     width: '49%',
+//   rejectedStatus: {
+//     color: 'red',
+//   },
+//   fillFormButton: {
+//     padding: 5,
+//     backgroundColor: '#e8f5e8',
 //     borderRadius: 5,
-//     backgroundColor: 'red',
-//     padding: 8,
+//     marginLeft: 10,
 //   },
-//   approveButton: {
-//     width: '49%',
-//     borderRadius: 5,
-//     backgroundColor: 'green',
-//     padding: 8,
-//   },
-
 //   emptyText: {
 //     textAlign: 'center',
 //     fontSize: 16,
@@ -241,13 +317,13 @@
 //     marginBottom: 16,
 //     paddingHorizontal: 10,
 //     fontSize: 16,
-//     // backgroundColor: '#fff',
+//     backgroundColor: '#fff',
 //   },
 // });
 
 // export default ShowComplaints;
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -269,92 +345,84 @@ const ShowComplaints = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [lastFetchTime, setLastFetchTime] = useState(0);
   const navigation = useNavigation();
 
-  const fetchComplaints = async () => {
+  // Memoized fetch function to prevent unnecessary recreations
+  const fetchComplaints = useCallback(async () => {
+    // Prevent too frequent API calls (min 10 seconds between calls)
+    const now = Date.now();
+    if (now - lastFetchTime < 10000 && !refreshing) {
+      setRefreshing(false);
+      return;
+    }
+
     try {
       const fieldEmpId = await AsyncStorage.getItem('_id');
       const blockListString = await AsyncStorage.getItem('block');
-      console.log("Retrieved block list string:", blockListString);
       
-      // Parse blockList if it's stored as a JSON string
       let parsedBlockList = [];
       try {
         parsedBlockList = blockListString ? JSON.parse(blockListString) : [];
       } catch (e) {
-        console.error("Error parsing block list:", e);
+        console.log("Error parsing block list:", e);
         parsedBlockList = [];
       }
       
-      console.log("Field Emp ID:", fieldEmpId);
-      console.log("Block List:", parsedBlockList);
-      
-      // Make API call with proper parameters
       const response = await axios.post(
         'https://service.galosolar.com/api/filedService/complaintList',
         {
           blockList: parsedBlockList,
-          fieldEmpId: fieldEmpId
+          fieldEmpId: fieldEmpId,
+          // Request only necessary fields from the server
+          fields: 'farmerData.village,farmerData.block,farmerData.farmerName,farmerData.contact,farmerData.saralId,farmerData.longitude,farmerData.latitude,complainantName,contact,complaintDetails,trackingId,StageData.stage,create_At'
         }
       );
       
       if (response.data.success) {
         const data = response.data.data || [];
-        // Remove duplicates by _id
-        const uniqueData = data.filter((item, index, self) => 
-          index === self.findIndex(t => t._id === item._id)
-        );
-        setComplaints(uniqueData);
+        
+        // Remove duplicates using a more efficient approach
+        const uniqueMap = new Map();
+        data.forEach(item => {
+          if (item._id && !uniqueMap.has(item._id)) {
+            // Only keep necessary fields to reduce memory usage
+            uniqueMap.set(item._id, {
+              _id: item._id,
+              farmerData: {
+                village: item.farmerData?.village,
+                block: item.farmerData?.block,
+                farmerName: item.farmerData?.farmerName,
+                contact: item.farmerData?.contact,
+                saralId: item.farmerData?.saralId,
+                longitude: item.farmerData?.longitude,
+                latitude: item.farmerData?.latitude
+              },
+              complainantName: item.complainantName,
+              contact: item.contact,
+              complaintDetails: item.complaintDetails,
+              trackingId: item.trackingId,
+              StageData: {
+                stage: item.StageData?.stage
+              },
+              create_At: item.create_At
+            });
+          }
+        });
+        
+        setComplaints(Array.from(uniqueMap.values()));
+        setLastFetchTime(now);
       } else {
-        Alert.alert("Error", "Failed to fetch complaints");
+        Alert.alert("Error", response.data.message || "Failed to fetch complaints");
       }
     } catch (error) {
-      console.error("Error fetching complaints:", error);
-      Alert.alert("Error", error.response?.data?.message || "Failed to fetch complaints");
+      console.log("Error fetching complaints:", error);
+      Alert.alert("Error", error.response?.data?.message || "Network error");
     } finally {                 
       setLoading(false);
       setRefreshing(false);
     }
-  };
-
-  // Add this useEffect to check for duplicates
-  useEffect(() => {
-    if (complaints.length > 0) {
-      const ids = complaints.map(item => item._id);
-      const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
-      
-      if (duplicateIds.length > 0) {
-        console.log('Duplicate IDs found:', duplicateIds);
-        // Filter out duplicates
-        const uniqueComplaints = complaints.filter((item, index, self) => 
-          index === self.findIndex(t => t._id === item._id)
-        );
-        setComplaints(uniqueComplaints);
-      }
-    }
-  }, [complaints]);
-
-  const filterComplaints = () => {
-    if (!complaints || complaints.length === 0) return [];
-    
-    if (!searchQuery.trim()) return complaints;
-    
-    const query = searchQuery.toLowerCase().trim();
-    
-    return complaints.filter(item => {
-      // Safely check each property with optional chaining and nullish coalescing
-      return (
-        (item?.farmerData?.village?.toLowerCase() ?? '').includes(query) ||
-        (item?.farmerData?.block?.toLowerCase() ?? '').includes(query) ||
-        (item?.farmerData?.farmerName?.toLowerCase() ?? '').includes(query) ||
-        (item?.farmerData?.contact?.toLowerCase() ?? '').includes(query) ||
-        (item?.farmerData?.saralId?.toLowerCase() ?? '').includes(query) ||
-        (item?.complainantName?.toLowerCase() ?? '').includes(query) ||
-        (item?.contact?.toLowerCase() ?? '').includes(query) ||
-        (item?.trackingId?.toLowerCase() ?? '').includes(query)
-      );
-    });
-  };
+  }, [lastFetchTime, refreshing]);
 
   useEffect(() => {
     fetchComplaints();
@@ -364,6 +432,41 @@ const ShowComplaints = () => {
     setRefreshing(true);
     fetchComplaints();
   };
+
+  // Debounced search to prevent frequent filtering
+  const [filteredComplaints, setFilteredComplaints] = useState([]);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!complaints || complaints.length === 0) {
+        setFilteredComplaints([]);
+        return;
+      }
+      
+      if (!searchQuery.trim()) {
+        setFilteredComplaints(complaints);
+        return;
+      }
+      
+      const query = searchQuery.toLowerCase().trim();
+      
+      const filtered = complaints.filter(item => {
+        return (
+          (item?.farmerData?.village?.toLowerCase() ?? '').includes(query) ||
+          (item?.farmerData?.block?.toLowerCase() ?? '').includes(query) ||
+          (item?.farmerData?.farmerName?.toLowerCase() ?? '').includes(query) ||
+          (item?.farmerData?.contact?.toLowerCase() ?? '').includes(query) ||
+          (item?.farmerData?.saralId?.toLowerCase() ?? '').includes(query) ||
+          (item?.complainantName?.toLowerCase() ?? '').includes(query) ||
+          (item?.contact?.toLowerCase() ?? '').includes(query) ||
+          (item?.trackingId?.toLowerCase() ?? '').includes(query)
+        );
+      });
+      
+      setFilteredComplaints(filtered);
+    }, 300); // 300ms debounce delay
+    
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, complaints]);
 
   const renderComplaintItem = ({item, index}) => (
     <View style={styles.card}>
@@ -447,13 +550,6 @@ const ShowComplaints = () => {
         <Text style={styles.label}>Block:</Text>{' '}
         {item.farmerData?.block || 'N/A'}
       </Text>
-      
-
-      
-      {/* <Text style={styles.infoText}>
-        <Text style={styles.label}>Created At:</Text>{' '}
-        {item.create_At ? new Date(item.create_At).toLocaleDateString() : 'N/A'}
-      </Text> */}
     </View>
   );
 
@@ -478,12 +574,9 @@ const ShowComplaints = () => {
       />
       
       <FlatList
-        data={filterComplaints()}
+        data={filteredComplaints}
         renderItem={renderComplaintItem}
-        keyExtractor={(item, index) => {
-          // Use _id if available and unique, otherwise fall back to index
-          return item._id ? `${item._id}-${index}` : `complaint-${index}`;
-        }}
+        keyExtractor={(item) => item._id}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             {complaints.length === 0 ? "No complaints available" : "No matching complaints found"}
@@ -492,6 +585,9 @@ const ShowComplaints = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
       />
     </View>
   );

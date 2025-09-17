@@ -320,13 +320,15 @@ const Outgoing = () => {
       const farmerContact = String(order.farmerContact || '').toLowerCase();
       const farmerName = String(order.farmerName || '').toLowerCase();
       const farmerVillage = String(order.farmerVillage || '').toLowerCase();
+      const serialNumber = String(order.serialNumber || '').toLowerCase()
 
       return (
         servicePersonName.includes(lowercasedQuery) ||
         farmerSaralId.includes(lowercasedQuery) ||
         farmerContact.includes(lowercasedQuery) ||
         farmerName.includes(lowercasedQuery) ||
-        farmerVillage.includes(lowercasedQuery) 
+        farmerVillage.includes(lowercasedQuery) ||
+        serialNumber.includes(lowercasedQuery)
       );
     });
 
@@ -526,7 +528,7 @@ const Outgoing = () => {
 
       <TextInput
         style={styles.searchBar}
-        placeholder="Search by servicePerson, farmerSaralId, farmer Name, Village, farmerContact"
+        placeholder="Search by servicePerson, farmerSaralId, farmer Name, Village, farmerContact, serialNumber"
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={'#000'}

@@ -3,7 +3,7 @@ import { View, Button, Linking, Alert, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const OpenGoogleMaps = ({ longitude, latitude }) => {
-  console.log(longitude, latitude);
+  // console.log(longitude, latitude);
   const openMap = () => {
     const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
