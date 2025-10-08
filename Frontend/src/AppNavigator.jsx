@@ -85,6 +85,7 @@ import ShowPath from './Component/Map/ShowPath';
 import BarcodeScanner from './Screens/Warehouse/BarcodeScanner';
 import NewInstallationTransactionData from './Screens/Warehouse/NewInstallationTransactionData';
 import TravelsData from './Screens/ServicePerson/TravelsData';
+import UpdateApp from './Screens/UpdateApp/UpdateApp';
 
 
 const Stack = createStackNavigator();
@@ -584,6 +585,12 @@ const AppNavigator = () => {
           name="TravelsData"
           component={TravelsData}
           options={{title: 'TravelsData', headerShown: false}}
+          />
+
+           <Stack.Screen
+          name="UpdateApp"
+          component={UpdateApp}
+          options={{title: 'UpdateApp', headerShown: false}}
           />
 
 

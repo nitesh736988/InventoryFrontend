@@ -27,6 +27,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(true); // Initial loading for auth check
   const [formLoading, setFormLoading] = useState(false); // Loading for form submission
   const [showPassword, setShowPassword] = useState(true);
+  const currentversion = 1;
 
   useEffect(() => {
     const checkExistingSession = async () => {
@@ -83,17 +84,25 @@ const LoginPage = () => {
     setFormLoading(true);
 
     try {
-      console.log(API_URL);
+      // console.log(API_URL);
       const response = await axios.post(`${API_URL}/user/login`, { 
         email, 
         password, 
         role 
       });
       
+      console.log('Login response:', response?.data);
       await AsyncStorage.setItem('role', role);
-
+      if (response.data.appVersion !== currentversion) {
+        const appLink = response?.data?.appLink;
+        navigation.navigate('UpdateApp',
+        { appLink }
+        );
+        console.log('appLink:', appLink);
+        return;
+      }
       if (role === 'serviceperson') {
-        const { id, block, latitude, longitude, contact } = response.data;
+        const { id, block, latitude, longitude, contact } = response?.data;
         await AsyncStorage.multiSet([
           ["_id", id],
           ["block", JSON.stringify(block)],
@@ -102,7 +111,7 @@ const LoginPage = () => {
           ["Contact", JSON.stringify(contact)]
         ]);
 
-        console.log('Stored serviceperson data:', { id, block,});
+        // console.log('Stored serviceperson data:', { id, block,});
       } else if (role === 'warehouseAdmin') {
         const { id, warehouse } = response.data;
         await AsyncStorage.multiSet([
