@@ -1600,7 +1600,7 @@
 
 // export default OutgoingInstallation;
 
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -1615,6 +1615,8 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {useForm, useFieldArray, Controller} from 'react-hook-form';
 import {API_URL} from '@env';
 
 const {width} = Dimensions.get('window');
@@ -1622,20 +1624,38 @@ const {width} = Dimensions.get('window');
 const OutgoingInstallation = () => {
   const [systems, setSystems] = useState([]);
   const [servicePersons, setServicePersons] = useState([]);
-  const [forms, setForms] = useState([
-    {
-      selectedSystem: '',
-      pumps: [],
-      selectedPump: '',
-      selectedServicePerson: '',
-      saralId: '',
-      validating: false,
-      isValid: false,
-      farmerDetails: null,
-      message: '',
-    },
-  ]);
   const [loading, setLoading] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+  } = useForm({
+    defaultValues: {
+      driverName: '',
+      driverContact: '',
+      vehicleNumber: '',
+      forms: [
+        {
+          selectedSystem: '',
+          selectedPump: '',
+          selectedServicePerson: '',
+          saralId: '',
+          farmerDetails: null,
+          dispatchBillPhoto: null,
+          pumps: [],
+          isValid: false,
+        },
+      ],
+    },
+  });
+
+  const {fields, append, remove, update} = useFieldArray({
+    control,
+    name: 'forms',
+  });
 
   useEffect(() => {
     fetchSystems();
@@ -1647,8 +1667,7 @@ const OutgoingInstallation = () => {
       const res = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
       setSystems(res?.data?.data || []);
     } catch (err) {
-      console.log('Error fetching systems:', err?.response?.data?.message || err?.message || err);
-      setSystems([]);
+      console.log('Error fetching systems:', err.message);
     }
   };
 
@@ -1657,157 +1676,170 @@ const OutgoingInstallation = () => {
       const res = await axios.get(`${API_URL}/warehouse-admin/get-installer-data`);
       setServicePersons(res?.data?.data || []);
     } catch (err) {
-      console.log('Error fetching service persons:', err?.response?.data?.message || err?.message || err);
-      setServicePersons([]);
+      console.log('Error fetching service persons:', err.message);
     }
   };
 
   const fetchPumpData = async (systemId, index) => {
     try {
-      const res = await axios.get(
-        `${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`,
-      );
-      const newForms = [...forms];
-      newForms[index].pumps = res?.data?.data || [];
-      setForms(newForms);
+      const res = await axios.get(`${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`);
+      const pumpList = res?.data?.data || [];
+      const form = watch('forms')[index];
+      update(index, {...form, pumps: pumpList});
     } catch (err) {
-      console.log('Error fetching pump data:', err?.response?.data?.message || err?.message || err);
+      console.log('Error fetching pumps:', err.message);
     }
   };
 
-  const handleSystemChange = (index, value) => {
-    const updated = [...forms];
-    updated[index].selectedSystem = value;
-    updated[index].selectedPump = '';
-    updated[index].pumps = [];
-    setForms(updated);
-    if (value) fetchPumpData(value, index);
-  };
-
-  const handleServicePersonChange = (index, value) => {
-    const updated = [...forms];
-    updated[index].selectedServicePerson = value;
-    setForms(updated);
-  };
-
-  const handleSaralIdChange = (index, text) => {
-    const updated = [...forms];
-    updated[index].saralId = text;
-    updated[index].isValid = false;
-    updated[index].message = '';
-    updated[index].farmerDetails = null;
-    setForms(updated);
-  };
-
-  const validateSaralId = async index => {
-    const updated = [...forms];
-    const form = updated[index];
-
-    if (!form.saralId) {
-      Alert.alert('Validation', 'Please enter Saral ID first');
+  const validateSaralId = async (index, saralId) => {
+    if (!saralId) {
+      Alert.alert('Validation', 'Please enter Saral ID first.');
       return;
     }
-
-    form.validating = true;
-    setForms([...updated]);
 
     try {
       const res = await axios.get(
-        `http://88.222.214.93:8001/farmer/showFarmerAccordingToSaralIdFrontEnd?saralId=${form.saralId}`,
+        `http://88.222.214.93:8001/farmer/showFarmerAccordingToSaralIdFrontEnd?saralId=${saralId}`,
       );
 
-      if (res.data && res.data.success) {
-        form.isValid = true;
-        form.farmerDetails = res.data.data;
-        form.message = 'Saral ID is valid!';
+      const success = res?.data?.success;
+      const farmer = res?.data?.data;
+
+      const form = watch('forms')[index];
+      if (success && farmer) {
+        update(index, {
+          ...form, 
+          farmerDetails: farmer, 
+          isValid: true,
+          saralId: saralId
+        });
+        Alert.alert('Success', 'Saral ID is valid');
       } else {
-        form.isValid = false;
-        form.farmerDetails = null;
-        form.message = 'Invalid Saral ID';
+        update(index, {
+          ...form, 
+          farmerDetails: null, 
+          isValid: false
+        });
+        Alert.alert('Invalid', 'Saral ID not found');
       }
-    } catch (error) {
-      form.isValid = false;
-      form.farmerDetails = null;
-      form.message = 'Error validating Saral ID';
-    } finally {
-      form.validating = false;
-      setForms([...updated]);
+    } catch (err) {
+      console.log('Validation error:', err.message);
+      Alert.alert('Error', 'Unable to validate Saral ID');
     }
   };
 
-  const addForm = () => {
-    setForms(prev => [
-      ...prev,
-      {
-        selectedSystem: '',
-        pumps: [],
-        selectedPump: '',
-        selectedServicePerson: '',
-        saralId: '',
-        validating: false,
-        isValid: false,
-        farmerDetails: null,
-        message: '',
-      },
-    ]);
+  const handlePhotoPick = async index => {
+    launchImageLibrary({mediaType: 'photo', quality: 0.8}, response => {
+      if (response.didCancel || response.errorCode) return;
+      const photo = response.assets[0];
+      const form = watch('forms')[index];
+      update(index, {...form, dispatchBillPhoto: photo});
+    });
   };
 
-  const removeForm = index => {
-    setForms(prev => prev.filter((_, i) => i !== index));
-  };
+  const onSubmit = async data => {
+    const {driverName, driverContact, vehicleNumber, forms} = data;
 
-  const handleSubmit = async () => {
-    const dispatchedSystem = forms
-      .filter(
-        f =>
-          f.isValid &&
-          f.saralId &&
-          f.selectedSystem &&
-          f.selectedPump &&
-          f.selectedServicePerson,
-      )
-      .map(f => ({
-        farmerSaralId: f.saralId,
-        installerId: f.selectedServicePerson,
-        systemId: f.selectedSystem,
-        pumpId: f.selectedPump,
-      }));
-
-    if (dispatchedSystem.length === 0) {
-      Alert.alert(
-        'Validation',
-        'Please complete and validate at least one full form before submitting.',
-      );
+    if (!driverName || !driverContact || !vehicleNumber) {
+      Alert.alert('Validation', 'Please fill driver details');
       return;
     }
 
-    const payload = { dispatchedSystem };
-    console.log('Submitting payload:', payload);
+    // Filter only valid forms
+    const validForms = forms.filter(f => 
+      f.isValid && 
+      f.selectedSystem && 
+      f.selectedPump && 
+      f.selectedServicePerson && 
+      f.saralId
+    );
+
+    if (validForms.length === 0) {
+      Alert.alert('Validation', 'Please validate at least one full form');
+      return;
+    }
+
+    // Create dispatchedSystem array in the exact format needed
+    const dispatchedSystem = validForms.map(f => ({
+      farmerSaralId: f.saralId,
+      installerId: f.selectedServicePerson,
+      systemId: f.selectedSystem,
+      pumpId: f.selectedPump,
+    }));
+
+    const formData = new FormData();
+    
+    // Add text fields
+    formData.append('driverName', driverName.trim());
+    formData.append('driverContact', driverContact.trim());
+    formData.append('vehicleNumber', vehicleNumber.trim());
+    formData.append('dispatchedSystem', JSON.stringify(dispatchedSystem));
+
+    // Add photos - only for valid forms and in sequence
+    validForms.forEach((f, i) => {
+      if (f.dispatchBillPhoto) {
+        formData.append(`dispatchBillPhoto${i + 1}`, {
+          uri: f.dispatchBillPhoto.uri,
+          name: f.dispatchBillPhoto.fileName || `dispatch_bill_${i + 1}.jpg`,
+          type: f.dispatchBillPhoto.type || 'image/jpeg',
+        });
+      }
+    });
+
+    console.log('Submitting form data:', {
+      driverName,
+      driverContact,
+      vehicleNumber,
+      dispatchedSystem,
+      photoCount: validForms.filter(f => f.dispatchBillPhoto).length
+    });
+
+    // Debug log
+    validForms.forEach((form, index) => {
+      console.log(`Form ${index + 1}:`, {
+        saralId: form.saralId,
+        systemId: form.selectedSystem,
+        pumpId: form.selectedPump,
+        installerId: form.selectedServicePerson,
+        hasPhoto: !!form.dispatchBillPhoto
+      });
+    });
+
+    console.log('Final FormData entries:', formData);
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        `${API_URL}/warehouse-admin/add-new-installation`,
-        payload,
-      );
+      const res = await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-        Alert.alert(res?.data?.message);
-        setForms([
-          {
-            selectedSystem: '',
-            pumps: [],
-            selectedPump: '',
-            selectedServicePerson: '',
-            saralId: '',
-            validating: false,
-            isValid: false,
-            farmerDetails: null,
-            message: '',
-          },
-        ]);
+      Alert.alert('Success', res?.data?.message || 'Submitted successfully');
+      
+      // Reset form after successful submission
+      reset({
+        driverName: '',
+        driverContact: '',
+        vehicleNumber: '',
+        forms: [{
+          selectedSystem: '',
+          selectedPump: '',
+          selectedServicePerson: '',
+          saralId: '',
+          farmerDetails: null,
+          dispatchBillPhoto: null,
+          pumps: [],
+          isValid: false,
+        }],
+      });
+      
     } catch (err) {
-      Alert.alert('Error', err?.response?.data?.message || err?.message);
-      console.log('Error:', err?.response?.data || err);
+      console.log('Submission error:', err.response?.data?.message || err.message);
+      Alert.alert(
+        'Error', 
+        err?.response?.data?.message || err.message || 'Submission failed'
+      );
     } finally {
       setLoading(false);
     }
@@ -1815,122 +1847,230 @@ const OutgoingInstallation = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Outgoing Installation</Text>
+      <Text style={styles.header}>Outgoing Installation Material</Text>
 
-      {forms.map((form, index) => (
-        <View key={index} style={styles.formBlock}>
-          <View style={styles.formHeader}>
-            <Text style={styles.formTitle}>Form {index + 1}</Text>
-            {forms.length > 1 && (
-              <TouchableOpacity onPress={() => removeForm(index)}>
-                <Text style={styles.removeFormText}>Remove</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+      {fields.map((field, index) => {
+        const form = watch('forms')[index];
+        return (
+          <View key={field.id} style={styles.formBlock}>
+            <View style={styles.formHeader}>
+              <Text style={styles.formTitle}>Form {index + 1}</Text>
+              {fields.length > 1 && (
+                <TouchableOpacity onPress={() => remove(index)}>
+                  <Text style={styles.removeFormText}>Remove</Text>
+                </TouchableOpacity>
+              )}
+            </View>
 
-          {/* System Picker */}
-          <Text style={styles.label}>Select System</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={form.selectedSystem}
-              onValueChange={val => handleSystemChange(index, val)}>
-              <Picker.Item label="Select System" value="" />
-              {systems.map(sys => (
-                <Picker.Item key={sys._id} label={sys.systemName} value={sys._id} />
-              ))}
-            </Picker>
-          </View>
-
-          {/* Pump Picker */}
-          {form.pumps.length > 0 && (
-            <>
-              <Text style={styles.label}>Select Pump</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  selectedValue={form.selectedPump}
-                  onValueChange={val => {
-                    const updated = [...forms];
-                    updated[index].selectedPump = val;
-                    setForms(updated);
-                  }}>
-                  <Picker.Item label="Select Pump" value="" />
-                  {form.pumps.map(pump => (
-                    <Picker.Item key={pump._id} label={pump.itemName} value={pump._id} />
-                  ))}
-                </Picker>
-              </View>
-            </>
-          )}
-
-          {/* Service Person Picker */}
-          <Text style={styles.label}>Select Service Person</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={form.selectedServicePerson}
-              onValueChange={val => handleServicePersonChange(index, val)}>
-              <Picker.Item label="Select Service Person" value="" />
-              {servicePersons.map(sp => (
-                <Picker.Item key={sp._id} label={sp.name} value={sp._id} />
-              ))}
-            </Picker>
-          </View>
-
-          {/* Saral ID Input */}
-          <Text style={styles.label}>Farmer Saral ID:</Text>
-          <View style={styles.saralIdContainer}>
-            <TextInput
-              style={[
-                styles.input,
-                { flex: 1 },
-                form.isValid ? styles.validInput :
-                form.message ? styles.invalidInput : null,
-              ]}
-              placeholder="Enter Farmer Saral ID"
-              value={form.saralId}
-              onChangeText={text => handleSaralIdChange(index, text)}
+            {/* System */}
+            <Text style={styles.label}>Select System</Text>
+            <Controller
+              control={control}
+              name={`forms.${index}.selectedSystem`}
+              render={({field: {value, onChange}}) => (
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={value}
+                    onValueChange={val => {
+                      onChange(val);
+                      fetchPumpData(val, index);
+                    }}
+                    style={{color: value ? '#000' : '#000'}}
+                    >
+                      
+                    <Picker.Item label="Select System" value="" />
+                    {systems.map(sys => (
+                      <Picker.Item key={sys._id} label={sys.systemName} value={sys._id} />
+                    ))}
+                  </Picker>
+                </View>
+              )}
             />
-            <TouchableOpacity
-              style={styles.validateButton}
-              onPress={() => validateSaralId(index)}
-              disabled={form.validating}>
-              <Text style={styles.validateButtonText}>
-                {form.validating ? 'Checking...' : 'Validate'}
+
+            {/* Pump */}
+            {form.pumps?.length > 0 && (
+              <>
+                <Text style={styles.label}>Select Pump</Text>
+                <Controller
+                  control={control}
+                  name={`forms.${index}.selectedPump`}
+                  render={({field: {value, onChange}}) => (
+                    <View style={styles.pickerContainer}>
+                      <Picker selectedValue={value} onValueChange={onChange}>
+                        <Picker.Item label="Select Pump" value="" 
+                        style={{color: value ? '#000' : '#000'}}  />
+                        
+
+                        {form.pumps.map(p => (
+                          <Picker.Item key={p._id} label={p.itemName} value={p._id} 
+                          style={{color: value ? '#000' : '#000'}} />
+                          
+                        ))}
+                      </Picker>
+                    </View>
+                  )}
+                />
+              </>
+            )}
+
+            {/* Service Person */}
+            <Text style={styles.label}>Select Service Person</Text>
+            <Controller
+              control={control}
+              name={`forms.${index}.selectedServicePerson`}
+              render={({field: {value, onChange}}) => (
+                <View style={styles.pickerContainer}>
+                  <Picker selectedValue={value} onValueChange={onChange}>
+                    <Picker.Item label="Select Service Person" value=""
+                    style={{color: value ? '#000' : '#000'}}  />
+                     
+                    {servicePersons.map(sp => (
+                      <Picker.Item key={sp._id} label={sp.name} value={sp._id} 
+                      style={{color: value ? '#000' : '#000'}} />
+                     
+                    ))}
+                  </Picker>
+                </View>
+              )}
+            />
+
+            {/* Saral ID */}
+            <Text style={styles.label}>Farmer Saral ID</Text>
+            <Controller
+              control={control}
+              name={`forms.${index}.saralId`}
+              render={({field: {value, onChange}}) => (
+                <View style={styles.saralIdContainer}>
+                  <TextInput
+                    style={[styles.input, {flex: 1}]}
+                    placeholder="Enter Saral ID"
+                    value={value}
+                    onChangeText={onChange}
+                    placeholderTextColor={'#000'}
+                    color={'#000'}
+                  />
+                  <TouchableOpacity
+                    style={styles.validateButton}
+                    onPress={() => validateSaralId(index, value)}>
+                    <Text style={styles.validateButtonText}>Validate</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+
+            {/* Show farmer details */}
+            {form.farmerDetails && (
+              <View style={styles.farmerCard}>
+                <Text style={styles.farmerText}>👨‍🌾 Name: {form.farmerDetails?.farmerName || 'N/A'}</Text>
+                <Text style={styles.farmerText}>📞 Contact: {form.farmerDetails?.contact || 'N/A'}</Text>
+                <Text style={styles.farmerText}>🆔 Saral ID: {form.saralId || 'N/A'}</Text>
+              </View>
+            )}
+
+            {/* Dispatch Bill Photo */}
+            <Text style={styles.label}>Dispatch Bill Photo</Text>
+            <TouchableOpacity style={styles.photoButton} onPress={() => handlePhotoPick(index)}>
+              <Text style={styles.photoButtonText}>
+                {form.dispatchBillPhoto ? 'Change Photo' : 'Upload Photo'}
               </Text>
             </TouchableOpacity>
-          </View>
+            {form.dispatchBillPhoto && (
+              <Text style={styles.photoFileName}>📸 {form.dispatchBillPhoto.fileName}</Text>
+            )}
 
-          {form.message ? (
-            <Text style={form.isValid ? styles.validMessage : styles.invalidMessage}>
-              {form.message}
-            </Text>
-          ) : null}
-
-          {form.farmerDetails && (
-            <View style={styles.farmerDetailsContainer}>
-              <Text style={styles.farmerDetailText}>
-                <Text style={styles.farmerDetailLabel}>Name:</Text> {form.farmerDetails.farmerName}
-              </Text>
-              <Text style={styles.farmerDetailText}>
-                <Text style={styles.farmerDetailLabel}>Contact:</Text> {form.farmerDetails.contact}
+            {/* Validation Status */}
+            <View style={[
+              styles.validationStatus, 
+              form.isValid ? styles.validStatus : styles.invalidStatus
+            ]}>
+              <Text style={styles.validationStatusText}>
+                {form.isValid ? '✅ Form Validated' : '❌ Form Not Validated'}
               </Text>
             </View>
-          )}
-        </View>
-      ))}
+          </View>
+        );
+      })}
 
-      {/* Add Another Form */}
-      <TouchableOpacity style={styles.addButton} onPress={addForm}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() =>
+          append({
+            selectedSystem: '',
+            selectedPump: '',
+            selectedServicePerson: '',
+            saralId: '',
+            farmerDetails: null,
+            dispatchBillPhoto: null,
+            pumps: [],
+            isValid: false,
+          })
+        }>
         <Text style={styles.addButtonText}>+ Add Another Form</Text>
       </TouchableOpacity>
 
-      {/* Submit Button */}
+      {/* Common Driver Info */}
+      <View style={styles.driverContainer}>
+        <Text style={styles.sectionTitle}>Driver Information</Text>
+        
+        <Text style={styles.label}>Driver Name</Text>
+        <Controller
+          control={control}
+          name="driverName"
+          render={({field: {value, onChange}}) => (
+            <TextInput 
+              style={styles.input} 
+              placeholder="Enter driver name"
+              value={value} 
+              onChangeText={onChange} 
+              placeholderTextColor={'#000'}
+              color={'#000'}
+            />
+          )}
+        />
+
+        <Text style={styles.label}>Driver Contact</Text>
+        <Controller
+          control={control}
+          name="driverContact"
+          render={({field: {value, onChange}}) => (
+            <TextInput
+              style={styles.input}
+              placeholder="Enter driver contact number"
+              keyboardType="phone-pad"
+              value={value}
+              onChangeText={onChange}
+              placeholderTextColor={'#000'}
+              color={'#000'}
+            />
+          )}
+        />
+
+        <Text style={styles.label}>Vehicle Number</Text>
+        <Controller
+          control={control}
+          name="vehicleNumber"
+          render={({field: {value, onChange}}) => (
+            <TextInput 
+              style={styles.input} 
+              placeholder="Enter vehicle number"
+              value={value} 
+              onChangeText={onChange} 
+              placeholderTextColor={'#000'}
+              color={'#000'}
+            />
+          )}
+        />
+      </View>
+
       <TouchableOpacity
-        style={[styles.button, loading && {backgroundColor: '#ccc'}]}
-        onPress={handleSubmit}
-        disabled={loading}>
-        <Text style={styles.buttonText}>
-          {loading ? 'Submitting...' : 'Submit All Installations'}
-        </Text>
+        style={[styles.submitButton, loading && {backgroundColor: '#ccc'}]}
+        disabled={loading}
+        onPress={handleSubmit(onSubmit)}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.submitText}>Submit Installation Data</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );
@@ -1941,11 +2081,11 @@ export default OutgoingInstallation;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: width * 0.05,
-    backgroundColor: '#f9f9f9',
+    padding: 15,
+    backgroundColor: '#f5f5f5',
   },
   header: {
-    fontSize: width * 0.06,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
@@ -1956,111 +2096,172 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    ...Platform.select({android: {elevation: 2}}),
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   formHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   formTitle: {
     fontWeight: 'bold',
-    fontSize: width * 0.045,
+    fontSize: 16,
+    color: '#333',
   },
   removeFormText: {
-    color: '#dc3545',
+    color: 'red',
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 15,
+    color: '#000',
+    textAlign: 'center',
   },
   label: {
-    fontSize: width * 0.04,
-    fontWeight: '500',
-    marginBottom: 8,
-    color: '#555',
-  },
-  pickerContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 15,
+    fontWeight: '600',
+    marginBottom: 6,
+    color: '#000',
+    fontSize: 14,
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ccc',
+    borderRadius: 8,
     padding: 12,
-    fontSize: width * 0.04,
+    marginBottom: 15,
+    fontSize: 14,
+    backgroundColor: '#fafafa',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 15,
+    backgroundColor: '#fafafa',
   },
   saralIdContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   validateButton: {
     backgroundColor: '#007bff',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    padding: 12,
     borderRadius: 8,
-    marginLeft: 10,
+    marginLeft: 8,
+    minWidth: 80,
+    alignItems: 'center',
   },
   validateButtonText: {
     color: '#fff',
-    fontSize: width * 0.04,
-    fontWeight: '600',
-  },
-  validInput: {
-    borderColor: '#28a745',
-  },
-  invalidInput: {
-    borderColor: '#dc3545',
-  },
-  validMessage: {
-    color: '#28a745',
-    fontSize: width * 0.04,
-    marginBottom: 10,
-  },
-  invalidMessage: {
-    color: '#dc3545',
-    fontSize: width * 0.04,
-    marginBottom: 10,
-  },
-  farmerDetailsContainer: {
-    backgroundColor: '#e9ecef',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-  },
-  farmerDetailLabel: {
     fontWeight: 'bold',
+    fontSize: 12,
   },
-  farmerDetailText: {
-    fontSize: width * 0.04,
+  farmerCard: {
+    backgroundColor: '#e9f7ef',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#28a745',
+  },
+  farmerText: {
+    fontSize: 14,
+    marginBottom: 4,
+    color: '#155724',
+  },
+  photoButton: {
+    backgroundColor: '#17a2b8',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  photoButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  photoFileName: {
+    marginTop: 5,
+    marginBottom: 15,
+    color: '#555',
+    fontSize: 12,
+    fontStyle: 'italic',
+  },
+  validationStatus: {
+    padding: 10,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  validStatus: {
+    backgroundColor: '#d4edda',
+    borderColor: '#c3e6cb',
+  },
+  invalidStatus: {
+    backgroundColor: '#f8d7da',
+    borderColor: '#f5c6cb',
+  },
+  validationStatusText: {
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   addButton: {
     backgroundColor: '#28a745',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: width * 0.04,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    padding: 14,
+    padding: 15,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 20,
   },
-  buttonText: {
+  addButtonText: {
     color: '#fff',
-    fontSize: width * 0.04,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  driverContainer: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  submitButton: {
+    backgroundColor: '#007bff',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  submitText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
+

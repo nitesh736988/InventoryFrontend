@@ -1042,10 +1042,18 @@ import {useForm, Controller} from 'react-hook-form';
 import axios from 'axios';
 import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {launchCamera} from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
-import ImageMarker from 'react-native-image-marker';
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Video} from 'react-native-compressor';
+import RNFS from 'react-native-fs';
+
+// Configure Geolocation
+Geolocation.setRNConfiguration({
+  skipPermissionRequests: false,
+  authorizationLevel: 'whenInUse',
+});
 
 const requestCameraPermission = async () => {
   try {
@@ -1053,235 +1061,1311 @@ const requestCameraPermission = async () => {
       PermissionsAndroid.PERMISSIONS.CAMERA,
       {
         title: 'Camera Permission',
-        message: 'We need access to your camera',
+        message: 'We need access to your camera to take pictures',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
         buttonPositive: 'OK',
       },
     );
     return granted === PermissionsAndroid.RESULTS.GRANTED;
-  } catch {
+  } catch (err) {
+    console.warn(err);
     return false;
   }
 };
 
 const requestLocationPermission = async () => {
-  try {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location Permission',
-        message: 'We need your location for coordinates',
-        buttonPositive: 'OK',
-      },
-    );
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
-  } catch {
-    return false;
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message: 'We need access to your location to fetch coordinates',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn('Location permission error:', err);
+      return false;
+    }
   }
+  return true;
 };
 
-export default function ShowComplaintData({route}) {
-  const navigation = useNavigation();
+const REJECTION_REASONS = [
+  {label: 'Select reason', value: ''},
+  {label: 'ShiftInd (शिफ्टिंड)', value: 'shiftind'},
+  {label: 'Use Monoblock (मोनोब्लॉक का उपयोग)', value: 'usemonoblock'},
+  {label: 'Electricity (बिजली का उपयोग)', value: 'electricity'},
+  {label: 'Use Home (घर में उपयोग)', value: 'usehome'},
+  {label: 'Others (अन्य)', value: 'others'},
+];
+
+const ShowComplaintData = ({route}) => {
+  const {complaintId, farmerName, farmerContact, saralId, HP, AC_DC, village} =
+    route.params;
+
   const {
     control,
     handleSubmit,
+    formState: {errors},
     watch,
     setValue,
-  } = useForm({defaultValues: {remarks: '', selectedStage: ''}});
+  } = useForm({
+    defaultValues: {
+      rmuNumber: '',
+      controllerNumber: '',
+      simNumber: '',
+      remarks: '',
+      farmerItemRemarks: '',
+      selectedStage: '',
+      otherRejectionReason: '',
+    },
+  });
 
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [stageOptions, setStageOptions] = useState([]);
   const [photos, setPhotos] = useState({});
+  const [serviceVideo, setServiceVideo] = useState(null);
+  const [videoCompressing, setVideoCompressing] = useState(false);
+  const [videoInfo, setVideoInfo] = useState({size: 0, duration: 0});
+  const navigation = useNavigation();
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [isButtonHidden, setIsButtonHidden] = useState(false);
+  const [selectedReason, setSelectedReason] = useState('');
+  const [locationGranted, setLocationGranted] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [lastKnownLocation, setLastKnownLocation] = useState(null);
 
   const selectedStage = watch('selectedStage');
+  const showRemarks = selectedStage !== '';
+  const isPendingSelected = selectedStage === '675be30222ae6f63bf772dcf';
+  const isResolvedSelected = selectedStage === '675be30222ae6f63bf772dd0';
+  const isRejectSelected = selectedStage === '675be30222ae6f63bf772dd1';
+  const isOtherReasonSelected = selectedReason === 'others';
 
-  useEffect(() => {
-    const init = async () => {
-      const locGranted = await requestLocationPermission();
-      if (locGranted) {
-        Geolocation.getCurrentPosition(
-          pos => {
-            setLongitude(pos.coords.longitude.toString());
-            setLatitude(pos.coords.latitude.toString());
-          },
-          e => console.warn(e.message),
-        );
-      }
+  const fileCategories = {
+    finalFoundation: 'Final Foundation Image With Farmer',
+    panelPhoto: 'Photograph With Panel + Structure',
+    photoWithWater: 'Photograph With Water Discharge',
+    photoWithController: 'Photograph with Controller',
+    simPhoto: 'SIM Photo',
+  };
 
+  // Improved location function with multiple strategies
+  const getCurrentLocation = (useHighAccuracy = false) => {
+    return new Promise((resolve, reject) => {
+      console.log('Starting location capture...');
+      
+      // First try with high accuracy (GPS)
+      const highAccuracyOptions = {
+        enableHighAccuracy: true,
+        timeout: 15000, // 15 seconds for GPS
+        maximumAge: 0
+      };
+
+      // Fallback to network-based location
+      const networkOptions = {
+        enableHighAccuracy: false, // Use network instead of GPS
+        timeout: 10000, // 10 seconds for network
+        maximumAge: 60000 // Accept location up to 1 minute old
+      };
+
+      const options = useHighAccuracy ? highAccuracyOptions : networkOptions;
+
+      Geolocation.getCurrentPosition(
+        (position) => {
+          console.log('Location captured successfully:', position.coords);
+          const coords = {
+            longitude: position.coords.longitude.toString(),
+            latitude: position.coords.latitude.toString(),
+            accuracy: position.coords.accuracy,
+            timestamp: new Date().toISOString(),
+            source: useHighAccuracy ? 'gps' : 'network'
+          };
+          // Store as last known location
+          setLastKnownLocation(coords);
+          resolve(coords);
+        },
+        (error) => {
+          console.log(`Location error (${useHighAccuracy ? 'GPS' : 'Network'}):`, error);
+          
+          if (useHighAccuracy) {
+            // If GPS fails, try network-based location
+            console.log('GPS failed, trying network-based location...');
+            Geolocation.getCurrentPosition(
+              (position) => {
+                console.log('Network location captured:', position.coords);
+                const coords = {
+                  longitude: position.coords.longitude.toString(),
+                  latitude: position.coords.latitude.toString(),
+                  accuracy: position.coords.accuracy,
+                  timestamp: new Date().toISOString(),
+                  source: 'network'
+                };
+                setLastKnownLocation(coords);
+                resolve(coords);
+              },
+              (networkError) => {
+                console.log('Network location also failed:', networkError);
+                reject(networkError);
+              },
+              networkOptions
+            );
+          } else {
+            reject(error);
+          }
+        },
+        options
+      );
+    });
+  };
+
+  // Get location with multiple retry attempts
+  const getLocationWithRetry = async (maxRetries = 2) => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const res = await axios.get(
-          'http://88.222.214.93:8001/filedService/showStage',
-        );
-        setStageOptions(res.data?.stages || []);
-      } catch (e) {
-        Alert.alert('Error fetching stage list');
+        console.log(`Location attempt ${attempt}/${maxRetries}`);
+        
+        // On first attempt, try high accuracy (GPS)
+        // On subsequent attempts, use network
+        const useHighAccuracy = attempt === 1;
+        const location = await getCurrentLocation(useHighAccuracy);
+        return location;
+      } catch (error) {
+        console.log(`Location attempt ${attempt} failed:`, error);
+        
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+  };
+
+  // Initialize location and permissions
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        setLoading(true);
+        
+        // Request location permission first
+        console.log('Requesting location permission...');
+        const granted = await requestLocationPermission();
+        setLocationGranted(granted);
+        console.log('Location permission granted:', granted);
+
+        if (granted) {
+          console.log('Fetching initial location...');
+          try {
+            // Try to get location with retry mechanism
+            const location = await getLocationWithRetry();
+            setLongitude(location.longitude);
+            setLatitude(location.latitude);
+            console.log('Initial location set:', location);
+          } catch (locationError) {
+            console.log('All location attempts failed:', locationError);
+            
+            // Show helpful guidance based on error type
+            if (locationError.code === locationError.TIMEOUT) {
+              Alert.alert(
+                'Location Timeout', 
+                'GPS signal is weak. Please move to an open area and ensure location services are enabled.'
+              );
+            } else if (locationError.code === locationError.POSITION_UNAVAILABLE) {
+              Alert.alert(
+                'Location Unavailable',
+                'Location services are unavailable. Please check your device settings.'
+              );
+            } else {
+              Alert.alert(
+                'Location Warning', 
+                'Could not get location. You can still take photos, but they will not have location data.'
+              );
+            }
+          }
+        } else {
+          Alert.alert(
+            'Location Permission Required',
+            'Please enable location permissions in app settings to capture location with photos.'
+          );
+        }
+
+        // Fetch stage data
+        console.log('Fetching stage data...');
+        try {
+          const stageResponse = await axios.get(
+            `http://88.222.214.93:8001/filedService/showStage`,
+          );
+          setStageOptions(stageResponse.data?.stages || []);
+        } catch (error) {
+          console.log('Error fetching stage data:', error);
+          Alert.alert(
+            'Error',
+            error.response?.data?.message || error.message,
+          );
+        }
+        
+      } catch (error) {
+        console.log('Initialization error:', error);
+        Alert.alert('Error', 'Failed to initialize app data');
       } finally {
         setLoading(false);
       }
     };
-    init();
+
+    initializeApp();
   }, []);
 
-  /** 📸 capture photo + embed GPS text */
-  const takePhoto = async category => {
-    const camOK = await requestCameraPermission();
-    if (!camOK) return Alert.alert('Camera permission denied');
-    launchCamera({mediaType: 'photo', quality: 0.8}, async resp => {
-      if (resp.didCancel || resp.errorCode) return;
-      const uri = resp.assets?.[0]?.uri;
-      if (!uri) return;
-      try {
-        const text = `Lat: ${latitude}, Lon: ${longitude}`;
-        const out = await ImageMarker.markText({
-          src: uri,
-          text,
-          position: 'bottomRight',
-          color: '#ffffff',
-          fontSize: 40,
-          scale: 1,
-          quality: 100,
-        });
-        setPhotos(p => ({...p, [category]: [...(p[category] || []), out]}));
-      } catch (err) {
-        Alert.alert('Marking failed', err.message);
+  // Function to capture location for photos
+  const captureLocationForPhoto = async () => {
+    console.log('Capturing location for photo...');
+    setLocationLoading(true);
+    
+    try {
+      // Try to get fresh location first
+      const freshLocation = await getLocationWithRetry(1); // Only 1 retry for photos
+      console.log('Fresh location for photo:', freshLocation);
+      return freshLocation;
+    } catch (error) {
+      console.log('Failed to get fresh location:', error);
+      
+      // Fallback strategies
+      if (lastKnownLocation) {
+        console.log('Using last known location:', lastKnownLocation);
+        return {
+          ...lastKnownLocation,
+          timestamp: new Date().toISOString(),
+          source: 'last_known'
+        };
+      } else if (longitude && latitude) {
+        console.log('Using stored location:', {longitude, latitude});
+        return {
+          longitude: longitude,
+          latitude: latitude,
+          accuracy: 0,
+          timestamp: new Date().toISOString(),
+          source: 'stored'
+        };
+      } else {
+        console.log('No location data available');
+        return {
+          longitude: '',
+          latitude: '',
+          accuracy: 0,
+          timestamp: new Date().toISOString(),
+          source: 'unavailable'
+        };
       }
-    });
+    } finally {
+      setLocationLoading(false);
+    }
   };
 
-  /** 📨 submit form with images */
+  const takePhoto = async (category) => {
+    try {
+      console.log(`Taking photo for category: ${category}`);
+      
+      const hasCameraPermission = await requestCameraPermission();
+      if (!hasCameraPermission) {
+        Alert.alert('Permission Denied', 'Camera access is required.');
+        return;
+      }
+
+      // Show location capture in progress if needed
+      if (locationGranted && !longitude && !latitude) {
+        Alert.alert('Getting Location', 'Capturing your current location...');
+      }
+
+      // Capture location before opening camera
+      console.log('Capturing location before camera...');
+      const photoLocation = await captureLocationForPhoto();
+      console.log('Location captured for photo:', photoLocation);
+
+      launchCamera(
+        {
+          mediaType: 'photo',
+          cameraType: 'back',
+          quality: 0.8,
+          includeBase64: false,
+          saveToPhotos: false,
+        },
+        (response) => {
+          if (response.didCancel) {
+            console.log('User cancelled camera');
+          } else if (response.errorCode) {
+            console.log('Camera Error:', response.errorMessage);
+            Alert.alert('Error', 'Failed to capture image');
+          } else if (response.assets?.[0]?.uri) {
+            const photoUri = response.assets[0].uri;
+            const photoWithLocation = {
+              uri: photoUri,
+              longitude: photoLocation.longitude,
+              latitude: photoLocation.latitude,
+              timestamp: new Date().toISOString(),
+              locationSource: photoLocation.source
+            };
+            
+            console.log('Photo saved with location data:', photoWithLocation);
+            
+            setPhotos(prev => ({
+              ...prev,
+              [category]: [...(prev[category] || []), photoWithLocation],
+            }));
+
+            // Update main coordinates if we got a good location
+            if (photoLocation.longitude && photoLocation.latitude) {
+              setLongitude(photoLocation.longitude);
+              setLatitude(photoLocation.latitude);
+            }
+
+            // Show success message
+            if (photoLocation.longitude && photoLocation.latitude) {
+              Alert.alert(
+                'Photo Captured Successfully', 
+                `Location captured:\nLat: ${photoLocation.latitude}\nLong: ${photoLocation.longitude}`
+              );
+            } else {
+              Alert.alert(
+                'Photo Captured', 
+                'Photo saved but location data is not available.'
+              );
+            }
+          }
+        },
+      );
+    } catch (error) {
+      console.log('Camera error:', error);
+      Alert.alert('Error', 'Failed to open camera: ' + error.message);
+    }
+  };
+
+  const handleVideoSelection = async () => {
+    try {
+      const options = {
+        mediaType: 'video',
+        videoQuality: 'high',
+        durationLimit: 300,
+      };
+
+      const response = await launchImageLibrary(options);
+
+      if (response.didCancel) {
+        console.log('User cancelled video selection');
+        return;
+      }
+
+      if (response.errorCode) {
+        console.log('Video Error:', response.errorMessage);
+        Alert.alert('Error', 'Failed to select video');
+        return;
+      }
+
+      if (response.assets?.[0]?.uri) {
+        setVideoCompressing(true);
+        const videoUri = response.assets[0].uri;
+        const duration = response.assets[0].duration || 0;
+
+        try {
+          // Get original file size
+          const stat = await RNFS.stat(videoUri);
+          const originalSizeMB = stat.size / (1024 * 1024);
+          setVideoInfo({size: originalSizeMB, duration});
+
+          // Show info about the selected video
+          Alert.alert(
+            'Video Selected',
+            `Original size: ${originalSizeMB.toFixed(
+              2,
+            )}MB\nDuration: ${Math.round(duration / 60)}min ${Math.round(
+              duration % 60,
+            )}sec\n\nCompressing to ~6MB...`,
+          );
+
+          // Calculate target bitrate (aim for ~6MB file)
+          const targetSizeBytes = 6 * 1024 * 1024; // 6MB in bytes
+          const calculatedBitrate = Math.floor(
+            (targetSizeBytes * 8) / duration,
+          ); // bits per second
+
+          // Compress the video with calculated settings
+          const compressedUri = await Video.compress(
+            videoUri,
+            {
+              compressionMethod: 'auto',
+              maxSize: 640, // Reduce resolution to 640px width
+              bitrate: calculatedBitrate > 500000 ? 500000 : calculatedBitrate, // Cap at 500kbps
+            },
+            progress => {
+              console.log('Compression progress: ', progress);
+            },
+          );
+
+          // Check compressed file size
+          const compressedStat = await RNFS.stat(compressedUri);
+          const compressedSizeMB = compressedStat.size / (1024 * 1024);
+
+          setServiceVideo(compressedUri);
+          setVideoInfo(prev => ({...prev, compressedSize: compressedSizeMB}));
+
+          Alert.alert(
+            'Success',
+            `Video compressed successfully!\nOriginal: ${originalSizeMB.toFixed(
+              2,
+            )}MB\nCompressed: ${compressedSizeMB.toFixed(2)}MB`,
+          );
+        } catch (compressionError) {
+          console.log('Compression error:', compressionError);
+          Alert.alert(
+            'Error',
+            'Failed to compress video. Please try a shorter video.',
+          );
+        } finally {
+          setVideoCompressing(false);
+        }
+      }
+    } catch (error) {
+      console.log('Video selection error:', error.message);
+      Alert.alert('Error', 'Failed to select video');
+      setVideoCompressing(false);
+    }
+  };
+
+  const removePhoto = (category, uri) => {
+    setPhotos(prev => ({
+      ...prev,
+      [category]: prev[category].filter(photo => photo.uri !== uri),
+    }));
+  };
+
+  const removeVideo = () => {
+    setServiceVideo(null);
+    setVideoInfo({size: 0, duration: 0});
+  };
+
+  const handleResolvedSelection = option => {
+    setSelected(option);
+    if (option === 'Yes') {
+      navigation.navigate('InstallationStock');
+    } else {
+      setValue('farmerItemRemarks', '');
+    }
+  };
+
+  const handleSelection = option => {
+    setSelected(option);
+    if (option === 'Yes') {
+      navigation.navigate('InOrder', {
+        id: complaintId,
+        name: farmerName,
+        farmerContact,
+        saralId,
+        farmerName,
+        village,
+      });
+    } else {
+      setValue('farmerItemRemarks', '');
+    }
+  };
+
   const onSubmit = async data => {
+    const serviceId = await AsyncStorage.getItem('_id');
+
+    if (!selectedStage) {
+      Alert.alert('Error', 'Please select a stage.');
+      return;
+    }
+
+    if (showRemarks && !data.remarks.trim() && !isRejectSelected) {
+      Alert.alert('Error', 'Remarks are required.');
+      return;
+    }
+
+    if (isRejectSelected && !selectedReason) {
+      Alert.alert('Error', 'Please select a rejection reason.');
+      return;
+    }
+
+    if (
+      isRejectSelected &&
+      selectedReason === 'others' &&
+      !data.otherRejectionReason.trim()
+    ) {
+      Alert.alert('Error', 'Please specify the rejection reason.');
+      return;
+    }
+
+    if (!data.rmuNumber.trim()) {
+      Alert.alert('Error', 'RMU Number is required.');
+      return;
+    }
+
+    if (!data.simNumber.trim()) {
+      Alert.alert('Error', 'SIM Number is required.');
+      return;
+    }
+
+    // Check if video exists and is under 10MB (slightly higher limit for safety)
+    if (serviceVideo) {
+      try {
+        const stat = await RNFS.stat(serviceVideo);
+        const videoSizeMB = stat.size / (1024 * 1024);
+        if (videoSizeMB > 10) {
+          Alert.alert(
+            'Error',
+            'Video is too large after compression. Please try again with a shorter video.',
+          );
+          return;
+        }
+      } catch (error) {
+        console.log('Error checking video size:', error);
+        Alert.alert('Error', 'Failed to verify video size.');
+        return;
+      }
+    }
+
+    const formData = new FormData();
+    formData.append('fieldEmpID', serviceId);
+    formData.append('complaintId', complaintId);
+    formData.append('stageId', selectedStage);
+
+    // For reject cases, use other rejection reason if selected, otherwise use the selected reason
+    if (isRejectSelected) {
+      const finalRemarks =
+        selectedReason === 'others'
+          ? data.otherRejectionReason
+          : `${selectedReason}: ${data.remarks || ''}`;
+      formData.append('remarks', finalRemarks);
+      formData.append('rejectionReason', selectedReason);
+    } else {
+      formData.append('remarks', data.remarks);
+    }
+
+    formData.append('rmuNumber', data.rmuNumber);
+    formData.append('controllerNumber', data.controllerNumber);
+    formData.append('simNumber', data.simNumber);
+    formData.append('longitude', longitude);
+    formData.append('latitude', latitude);
+    formData.append('farmerItemRemarks', data.farmerItemRemarks || '');
+
+    // Append photos with their location data
+    Object.entries(photos).forEach(([category, photoArray]) => {
+      photoArray.forEach((photo, index) => {
+        formData.append(category, {
+          uri: photo.uri,
+          type: 'image/jpeg',
+          name: `${category}_${index}.jpg`,
+        });
+        // Append location data for each photo
+        formData.append(`${category}Longitude`, photo.longitude || '');
+        formData.append(`${category}Latitude`, photo.latitude || '');
+        formData.append(`${category}Timestamp`, photo.timestamp || '');
+      });
+    });
+
+    if (serviceVideo) {
+      formData.append('serviceVideo', {
+        uri: serviceVideo,
+        type: 'video/mp4',
+        name: 'service_video.mp4',
+      });
+    }
+
     try {
       setSubmitting(true);
-      const uid = await AsyncStorage.getItem('_id');
-      const formData = new FormData();
-      formData.append('fieldEmpID', uid);
-      formData.append('stageId', selectedStage);
-      formData.append('remarks', data.remarks);
-      formData.append('longitude', longitude);
-      formData.append('latitude', latitude);
-      Object.entries(photos).forEach(([cat, arr]) =>
-        arr.forEach((uri, i) =>
-          formData.append(cat, {
-            uri,
-            type: 'image/jpeg',
-            name: `${cat}_${i}.jpg`,
-          }),
-        ),
-      );
-      await axios.put(
-        'https://service.galosolar.com/api/filedService/complaintUpdateWithMulter',
+      const response = await axios.put(
+        `https://service.galosolar.com/api/filedService/complaintUpdateWithMulter`,
         formData,
-        {headers: {'Content-Type': 'multipart/form-data'}},
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          timeout: 60000,
+        },
       );
-      Alert.alert('Uploaded!');
-      navigation.goBack();
-    } catch (e) {
-      Alert.alert('Error', e.message);
+
+      if (response.status === 200) {
+        Alert.alert('Success', response?.data?.message);
+        navigation.goBack();
+      }
+    } catch (error) {
+      Alert.alert('Error', error?.response?.data?.message || error.message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" />
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
         <Text>Loading...</Text>
       </View>
     );
+  }
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Complaint Update</Text>
+      <Text style={styles.header}>Complaint Details</Text>
 
-      <Text style={styles.label}>Select Stage</Text>
-      <Controller
-        control={control}
-        name="selectedStage"
-        render={({field: {onChange, value}}) => (
-          <Picker selectedValue={value} onValueChange={onChange}>
-            <Picker.Item label="Select Stage" value="" />
-            {stageOptions.map(s => (
-              <Picker.Item key={s._id} label={s.stageName} value={s._id} />
-            ))}
-          </Picker>
+      <View style={styles.card}>
+        <View style={styles.row}>
+          <Text style={styles.label}>Farmer Name:</Text>
+          <Text style={styles.value}>{farmerName || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Farmer Contact:</Text>
+          <Text style={styles.value}>{farmerContact?.toString() || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Saral Id:</Text>
+          <Text style={styles.value}>{saralId || 'N/A'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Current Longitude:</Text>
+          <Text style={styles.value}>{longitude || 'Not available'}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Current Latitude:</Text>
+          <Text style={styles.value}>{latitude || 'Not available'}</Text>
+        </View>
+
+        {!longitude && !latitude && locationGranted && (
+          <View style={styles.warningBox}>
+            <MaterialIcon name="signal-off" size={20} color="#ff6b00" />
+            <Text style={styles.warningText}>
+              Location not available. Move to open area and try taking photos.
+            </Text>
+          </View>
         )}
-      />
 
-      <Text style={styles.label}>Remarks</Text>
+        {!locationGranted && (
+          <View style={styles.warningBox}>
+            <MaterialIcon name="alert-circle" size={20} color="#ff6b00" />
+            <Text style={styles.warningText}>
+              Location permission not granted. Photos will not have location data.
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <Text style={styles.label}>RMU Number:</Text>
       <Controller
         control={control}
-        name="remarks"
-        render={({field: {onChange, value}}) => (
+        rules={{required: true}}
+        render={({field: {onChange, onBlur, value}}) => (
           <TextInput
             style={styles.input}
-            value={value}
+            onBlur={onBlur}
             onChangeText={onChange}
-            placeholder="Remarks"
+            value={value}
+            placeholder="Enter RMU Number"
+            placeholderTextColor={'#000'}
           />
         )}
+        name="rmuNumber"
       />
-
-      <Text style={styles.label}>Photos</Text>
-      {Object.keys(photos).map(cat =>
-        photos[cat].map((uri, i) => (
-          <Image key={cat + i} source={{uri}} style={styles.image} />
-        )),
+      {errors.rmuNumber && (
+        <Text style={styles.errorText}>This field is required</Text>
       )}
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => takePhoto('sitePhotos')}>
-        <Text style={styles.btnText}>Take Photo with GPS</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.button, {backgroundColor: '#333'}]}
-        onPress={handleSubmit(onSubmit)}
-        disabled={submitting}>
-        {submitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.btnText}>Submit</Text>
+      <Text style={styles.label}>Controller Number:</Text>
+      <Controller
+        control={control}
+        render={({field: {onChange, onBlur, value}}) => (
+          <TextInput
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            placeholder="Enter Controller Number"
+            placeholderTextColor={'#000'}
+          />
         )}
-      </TouchableOpacity>
+        name="controllerNumber"
+      />
+
+      <Text style={styles.label}>SIM Number:</Text>
+      <Controller
+        control={control}
+        rules={{required: true}}
+        render={({field: {onChange, onBlur, value}}) => (
+          <TextInput
+            style={styles.input}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            value={value}
+            placeholder="Enter SIM Number"
+            placeholderTextColor={'#000'}
+          />
+        )}
+        name="simNumber"
+      />
+      {errors.simNumber && (
+        <Text style={styles.errorText}>This field is required</Text>
+      )}
+
+      {/* Service Video Section */}
+      <View style={styles.fileContainer}>
+        <Text style={styles.label}>
+          Service Video (will be compressed to ~6MB):
+        </Text>
+        <View style={styles.videoButtonsContainer}>
+          <TouchableOpacity
+            onPress={handleVideoSelection}
+            style={styles.videoButton}>
+            <MaterialIcon name="folder-multiple-image" size={28} color="#000" />
+            <Text style={styles.title}>Select Video from Gallery</Text>
+          </TouchableOpacity>
+        </View>
+
+        {serviceVideo && (
+          <View style={styles.videoPreviewContainer}>
+            {videoCompressing && (
+              <View style={styles.compressionOverlay}>
+                <ActivityIndicator size="large" color="#0000ff" />
+                <Text style={styles.compressionText}>Compressing video...</Text>
+              </View>
+            )}
+            <View style={styles.videoPlaceholder}>
+              <MaterialIcon name="video" size={48} color="#000" />
+              <Text style={styles.videoText}>Video Selected</Text>
+              <Text style={styles.videoSubText}>
+                {videoInfo.size > 0 &&
+                  `Original: ${videoInfo.size.toFixed(2)}MB`}
+                {videoInfo.compressedSize &&
+                  ` → ${videoInfo.compressedSize.toFixed(2)}MB`}
+              </Text>
+              <Text style={styles.videoSubText}>Tap to remove</Text>
+            </View>
+            <TouchableOpacity style={styles.cutButton} onPress={removeVideo}>
+              <Text style={styles.cutButtonText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      {Object.entries(fileCategories).map(([category, label]) => (
+        <View key={category} style={styles.fileContainer}>
+          <Text style={styles.label}>{label}</Text>
+
+          <TouchableOpacity
+            onPress={() => takePhoto(category)}
+            style={styles.imageButton}
+            disabled={locationLoading}
+          >
+            {locationLoading ? (
+              <ActivityIndicator size="small" color="#000" />
+            ) : (
+              <MaterialIcon name="camera-plus" size={28} color="#000" />
+            )}
+            <Text style={styles.title}>
+              {locationLoading ? 'Getting Location...' : 'Take Photo with Location'}
+            </Text>
+          </TouchableOpacity>
+
+          <ScrollView horizontal style={styles.imagePreviewContainer}>
+            {(photos[category] || []).map((photo, index) => (
+              <View key={index} style={styles.imageWrapper}>
+                <Image source={{uri: photo.uri}} style={styles.imagePreview} />
+                <View style={styles.locationInfo}>
+                  <Text style={styles.locationText}>
+                    Lat: {photo.latitude || 'No location'}
+                  </Text>
+                  <Text style={styles.locationText}>
+                    Long: {photo.longitude || 'No location'}
+                  </Text>
+                  {photo.latitude && photo.longitude && (
+                    <Text style={styles.locationSuccess}>
+                      ✓ Location Captured
+                    </Text>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={styles.cutButton}
+                  onPress={() => removePhoto(category, photo.uri)}
+                >
+                  <Text style={styles.cutButtonText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      ))}
+
+      <Text style={styles.label}>Status:</Text>
+      <View style={styles.pickerContainer}>
+        <Controller
+          control={control}
+          name="selectedStage"
+          render={({field: {onChange, value}}) => (
+            <Picker selectedValue={value} onValueChange={onChange}>
+              <Picker.Item label="Select a Status" value="" />
+              {stageOptions.map(({_id, stage}) => (
+                <Picker.Item key={_id} label={stage} value={_id} />
+              ))}
+            </Picker>
+          )}
+        />
+      </View>
+
+      {/* General remarks for all statuses except reject */}
+      {showRemarks && !isRejectSelected && (
+        <>
+          <Text style={styles.label}>Remarks:</Text>
+          <Controller
+            control={control}
+            rules={{required: true}}
+            render={({field: {onChange, onBlur, value}}) => (
+              <TextInput
+                style={styles.inputBox}
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Enter remarks"
+                multiline={true}
+                numberOfLines={4}
+                placeholderTextColor={'#000'}
+              />
+            )}
+            name="remarks"
+          />
+          {errors.remarks && (
+            <Text style={styles.errorText}>This field is required</Text>
+          )}
+        </>
+      )}
+
+      {isPendingSelected && (
+        <>
+          <View style={styles.optionsContainer}>
+            <Text style={styles.label}>Collected Defective Material:</Text>
+
+            <TouchableOpacity
+              onPress={() => handleSelection('Yes')}
+              style={styles.option}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selected === 'Yes' && styles.checkedBox,
+                ]}>
+                {selected === 'Yes' && <Text style={styles.checkmark}>✔</Text>}
+              </View>
+              <Text style={styles.optionText}>Yes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleSelection('No')}
+              style={styles.option}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selected === 'No' && styles.checkedBox,
+                ]}>
+                {selected === 'No' && <Text style={styles.checkmark}>✔</Text>}
+              </View>
+              <Text style={styles.optionText}>No</Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            {selected === 'No' && (
+              <Controller
+                control={control}
+                render={({field: {onChange, onBlur, value}}) => (
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter Service Remarks"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    multiline={true}
+                    numberOfLines={4}
+                    placeholderTextColor={'#000'}
+                  />
+                )}
+                name="farmerItemRemarks"
+              />
+            )}
+          </View>
+        </>
+      )}
+
+      {isResolvedSelected && (
+        <>
+          <View style={styles.optionsContainer}>
+            <Text style={styles.label}>Okay Item Given:</Text>
+
+            <TouchableOpacity
+              onPress={() => handleResolvedSelection('Yes')}
+              style={styles.option}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selected === 'Yes' && styles.checkedBox,
+                ]}>
+                {selected === 'Yes' && <Text style={styles.checkmark}>✔</Text>}
+              </View>
+              <Text style={styles.optionText}>Yes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleResolvedSelection('No')}
+              style={styles.option}>
+              <View
+                style={[
+                  styles.checkbox,
+                  selected === 'No' && styles.checkedBox,
+                ]}>
+                {selected === 'No' && <Text style={styles.checkmark}>✔</Text>}
+              </View>
+              <Text style={styles.optionText}>No</Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            {selected === 'No' && (
+              <Controller
+                control={control}
+                render={({field: {onChange, onBlur, value}}) => (
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter Service Remarks"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    multiline={true}
+                    numberOfLines={4}
+                    placeholderTextColor={'#000'}
+                  />
+                )}
+                name="farmerItemRemarks"
+              />
+            )}
+          </View>
+        </>
+      )}
+
+      {isRejectSelected && (
+        <>
+          <View style={styles.optionsContainer}>
+            <Text style={styles.label}>Rejection Reason:</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={selectedReason}
+                onValueChange={setSelectedReason}>
+                {REJECTION_REASONS.map(reason => (
+                  <Picker.Item
+                    key={reason.value}
+                    label={reason.label}
+                    value={reason.value}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </View>
+
+          {/* Show additional remarks field only when "Others" is selected */}
+          {isOtherReasonSelected && (
+            <>
+              <Text style={styles.label}>Specify Reason:</Text>
+              <Controller
+                control={control}
+                rules={{required: isOtherReasonSelected}}
+                render={({field: {onChange, onBlur, value}}) => (
+                  <TextInput
+                    style={styles.inputBox}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Please specify the rejection reason"
+                    multiline={true}
+                    numberOfLines={4}
+                    placeholderTextColor={'#000'}
+                  />
+                )}
+                name="otherRejectionReason"
+              />
+              {errors.otherRejectionReason && (
+                <Text style={styles.errorText}>This field is required</Text>
+              )}
+            </>
+          )}
+        </>
+      )}
+
+      {!isButtonHidden && (
+        <TouchableOpacity
+          onPress={handleSubmit(onSubmit)}
+          style={styles.submitButton}
+          disabled={submitting}>
+          {submitting ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Submit</Text>
+          )}
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#fbd33b', padding: 16},
-  loader: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 12,
+    marginBottom: 20,
     color: '#000',
   },
-  label: {fontSize: 16, fontWeight: 'bold', marginTop: 10, color: '#000'},
+  card: {
+    backgroundColor: '#f8f9fa',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#dee2e6',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 5,
+  },
+  value: {
+    fontSize: 16,
+    color: '#000',
+  },
+  warningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff3cd',
+    padding: 10,
+    borderRadius: 6,
+    marginTop: 10,
+    borderColor: '#ffeaa7',
+    borderWidth: 1,
+  },
+  warningText: {
+    color: '#856404',
+    fontSize: 12,
+    marginLeft: 8,
+    flex: 1,
+  },
+  locationSuccess: {
+    color: '#28a745',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: '#ccc',
     borderRadius: 8,
-    padding: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
     color: '#000',
   },
-  button: {
-    backgroundColor: '#000',
-    marginTop: 16,
+  inputBox: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+    color: '#000',
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  fileContainer: {
+    marginBottom: 20,
+  },
+  imageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
     padding: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    marginBottom: 10,
   },
-  btnText: {color: '#fff', fontWeight: 'bold'},
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    marginVertical: 8,
+  videoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 10,
+  },
+  imagePreviewContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 10,
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
     borderRadius: 8,
   },
+  locationInfo: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    padding: 4,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  locationText: {
+    color: '#fff',
+    fontSize: 10,
+  },
+  cutButton: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#ff4444',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cutButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  videoPreviewContainer: {
+    position: 'relative',
+    marginTop: 10,
+  },
+  videoPlaceholder: {
+    width: '100%',
+    height: 150,
+    backgroundColor: '#f8f9fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dee2e6',
+  },
+  videoText: {
+    fontSize: 16,
+    color: '#000',
+    marginTop: 8,
+  },
+  videoSubText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+  },
+  compressionOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+    borderRadius: 8,
+  },
+  compressionText: {
+    marginTop: 10,
+    color: '#000',
+    fontSize: 14,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+  },
+  optionsContainer: {
+    marginBottom: 15,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkedBox: {
+    backgroundColor: '#007bff',
+    borderColor: '#007bff',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  submitButton: {
+    backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: '#ff4444',
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
+
+export default ShowComplaintData;
