@@ -1024,6 +1024,9 @@
 // export default ShowComplaintData;
 
 
+
+
+
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -1049,12 +1052,6 @@ import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Video} from 'react-native-compressor';
 import RNFS from 'react-native-fs';
 
-// Configure Geolocation
-Geolocation.setRNConfiguration({
-  skipPermissionRequests: false,
-  authorizationLevel: 'whenInUse',
-});
-
 const requestCameraPermission = async () => {
   try {
     const granted = await PermissionsAndroid.request(
@@ -1075,25 +1072,22 @@ const requestCameraPermission = async () => {
 };
 
 const requestLocationPermission = async () => {
-  if (Platform.OS === 'android') {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Location Permission',
-          message: 'We need access to your location to fetch coordinates',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (err) {
-      console.warn('Location permission error:', err);
-      return false;
-    }
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location Permission',
+        message: 'We need access to your location to fetch coordinates',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (err) {
+    console.warn(err);
+    return false;
   }
-  return true;
 };
 
 const REJECTION_REASONS = [
@@ -1140,9 +1134,6 @@ const ShowComplaintData = ({route}) => {
   const [selected, setSelected] = useState(null);
   const [isButtonHidden, setIsButtonHidden] = useState(false);
   const [selectedReason, setSelectedReason] = useState('');
-  const [locationGranted, setLocationGranted] = useState(false);
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [lastKnownLocation, setLastKnownLocation] = useState(null);
 
   const selectedStage = watch('selectedStage');
   const showRemarks = selectedStage !== '';
@@ -1159,237 +1150,57 @@ const ShowComplaintData = ({route}) => {
     simPhoto: 'SIM Photo',
   };
 
-  // Improved location function with multiple strategies
-  const getCurrentLocation = (useHighAccuracy = false) => {
-    return new Promise((resolve, reject) => {
-      console.log('Starting location capture...');
-      
-      // First try with high accuracy (GPS)
-      const highAccuracyOptions = {
-        enableHighAccuracy: true,
-        timeout: 15000, // 15 seconds for GPS
-        maximumAge: 0
-      };
-
-      // Fallback to network-based location
-      const networkOptions = {
-        enableHighAccuracy: false, // Use network instead of GPS
-        timeout: 10000, // 10 seconds for network
-        maximumAge: 60000 // Accept location up to 1 minute old
-      };
-
-      const options = useHighAccuracy ? highAccuracyOptions : networkOptions;
-
-      Geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Location captured successfully:', position.coords);
-          const coords = {
-            longitude: position.coords.longitude.toString(),
-            latitude: position.coords.latitude.toString(),
-            accuracy: position.coords.accuracy,
-            timestamp: new Date().toISOString(),
-            source: useHighAccuracy ? 'gps' : 'network'
-          };
-          // Store as last known location
-          setLastKnownLocation(coords);
-          resolve(coords);
-        },
-        (error) => {
-          console.log(`Location error (${useHighAccuracy ? 'GPS' : 'Network'}):`, error);
-          
-          if (useHighAccuracy) {
-            // If GPS fails, try network-based location
-            console.log('GPS failed, trying network-based location...');
-            Geolocation.getCurrentPosition(
-              (position) => {
-                console.log('Network location captured:', position.coords);
-                const coords = {
-                  longitude: position.coords.longitude.toString(),
-                  latitude: position.coords.latitude.toString(),
-                  accuracy: position.coords.accuracy,
-                  timestamp: new Date().toISOString(),
-                  source: 'network'
-                };
-                setLastKnownLocation(coords);
-                resolve(coords);
-              },
-              (networkError) => {
-                console.log('Network location also failed:', networkError);
-                reject(networkError);
-              },
-              networkOptions
-            );
-          } else {
-            reject(error);
-          }
-        },
-        options
-      );
-    });
-  };
-
-  // Get location with multiple retry attempts
-  const getLocationWithRetry = async (maxRetries = 2) => {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`Location attempt ${attempt}/${maxRetries}`);
-        
-        // On first attempt, try high accuracy (GPS)
-        // On subsequent attempts, use network
-        const useHighAccuracy = attempt === 1;
-        const location = await getCurrentLocation(useHighAccuracy);
-        return location;
-      } catch (error) {
-        console.log(`Location attempt ${attempt} failed:`, error);
-        
-        if (attempt === maxRetries) {
-          throw error;
-        }
-        
-        // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
-  };
-
-  // Initialize location and permissions
+  // Fast location fetching - same as your original code
   useEffect(() => {
-    const initializeApp = async () => {
+    const initialize = async () => {
+      if (Platform.OS === 'android') {
+        const locationGranted = await requestLocationPermission();
+        if (locationGranted) {
+          Geolocation.getCurrentPosition(
+            position => {
+              setLongitude(position.coords.longitude.toString());
+              setLatitude(position.coords.latitude.toString());
+            },
+            error => {
+              console.log('Error getting location:', error.message);
+              Alert.alert('Error', 'Unable to fetch location.');
+            },
+          );
+        }
+      }
+
       try {
-        setLoading(true);
-        
-        // Request location permission first
-        console.log('Requesting location permission...');
-        const granted = await requestLocationPermission();
-        setLocationGranted(granted);
-        console.log('Location permission granted:', granted);
-
-        if (granted) {
-          console.log('Fetching initial location...');
-          try {
-            // Try to get location with retry mechanism
-            const location = await getLocationWithRetry();
-            setLongitude(location.longitude);
-            setLatitude(location.latitude);
-            console.log('Initial location set:', location);
-          } catch (locationError) {
-            console.log('All location attempts failed:', locationError);
-            
-            // Show helpful guidance based on error type
-            if (locationError.code === locationError.TIMEOUT) {
-              Alert.alert(
-                'Location Timeout', 
-                'GPS signal is weak. Please move to an open area and ensure location services are enabled.'
-              );
-            } else if (locationError.code === locationError.POSITION_UNAVAILABLE) {
-              Alert.alert(
-                'Location Unavailable',
-                'Location services are unavailable. Please check your device settings.'
-              );
-            } else {
-              Alert.alert(
-                'Location Warning', 
-                'Could not get location. You can still take photos, but they will not have location data.'
-              );
-            }
-          }
-        } else {
-          Alert.alert(
-            'Location Permission Required',
-            'Please enable location permissions in app settings to capture location with photos.'
-          );
-        }
-
-        // Fetch stage data
-        console.log('Fetching stage data...');
-        try {
-          const stageResponse = await axios.get(
-            `http://88.222.214.93:8001/filedService/showStage`,
-          );
-          setStageOptions(stageResponse.data?.stages || []);
-        } catch (error) {
-          console.log('Error fetching stage data:', error);
-          Alert.alert(
-            'Error',
-            error.response?.data?.message || error.message,
-          );
-        }
-        
+        const stageResponse = await axios.get(
+          `http://88.222.214.93:8001/filedService/showStage`,
+        );
+        setStageOptions(stageResponse.data?.stages || []);
       } catch (error) {
-        console.log('Initialization error:', error);
-        Alert.alert('Error', 'Failed to initialize app data');
+        Alert.alert(
+          'Error fetching stage data:',
+          error.response?.data?.message || error.message,
+        );
       } finally {
         setLoading(false);
       }
     };
-
-    initializeApp();
+    initialize();
   }, []);
 
-  // Function to capture location for photos
-  const captureLocationForPhoto = async () => {
-    console.log('Capturing location for photo...');
-    setLocationLoading(true);
-    
+  // Optimized photo capture with location
+  const takePhoto = async category => {
     try {
-      // Try to get fresh location first
-      const freshLocation = await getLocationWithRetry(1); // Only 1 retry for photos
-      console.log('Fresh location for photo:', freshLocation);
-      return freshLocation;
-    } catch (error) {
-      console.log('Failed to get fresh location:', error);
-      
-      // Fallback strategies
-      if (lastKnownLocation) {
-        console.log('Using last known location:', lastKnownLocation);
-        return {
-          ...lastKnownLocation,
-          timestamp: new Date().toISOString(),
-          source: 'last_known'
-        };
-      } else if (longitude && latitude) {
-        console.log('Using stored location:', {longitude, latitude});
-        return {
-          longitude: longitude,
-          latitude: latitude,
-          accuracy: 0,
-          timestamp: new Date().toISOString(),
-          source: 'stored'
-        };
-      } else {
-        console.log('No location data available');
-        return {
-          longitude: '',
-          latitude: '',
-          accuracy: 0,
-          timestamp: new Date().toISOString(),
-          source: 'unavailable'
-        };
-      }
-    } finally {
-      setLocationLoading(false);
-    }
-  };
-
-  const takePhoto = async (category) => {
-    try {
-      console.log(`Taking photo for category: ${category}`);
-      
-      const hasCameraPermission = await requestCameraPermission();
-      if (!hasCameraPermission) {
+      const hasPermission = await requestCameraPermission();
+      if (!hasPermission) {
         Alert.alert('Permission Denied', 'Camera access is required.');
         return;
       }
 
-      // Show location capture in progress if needed
-      if (locationGranted && !longitude && !latitude) {
-        Alert.alert('Getting Location', 'Capturing your current location...');
-      }
-
-      // Capture location before opening camera
-      console.log('Capturing location before camera...');
-      const photoLocation = await captureLocationForPhoto();
-      console.log('Location captured for photo:', photoLocation);
+      // Use current location for the photo (no additional location fetch)
+      const photoLocation = {
+        longitude: longitude,
+        latitude: latitude,
+        timestamp: new Date().toISOString(),
+      };
 
       launchCamera(
         {
@@ -1397,9 +1208,8 @@ const ShowComplaintData = ({route}) => {
           cameraType: 'back',
           quality: 0.8,
           includeBase64: false,
-          saveToPhotos: false,
         },
-        (response) => {
+        response => {
           if (response.didCancel) {
             console.log('User cancelled camera');
           } else if (response.errorCode) {
@@ -1411,33 +1221,19 @@ const ShowComplaintData = ({route}) => {
               uri: photoUri,
               longitude: photoLocation.longitude,
               latitude: photoLocation.latitude,
-              timestamp: new Date().toISOString(),
-              locationSource: photoLocation.source
+              timestamp: photoLocation.timestamp,
             };
-            
-            console.log('Photo saved with location data:', photoWithLocation);
             
             setPhotos(prev => ({
               ...prev,
               [category]: [...(prev[category] || []), photoWithLocation],
             }));
 
-            // Update main coordinates if we got a good location
+            // Show success message with location if available
             if (photoLocation.longitude && photoLocation.latitude) {
-              setLongitude(photoLocation.longitude);
-              setLatitude(photoLocation.latitude);
-            }
-
-            // Show success message
-            if (photoLocation.longitude && photoLocation.latitude) {
-              Alert.alert(
-                'Photo Captured Successfully', 
-                `Location captured:\nLat: ${photoLocation.latitude}\nLong: ${photoLocation.longitude}`
-              );
-            } else {
               Alert.alert(
                 'Photo Captured', 
-                'Photo saved but location data is not available.'
+                `Location captured:\nLat: ${photoLocation.latitude}\nLong: ${photoLocation.longitude}`
               );
             }
           }
@@ -1445,7 +1241,7 @@ const ShowComplaintData = ({route}) => {
       );
     } catch (error) {
       console.log('Camera error:', error);
-      Alert.alert('Error', 'Failed to open camera: ' + error.message);
+      Alert.alert('Error', 'Failed to open camera');
     }
   };
 
@@ -1490,6 +1286,18 @@ const ShowComplaintData = ({route}) => {
               duration % 60,
             )}sec\n\nCompressing to ~6MB...`,
           );
+
+          // Calculate compression ratio based on original size
+          let compressionRatio = 1;
+          if (originalSizeMB > 50) {
+            compressionRatio = 0.1; // 10% of original for very large files
+          } else if (originalSizeMB > 20) {
+            compressionRatio = 0.15; // 15% of original for large files
+          } else if (originalSizeMB > 10) {
+            compressionRatio = 0.2; // 20% of original for medium files
+          } else {
+            compressionRatio = 0.3; // 30% of original for smaller files
+          }
 
           // Calculate target bitrate (aim for ~6MB file)
           const targetSizeBytes = 6 * 1024 * 1024; // 6MB in bytes
@@ -1734,32 +1542,14 @@ const ShowComplaintData = ({route}) => {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Current Longitude:</Text>
-          <Text style={styles.value}>{longitude || 'Not available'}</Text>
+          <Text style={styles.label}>Longitude:</Text>
+          <Text style={styles.value}>{longitude?.toString() || 'N/A'}</Text>
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>Current Latitude:</Text>
-          <Text style={styles.value}>{latitude || 'Not available'}</Text>
+          <Text style={styles.label}>Latitude:</Text>
+          <Text style={styles.value}>{latitude?.toString() || 'N/A'}</Text>
         </View>
-
-        {!longitude && !latitude && locationGranted && (
-          <View style={styles.warningBox}>
-            <MaterialIcon name="signal-off" size={20} color="#ff6b00" />
-            <Text style={styles.warningText}>
-              Location not available. Move to open area and try taking photos.
-            </Text>
-          </View>
-        )}
-
-        {!locationGranted && (
-          <View style={styles.warningBox}>
-            <MaterialIcon name="alert-circle" size={20} color="#ff6b00" />
-            <Text style={styles.warningText}>
-              Location permission not granted. Photos will not have location data.
-            </Text>
-          </View>
-        )}
       </View>
 
       <Text style={styles.label}>RMU Number:</Text>
@@ -1864,17 +1654,9 @@ const ShowComplaintData = ({route}) => {
 
           <TouchableOpacity
             onPress={() => takePhoto(category)}
-            style={styles.imageButton}
-            disabled={locationLoading}
-          >
-            {locationLoading ? (
-              <ActivityIndicator size="small" color="#000" />
-            ) : (
-              <MaterialIcon name="camera-plus" size={28} color="#000" />
-            )}
-            <Text style={styles.title}>
-              {locationLoading ? 'Getting Location...' : 'Take Photo with Location'}
-            </Text>
+            style={styles.imageButton}>
+            <MaterialIcon name="camera-plus" size={28} color="#000" />
+            <Text style={styles.title}>Take Photo with Location</Text>
           </TouchableOpacity>
 
           <ScrollView horizontal style={styles.imagePreviewContainer}>
@@ -1889,15 +1671,12 @@ const ShowComplaintData = ({route}) => {
                     Long: {photo.longitude || 'No location'}
                   </Text>
                   {photo.latitude && photo.longitude && (
-                    <Text style={styles.locationSuccess}>
-                      ✓ Location Captured
-                    </Text>
+                    <Text style={styles.locationSuccess}>✓ Location Captured</Text>
                   )}
                 </View>
                 <TouchableOpacity
                   style={styles.cutButton}
-                  onPress={() => removePhoto(category, photo.uri)}
-                >
+                  onPress={() => removePhoto(category, photo.uri)}>
                   <Text style={styles.cutButtonText}>✕</Text>
                 </TouchableOpacity>
               </View>
@@ -2122,118 +1901,192 @@ const ShowComplaintData = ({route}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
+  container: {flex: 1, padding: 16, backgroundColor: '#fbd33b'},
   header: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: 20,
-    color: '#000',
-  },
-  card: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    color: 'black',
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    marginRight: 10,
+    fontWeight: 'bold',
     color: '#000',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   value: {
     fontSize: 16,
     color: '#000',
   },
-  warningBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff3cd',
-    padding: 10,
-    borderRadius: 6,
-    marginTop: 10,
-    borderColor: '#ffeaa7',
-    borderWidth: 1,
-  },
-  warningText: {
-    color: '#856404',
-    fontSize: 12,
-    marginLeft: 8,
-    flex: 1,
-  },
-  locationSuccess: {
-    color: '#28a745',
-    fontSize: 9,
-    fontWeight: 'bold',
-  },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
+    padding: 8,
     fontSize: 16,
+    marginBottom: 12,
     color: '#000',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 12,
+  },
+  optionsContainer: {
+    flexDirection: 'column',
+    marginBottom: 12,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+    marginBottom: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#007BFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 5,
+  },
+  checkedBox: {
+    backgroundColor: '#007BFF',
+  },
+  optionText: {
+    fontSize: 16,
+  },
+  card: {
+    padding: 10,
+    backgroundColor: '#fbd33b',
+    borderRadius: 8,
+    elevation: 3,
+    marginVertical: 5,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 8,
+    marginBottom: 12,
   },
   inputBox: {
+    height: 120,
+    borderColor: '#000',
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
-    fontSize: 16,
-    color: '#000',
-    height: 100,
     textAlignVertical: 'top',
-  },
-  fileContainer: {
-    marginBottom: 20,
+    padding: 8,
+    fontSize: 16,
+    marginBottom: 12,
   },
   imageButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e9ecef',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
+  },
+  videoButtonsContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
   },
   videoButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e9ecef',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
   },
-  title: {
+  videoPreviewContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 150,
+    marginBottom: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 10,
+  },
+  videoPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  videoText: {
     fontSize: 16,
-    color: '#000',
-    marginLeft: 10,
+    fontWeight: 'bold',
+    marginTop: 8,
   },
-  imagePreviewContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
+  videoSubText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  imagePreviewContainer: {flexDirection: 'row', marginBottom: 16},
+  imagePreview: {width: 100, height: 100, borderRadius: 10},
+  submitButton: {
+    backgroundColor: '#000',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 40,
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  cutButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 5,
+    borderRadius: 15,
+  },
+  cutButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  buttonText: {color: '#fff', fontSize: 16},
+  loaderContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  fileContainer: {
+    marginBottom: 16,
   },
   imageWrapper: {
     position: 'relative',
     marginRight: 10,
   },
-  imagePreview: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+  title: {
+    fontSize: 14,
+    color: '#000',
+    marginLeft: 5,
+  },
+  compressionOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    borderRadius: 10,
+  },
+  compressionText: {
+    color: 'white',
+    marginTop: 10,
+  },
+  checkmark: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   locationInfo: {
     position: 'absolute',
@@ -2242,129 +2095,17 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     padding: 4,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
   },
   locationText: {
     color: '#fff',
     fontSize: 10,
   },
-  cutButton: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#ff4444',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cutButtonText: {
-    color: '#fff',
-    fontSize: 12,
+  locationSuccess: {
+    color: '#28a745',
+    fontSize: 9,
     fontWeight: 'bold',
-  },
-  videoPreviewContainer: {
-    position: 'relative',
-    marginTop: 10,
-  },
-  videoPlaceholder: {
-    width: '100%',
-    height: 150,
-    backgroundColor: '#f8f9fa',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#dee2e6',
-  },
-  videoText: {
-    fontSize: 16,
-    color: '#000',
-    marginTop: 8,
-  },
-  videoSubText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  compressionOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-    borderRadius: 8,
-  },
-  compressionText: {
-    marginTop: 10,
-    color: '#000',
-    fontSize: 14,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  optionsContainer: {
-    marginBottom: 15,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkedBox: {
-    backgroundColor: '#007bff',
-    borderColor: '#007bff',
-  },
-  checkmark: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  optionText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  submitButton: {
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: '#ff4444',
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
