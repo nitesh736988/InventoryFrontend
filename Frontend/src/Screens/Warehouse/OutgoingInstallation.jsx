@@ -1600,6 +1600,675 @@
 
 // export default OutgoingInstallation;
 
+// import React, {useEffect, useState} from 'react';
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   TouchableOpacity,
+//   ScrollView,
+//   Alert,
+//   StyleSheet,
+//   Dimensions,
+//   Platform,
+//   ActivityIndicator,
+// } from 'react-native';
+// import {Picker} from '@react-native-picker/picker';
+// import axios from 'axios';
+// import {launchImageLibrary} from 'react-native-image-picker';
+// import {useForm, useFieldArray, Controller} from 'react-hook-form';
+// import {API_URL} from '@env';
+
+// const {width} = Dimensions.get('window');
+
+// const OutgoingInstallation = () => {
+//   const [systems, setSystems] = useState([]);
+//   const [servicePersons, setServicePersons] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+//   const {
+//     control,
+//     handleSubmit,
+//     watch,
+//     setValue,
+//     reset,
+//   } = useForm({
+//     defaultValues: {
+//       driverName: '',
+//       driverContact: '',
+//       vehicleNumber: '',
+//       forms: [
+//         {
+//           selectedSystem: '',
+//           selectedPump: '',
+//           selectedServicePerson: '',
+//           saralId: '',
+//           farmerDetails: null,
+//           dispatchBillPhoto: null,
+//           pumps: [],
+//           isValid: false,
+//         },
+//       ],
+//     },
+//   });
+
+//   const {fields, append, remove, update} = useFieldArray({
+//     control,
+//     name: 'forms',
+//   });
+
+//   useEffect(() => {
+//     fetchSystems();
+//     fetchServicePersons();
+//   }, []);
+
+//   const fetchSystems = async () => {
+//     try {
+//       const res = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+//       setSystems(res?.data?.data || []);
+//     } catch (err) {
+//       console.log('Error fetching systems:', err.message);
+//     }
+//   };
+
+//   const fetchServicePersons = async () => {
+//     try {
+//       const res = await axios.get(`${API_URL}/warehouse-admin/get-installer-data`);
+//       setServicePersons(res?.data?.data || []);
+//     } catch (err) {
+//       console.log('Error fetching service persons:', err.message);
+//     }
+//   };
+
+//   const fetchPumpData = async (systemId, index) => {
+//     try {
+//       const res = await axios.get(`${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`);
+//       const pumpList = res?.data?.data || [];
+//       const form = watch('forms')[index];
+//       update(index, {...form, pumps: pumpList});
+//     } catch (err) {
+//       console.log('Error fetching pumps:', err.message);
+//     }
+//   };
+
+//   const validateSaralId = async (index, saralId) => {
+//     if (!saralId) {
+//       Alert.alert('Validation', 'Please enter Saral ID first.');
+//       return;
+//     }
+
+//     try {
+//       const res = await axios.get(
+//         `http://88.222.214.93:8001/farmer/showFarmerAccordingToSaralIdFrontEnd?saralId=${saralId}`,
+//       );
+
+//       const success = res?.data?.success;
+//       const farmer = res?.data?.data;
+
+//       const form = watch('forms')[index];
+//       if (success && farmer) {
+//         update(index, {
+//           ...form, 
+//           farmerDetails: farmer, 
+//           isValid: true,
+//           saralId: saralId
+//         });
+//         Alert.alert('Success', 'Saral ID is valid');
+//       } else {
+//         update(index, {
+//           ...form, 
+//           farmerDetails: null, 
+//           isValid: false
+//         });
+//         Alert.alert('Invalid', 'Saral ID not found');
+//       }
+//     } catch (err) {
+//       console.log('Validation error:', err.message);
+//       Alert.alert('Error', 'Unable to validate Saral ID');
+//     }
+//   };
+
+//   const handlePhotoPick = async index => {
+//     launchImageLibrary({mediaType: 'photo', quality: 0.8}, response => {
+//       if (response.didCancel || response.errorCode) return;
+//       const photo = response.assets[0];
+//       const form = watch('forms')[index];
+//       update(index, {...form, dispatchBillPhoto: photo});
+//     });
+//   };
+
+//   const onSubmit = async data => {
+//     const {driverName, driverContact, vehicleNumber, forms} = data;
+
+//     if (!driverName || !driverContact || !vehicleNumber) {
+//       Alert.alert('Validation', 'Please fill driver details');
+//       return;
+//     }
+
+//     // Filter only valid forms
+//     const validForms = forms.filter(f => 
+//       f.isValid && 
+//       f.selectedSystem && 
+//       f.selectedPump && 
+//       f.selectedServicePerson && 
+//       f.saralId
+//     );
+
+//     if (validForms.length === 0) {
+//       Alert.alert('Validation', 'Please validate at least one full form');
+//       return;
+//     }
+
+//     // Create dispatchedSystem array in the exact format needed
+//     const dispatchedSystem = validForms.map(f => ({
+//       farmerSaralId: f.saralId,
+//       installerId: f.selectedServicePerson,
+//       systemId: f.selectedSystem,
+//       pumpId: f.selectedPump,
+//     }));
+
+//     const formData = new FormData();
+    
+//     // Add text fields
+//     formData.append('driverName', driverName.trim());
+//     formData.append('driverContact', driverContact.trim());
+//     formData.append('vehicleNumber', vehicleNumber.trim());
+//     formData.append('dispatchedSystem', JSON.stringify(dispatchedSystem));
+
+//     // Add photos - only for valid forms and in sequence
+//     validForms.forEach((f, i) => {
+//       if (f.dispatchBillPhoto) {
+//         formData.append(`dispatchBillPhoto${i + 1}`, {
+//           uri: f.dispatchBillPhoto.uri,
+//           name: f.dispatchBillPhoto.fileName || `dispatch_bill_${i + 1}.jpg`,
+//           type: f.dispatchBillPhoto.type || 'image/jpeg',
+//         });
+//       }
+//     });
+
+//     console.log('Submitting form data:', {
+//       driverName,
+//       driverContact,
+//       vehicleNumber,
+//       dispatchedSystem,
+//       photoCount: validForms.filter(f => f.dispatchBillPhoto).length
+//     });
+
+//     // Debug log
+//     validForms.forEach((form, index) => {
+//       console.log(`Form ${index + 1}:`, {
+//         saralId: form.saralId,
+//         systemId: form.selectedSystem,
+//         pumpId: form.selectedPump,
+//         installerId: form.selectedServicePerson,
+//         hasPhoto: !!form.dispatchBillPhoto
+//       });
+//     });
+
+//     console.log('Final FormData entries:', formData);
+
+//     try {
+//       setLoading(true);
+//       const res = await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, formData, {
+//         headers: {
+//           'Content-Type': 'multipart/form-data',
+//         },
+//       });
+
+//       Alert.alert('Success', res?.data?.message || 'Submitted successfully');
+      
+//       // Reset form after successful submission
+//       reset({
+//         driverName: '',
+//         driverContact: '',
+//         vehicleNumber: '',
+//         forms: [{
+//           selectedSystem: '',
+//           selectedPump: '',
+//           selectedServicePerson: '',
+//           saralId: '',
+//           farmerDetails: null,
+//           dispatchBillPhoto: null,
+//           pumps: [],
+//           isValid: false,
+//         }],
+//       });
+      
+//     } catch (err) {
+//       console.log('Submission error:', err.response?.data?.message || err.message);
+//       Alert.alert(
+//         'Error', 
+//         err?.response?.data?.message || err.message || 'Submission failed'
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <Text style={styles.header}>Outgoing Installation Material</Text>
+
+//       {fields.map((field, index) => {
+//         const form = watch('forms')[index];
+//         return (
+//           <View key={field.id} style={styles.formBlock}>
+//             <View style={styles.formHeader}>
+//               <Text style={styles.formTitle}>Form {index + 1}</Text>
+//               {fields.length > 1 && (
+//                 <TouchableOpacity onPress={() => remove(index)}>
+//                   <Text style={styles.removeFormText}>Remove</Text>
+//                 </TouchableOpacity>
+//               )}
+//             </View>
+
+//             {/* System */}
+//             <Text style={styles.label}>Select System</Text>
+//             <Controller
+//               control={control}
+//               name={`forms.${index}.selectedSystem`}
+//               render={({field: {value, onChange}}) => (
+//                 <View style={styles.pickerContainer}>
+//                   <Picker
+//                     selectedValue={value}
+//                     onValueChange={val => {
+//                       onChange(val);
+//                       fetchPumpData(val, index);
+//                     }}
+//                     style={{color: value ? '#000' : '#000'}}
+//                     >
+                      
+//                     <Picker.Item label="Select System" value="" />
+//                     {systems.map(sys => (
+//                       <Picker.Item key={sys._id} label={sys.systemName} value={sys._id} />
+//                     ))}
+//                   </Picker>
+//                 </View>
+//               )}
+//             />
+
+//             {/* Pump */}
+//             {form.pumps?.length > 0 && (
+//               <>
+//                 <Text style={styles.label}>Select Pump</Text>
+//                 <Controller
+//                   control={control}
+//                   name={`forms.${index}.selectedPump`}
+//                   render={({field: {value, onChange}}) => (
+//                     <View style={styles.pickerContainer}>
+//                       <Picker selectedValue={value} onValueChange={onChange}>
+//                         <Picker.Item label="Select Pump" value="" 
+//                         style={{color: value ? '#000' : '#000'}}  />
+                        
+
+//                         {form.pumps.map(p => (
+//                           <Picker.Item key={p._id} label={p.itemName} value={p._id} 
+//                           style={{color: value ? '#000' : '#000'}} />
+                          
+//                         ))}
+//                       </Picker>
+//                     </View>
+//                   )}
+//                 />
+//               </>
+//             )}
+
+//             {/* Service Person */}
+//             <Text style={styles.label}>Select Service Person</Text>
+//             <Controller
+//               control={control}
+//               name={`forms.${index}.selectedServicePerson`}
+//               render={({field: {value, onChange}}) => (
+//                 <View style={styles.pickerContainer}>
+//                   <Picker selectedValue={value} onValueChange={onChange}>
+//                     <Picker.Item label="Select Service Person" value=""
+//                     style={{color: value ? '#000' : '#000'}}  />
+                     
+//                     {servicePersons.map(sp => (
+//                       <Picker.Item key={sp._id} label={sp.name} value={sp._id} 
+//                       style={{color: value ? '#000' : '#000'}} />
+                     
+//                     ))}
+//                   </Picker>
+//                 </View>
+//               )}
+//             />
+
+//             {/* Saral ID */}
+//             <Text style={styles.label}>Farmer Saral ID</Text>
+//             <Controller
+//               control={control}
+//               name={`forms.${index}.saralId`}
+//               render={({field: {value, onChange}}) => (
+//                 <View style={styles.saralIdContainer}>
+//                   <TextInput
+//                     style={[styles.input, {flex: 1}]}
+//                     placeholder="Enter Saral ID"
+//                     value={value}
+//                     onChangeText={onChange}
+//                     placeholderTextColor={'#000'}
+//                     color={'#000'}
+//                   />
+//                   <TouchableOpacity
+//                     style={styles.validateButton}
+//                     onPress={() => validateSaralId(index, value)}>
+//                     <Text style={styles.validateButtonText}>Validate</Text>
+//                   </TouchableOpacity>
+//                 </View>
+//               )}
+//             />
+
+//             {/* Show farmer details */}
+//             {form.farmerDetails && (
+//               <View style={styles.farmerCard}>
+//                 <Text style={styles.farmerText}>👨‍🌾 Name: {form.farmerDetails?.farmerName || 'N/A'}</Text>
+//                 <Text style={styles.farmerText}>📞 Contact: {form.farmerDetails?.contact || 'N/A'}</Text>
+//                 <Text style={styles.farmerText}>🆔 Saral ID: {form.saralId || 'N/A'}</Text>
+//               </View>
+//             )}
+
+//             {/* Dispatch Bill Photo */}
+//             <Text style={styles.label}>Dispatch Bill Photo</Text>
+//             <TouchableOpacity style={styles.photoButton} onPress={() => handlePhotoPick(index)}>
+//               <Text style={styles.photoButtonText}>
+//                 {form.dispatchBillPhoto ? 'Change Photo' : 'Upload Photo'}
+//               </Text>
+//             </TouchableOpacity>
+//             {form.dispatchBillPhoto && (
+//               <Text style={styles.photoFileName}>📸 {form.dispatchBillPhoto.fileName}</Text>
+//             )}
+
+//             {/* Validation Status */}
+//             <View style={[
+//               styles.validationStatus, 
+//               form.isValid ? styles.validStatus : styles.invalidStatus
+//             ]}>
+//               <Text style={styles.validationStatusText}>
+//                 {form.isValid ? '✅ Form Validated' : '❌ Form Not Validated'}
+//               </Text>
+//             </View>
+//           </View>
+//         );
+//       })}
+
+//       <TouchableOpacity
+//         style={styles.addButton}
+//         onPress={() =>
+//           append({
+//             selectedSystem: '',
+//             selectedPump: '',
+//             selectedServicePerson: '',
+//             saralId: '',
+//             farmerDetails: null,
+//             dispatchBillPhoto: null,
+//             pumps: [],
+//             isValid: false,
+//           })
+//         }>
+//         <Text style={styles.addButtonText}>+ Add Another Form</Text>
+//       </TouchableOpacity>
+
+//       {/* Common Driver Info */}
+//       <View style={styles.driverContainer}>
+//         <Text style={styles.sectionTitle}>Driver Information</Text>
+        
+//         <Text style={styles.label}>Driver Name</Text>
+//         <Controller
+//           control={control}
+//           name="driverName"
+//           render={({field: {value, onChange}}) => (
+//             <TextInput 
+//               style={styles.input} 
+//               placeholder="Enter driver name"
+//               value={value} 
+//               onChangeText={onChange} 
+//               placeholderTextColor={'#000'}
+//               color={'#000'}
+//             />
+//           )}
+//         />
+
+//         <Text style={styles.label}>Driver Contact</Text>
+//         <Controller
+//           control={control}
+//           name="driverContact"
+//           render={({field: {value, onChange}}) => (
+//             <TextInput
+//               style={styles.input}
+//               placeholder="Enter driver contact number"
+//               keyboardType="phone-pad"
+//               value={value}
+//               onChangeText={onChange}
+//               placeholderTextColor={'#000'}
+//               color={'#000'}
+//             />
+//           )}
+//         />
+
+//         <Text style={styles.label}>Vehicle Number</Text>
+//         <Controller
+//           control={control}
+//           name="vehicleNumber"
+//           render={({field: {value, onChange}}) => (
+//             <TextInput 
+//               style={styles.input} 
+//               placeholder="Enter vehicle number"
+//               value={value} 
+//               onChangeText={onChange} 
+//               placeholderTextColor={'#000'}
+//               color={'#000'}
+//             />
+//           )}
+//         />
+//       </View>
+
+//       <TouchableOpacity
+//         style={[styles.submitButton, loading && {backgroundColor: '#ccc'}]}
+//         disabled={loading}
+//         onPress={handleSubmit(onSubmit)}>
+//         {loading ? (
+//           <ActivityIndicator color="#fff" />
+//         ) : (
+//           <Text style={styles.submitText}>Submit Installation Data</Text>
+//         )}
+//       </TouchableOpacity>
+//     </ScrollView>
+//   );
+// };
+
+// export default OutgoingInstallation;
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 15,
+//     backgroundColor: '#f5f5f5',
+//   },
+//   header: {
+//     fontSize: 22,
+//     fontWeight: 'bold',
+//     marginBottom: 20,
+//     textAlign: 'center',
+//     color: '#333',
+//   },
+//   formBlock: {
+//     backgroundColor: '#fff',
+//     padding: 15,
+//     borderRadius: 10,
+//     marginBottom: 20,
+//     ...Platform.select({
+//       ios: {
+//         shadowColor: '#000',
+//         shadowOffset: { width: 0, height: 2 },
+//         shadowOpacity: 0.1,
+//         shadowRadius: 4,
+//       },
+//       android: {
+//         elevation: 2,
+//       },
+//     }),
+//   },
+//   formHeader: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginBottom: 15,
+//     paddingBottom: 10,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#eee',
+//   },
+//   formTitle: {
+//     fontWeight: 'bold',
+//     fontSize: 16,
+//     color: '#333',
+//   },
+//   removeFormText: {
+//     color: 'red',
+//     fontWeight: '600',
+//   },
+//   sectionTitle: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     marginBottom: 15,
+//     color: '#000',
+//     textAlign: 'center',
+//   },
+//   label: {
+//     fontWeight: '600',
+//     marginBottom: 6,
+//     color: '#000',
+//     fontSize: 14,
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     borderRadius: 8,
+//     padding: 12,
+//     marginBottom: 15,
+//     fontSize: 14,
+//     backgroundColor: '#fafafa',
+//   },
+//   pickerContainer: {
+//     borderWidth: 1,
+//     borderColor: '#ccc',
+//     borderRadius: 8,
+//     marginBottom: 15,
+//     backgroundColor: '#fafafa',
+//   },
+//   saralIdContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     marginBottom: 15,
+//   },
+//   validateButton: {
+//     backgroundColor: '#007bff',
+//     padding: 12,
+//     borderRadius: 8,
+//     marginLeft: 8,
+//     minWidth: 80,
+//     alignItems: 'center',
+//   },
+//   validateButtonText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     fontSize: 12,
+//   },
+//   farmerCard: {
+//     backgroundColor: '#e9f7ef',
+//     padding: 12,
+//     borderRadius: 8,
+//     marginBottom: 15,
+//     borderLeftWidth: 4,
+//     borderLeftColor: '#28a745',
+//   },
+//   farmerText: {
+//     fontSize: 14,
+//     marginBottom: 4,
+//     color: '#155724',
+//   },
+//   photoButton: {
+//     backgroundColor: '#17a2b8',
+//     padding: 12,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//     marginBottom: 10,
+//   },
+//   photoButtonText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     fontSize: 14,
+//   },
+//   photoFileName: {
+//     marginTop: 5,
+//     marginBottom: 15,
+//     color: '#555',
+//     fontSize: 12,
+//     fontStyle: 'italic',
+//   },
+//   validationStatus: {
+//     padding: 10,
+//     borderRadius: 6,
+//     alignItems: 'center',
+//   },
+//   validStatus: {
+//     backgroundColor: '#d4edda',
+//     borderColor: '#c3e6cb',
+//   },
+//   invalidStatus: {
+//     backgroundColor: '#f8d7da',
+//     borderColor: '#f5c6cb',
+//   },
+//   validationStatusText: {
+//     fontWeight: 'bold',
+//     fontSize: 12,
+//   },
+//   addButton: {
+//     backgroundColor: '#28a745',
+//     padding: 15,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//     marginBottom: 20,
+//   },
+//   addButtonText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     fontSize: 16,
+//   },
+//   driverContainer: {
+//     backgroundColor: '#fff',
+//     padding: 15,
+//     borderRadius: 10,
+//     marginBottom: 20,
+//     ...Platform.select({
+//       ios: {
+//         shadowColor: '#000',
+//         shadowOffset: { width: 0, height: 2 },
+//         shadowOpacity: 0.1,
+//         shadowRadius: 4,
+//       },
+//       android: {
+//         elevation: 2,
+//       },
+//     }),
+//   },
+//   submitButton: {
+//     backgroundColor: '#007bff',
+//     padding: 16,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//     marginBottom: 30,
+//   },
+//   submitText: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//     fontSize: 16,
+//   },
+// });
+
+
+
+
+
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -1616,6 +2285,7 @@ import {
 import {Picker} from '@react-native-picker/picker';
 import axios from 'axios';
 import {launchImageLibrary} from 'react-native-image-picker';
+import DocumentPicker from 'react-native-document-picker';
 import {useForm, useFieldArray, Controller} from 'react-hook-form';
 import {API_URL} from '@env';
 
@@ -1644,7 +2314,8 @@ const OutgoingInstallation = () => {
           selectedServicePerson: '',
           saralId: '',
           farmerDetails: null,
-          dispatchBillPhoto: null,
+          dispatchBillFile: null, // Combined field for both photo and PDF
+          fileType: null, // 'photo' or 'pdf'
           pumps: [],
           isValid: false,
         },
@@ -1668,6 +2339,7 @@ const OutgoingInstallation = () => {
       setSystems(res?.data?.data || []);
     } catch (err) {
       console.log('Error fetching systems:', err.message);
+      Alert.alert('Error', 'Failed to fetch systems');
     }
   };
 
@@ -1677,6 +2349,7 @@ const OutgoingInstallation = () => {
       setServicePersons(res?.data?.data || []);
     } catch (err) {
       console.log('Error fetching service persons:', err.message);
+      Alert.alert('Error', 'Failed to fetch service persons');
     }
   };
 
@@ -1688,6 +2361,7 @@ const OutgoingInstallation = () => {
       update(index, {...form, pumps: pumpList});
     } catch (err) {
       console.log('Error fetching pumps:', err.message);
+      Alert.alert('Error', 'Failed to fetch pump data');
     }
   };
 
@@ -1733,33 +2407,90 @@ const OutgoingInstallation = () => {
       if (response.didCancel || response.errorCode) return;
       const photo = response.assets[0];
       const form = watch('forms')[index];
-      update(index, {...form, dispatchBillPhoto: photo});
+      update(index, {
+        ...form, 
+        dispatchBillFile: photo,
+        fileType: 'photo'
+      });
     });
+  };
+
+  const handlePdfPick = async index => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.pdf],
+      });
+      
+      const pdfFile = res[0];
+      const form = watch('forms')[index];
+      
+      update(index, {
+        ...form, 
+        dispatchBillFile: pdfFile,
+        fileType: 'pdf'
+      });
+      
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) return;
+      console.log('PDF pick error:', err);
+      Alert.alert('Error', 'Failed to pick PDF file');
+    }
+  };
+
+  const removeFile = async (index) => {
+    const form = watch('forms')[index];
+    update(index, {
+      ...form, 
+      dispatchBillFile: null,
+      fileType: null
+    });
+  };
+
+  const getFileDisplayName = (file, fileType) => {
+    if (!file) return '';
+    
+    if (fileType === 'photo') {
+      return file.fileName || 'photo.jpg';
+    } else if (fileType === 'pdf') {
+      return file.name || 'document.pdf';
+    }
+    return '';
+  };
+
+  const getFileIcon = (fileType) => {
+    if (fileType === 'photo') return '📸';
+    if (fileType === 'pdf') return '📄';
+    return '📎';
   };
 
   const onSubmit = async data => {
     const {driverName, driverContact, vehicleNumber, forms} = data;
 
     if (!driverName || !driverContact || !vehicleNumber) {
-      Alert.alert('Validation', 'Please fill driver details');
+      Alert.alert('Validation', 'Please fill all driver details');
       return;
     }
 
-    // Filter only valid forms
     const validForms = forms.filter(f => 
       f.isValid && 
       f.selectedSystem && 
       f.selectedPump && 
       f.selectedServicePerson && 
-      f.saralId
+      f.saralId &&
+      f.dispatchBillFile // Ensure file is uploaded
     );
 
     if (validForms.length === 0) {
-      Alert.alert('Validation', 'Please validate at least one full form');
+      Alert.alert('Validation', 'Please validate at least one full form with a dispatch bill file');
       return;
     }
 
-    // Create dispatchedSystem array in the exact format needed
+    submitData(data, validForms);
+  };
+
+  const submitData = async (data, validForms) => {
+    const {driverName, driverContact, vehicleNumber} = data;
+
     const dispatchedSystem = validForms.map(f => ({
       farmerSaralId: f.saralId,
       installerId: f.selectedServicePerson,
@@ -1769,43 +2500,47 @@ const OutgoingInstallation = () => {
 
     const formData = new FormData();
     
-    // Add text fields
     formData.append('driverName', driverName.trim());
     formData.append('driverContact', driverContact.trim());
     formData.append('vehicleNumber', vehicleNumber.trim());
     formData.append('dispatchedSystem', JSON.stringify(dispatchedSystem));
 
-    // Add photos - only for valid forms and in sequence
+    // Add files - both photos and PDFs are sent as dispatchBillPhoto fields
     validForms.forEach((f, i) => {
-      if (f.dispatchBillPhoto) {
+      if (f.dispatchBillFile) {
+        let fileExtension = 'jpg';
+        let mimeType = 'image/jpeg';
+        
+        if (f.fileType === 'pdf') {
+          fileExtension = 'pdf';
+          mimeType = 'application/pdf';
+        } else if (f.dispatchBillFile.type) {
+          mimeType = f.dispatchBillFile.type;
+          // Extract extension from type or filename
+          if (f.dispatchBillFile.type === 'image/png') {
+            fileExtension = 'png';
+          } else if (f.dispatchBillFile.type === 'image/jpeg') {
+            fileExtension = 'jpg';
+          }
+        }
+        
+        // Always use the same field name for both photos and PDFs
         formData.append(`dispatchBillPhoto${i + 1}`, {
-          uri: f.dispatchBillPhoto.uri,
-          name: f.dispatchBillPhoto.fileName || `dispatch_bill_${i + 1}.jpg`,
-          type: f.dispatchBillPhoto.type || 'image/jpeg',
+          uri: f.dispatchBillFile.uri,
+          name: f.dispatchBillFile.fileName || f.dispatchBillFile.name || `dispatch_bill_${i + 1}.${fileExtension}`,
+          type: mimeType,
         });
       }
     });
 
-    console.log('Submitting form data:', {
+    console.log('Submitting form data with files:', {
       driverName,
       driverContact,
       vehicleNumber,
       dispatchedSystem,
-      photoCount: validForms.filter(f => f.dispatchBillPhoto).length
+      fileCount: validForms.length,
+      fileTypes: validForms.map(f => f.fileType)
     });
-
-    // Debug log
-    validForms.forEach((form, index) => {
-      console.log(`Form ${index + 1}:`, {
-        saralId: form.saralId,
-        systemId: form.selectedSystem,
-        pumpId: form.selectedPump,
-        installerId: form.selectedServicePerson,
-        hasPhoto: !!form.dispatchBillPhoto
-      });
-    });
-
-    console.log('Final FormData entries:', formData);
 
     try {
       setLoading(true);
@@ -1813,11 +2548,11 @@ const OutgoingInstallation = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 30000,
       });
 
       Alert.alert('Success', res?.data?.message || 'Submitted successfully');
       
-      // Reset form after successful submission
       reset({
         driverName: '',
         driverContact: '',
@@ -1828,18 +2563,30 @@ const OutgoingInstallation = () => {
           selectedServicePerson: '',
           saralId: '',
           farmerDetails: null,
-          dispatchBillPhoto: null,
+          dispatchBillFile: null,
+          fileType: null,
           pumps: [],
           isValid: false,
         }],
       });
       
     } catch (err) {
-      console.log('Submission error:', err.response?.data?.message || err.message);
-      Alert.alert(
-        'Error', 
-        err?.response?.data?.message || err.message || 'Submission failed'
-      );
+      const errorMessage = err.response?.data?.message || err.message || 'Submission failed';
+      console.log('Submission error:', errorMessage);
+      
+      if (errorMessage.includes('Only image') || errorMessage.includes('image') || errorMessage.includes('jpeg') || errorMessage.includes('jpg') || errorMessage.includes('png')) {
+        Alert.alert(
+          'File Type Error', 
+          'The server only accepts image files (JPEG, JPG, PNG). Please upload photos instead of PDFs.',
+          [
+            {
+              text: 'OK'
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Submission Error', errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -1862,7 +2609,7 @@ const OutgoingInstallation = () => {
               )}
             </View>
 
-            {/* System */}
+            {/* System Selection */}
             <Text style={styles.label}>Select System</Text>
             <Controller
               control={control}
@@ -1874,10 +2621,7 @@ const OutgoingInstallation = () => {
                     onValueChange={val => {
                       onChange(val);
                       fetchPumpData(val, index);
-                    }}
-                    style={{color: value ? '#000' : '#000'}}
-                    >
-                      
+                    }}>
                     <Picker.Item label="Select System" value="" />
                     {systems.map(sys => (
                       <Picker.Item key={sys._id} label={sys.systemName} value={sys._id} />
@@ -1887,7 +2631,7 @@ const OutgoingInstallation = () => {
               )}
             />
 
-            {/* Pump */}
+            {/* Pump Selection */}
             {form.pumps?.length > 0 && (
               <>
                 <Text style={styles.label}>Select Pump</Text>
@@ -1897,14 +2641,9 @@ const OutgoingInstallation = () => {
                   render={({field: {value, onChange}}) => (
                     <View style={styles.pickerContainer}>
                       <Picker selectedValue={value} onValueChange={onChange}>
-                        <Picker.Item label="Select Pump" value="" 
-                        style={{color: value ? '#000' : '#000'}}  />
-                        
-
+                        <Picker.Item label="Select Pump" value="" />
                         {form.pumps.map(p => (
-                          <Picker.Item key={p._id} label={p.itemName} value={p._id} 
-                          style={{color: value ? '#000' : '#000'}} />
-                          
+                          <Picker.Item key={p._id} label={p.itemName} value={p._id} />
                         ))}
                       </Picker>
                     </View>
@@ -1913,7 +2652,7 @@ const OutgoingInstallation = () => {
               </>
             )}
 
-            {/* Service Person */}
+            {/* Service Person Selection */}
             <Text style={styles.label}>Select Service Person</Text>
             <Controller
               control={control}
@@ -1921,13 +2660,9 @@ const OutgoingInstallation = () => {
               render={({field: {value, onChange}}) => (
                 <View style={styles.pickerContainer}>
                   <Picker selectedValue={value} onValueChange={onChange}>
-                    <Picker.Item label="Select Service Person" value=""
-                    style={{color: value ? '#000' : '#000'}}  />
-                     
+                    <Picker.Item label="Select Service Person" value="" />
                     {servicePersons.map(sp => (
-                      <Picker.Item key={sp._id} label={sp.name} value={sp._id} 
-                      style={{color: value ? '#000' : '#000'}} />
-                     
+                      <Picker.Item key={sp._id} label={sp.name} value={sp._id} />
                     ))}
                   </Picker>
                 </View>
@@ -1958,7 +2693,7 @@ const OutgoingInstallation = () => {
               )}
             />
 
-            {/* Show farmer details */}
+            {/* Farmer Details */}
             {form.farmerDetails && (
               <View style={styles.farmerCard}>
                 <Text style={styles.farmerText}>👨‍🌾 Name: {form.farmerDetails?.farmerName || 'N/A'}</Text>
@@ -1967,16 +2702,68 @@ const OutgoingInstallation = () => {
               </View>
             )}
 
-            {/* Dispatch Bill Photo */}
-            <Text style={styles.label}>Dispatch Bill Photo</Text>
-            <TouchableOpacity style={styles.photoButton} onPress={() => handlePhotoPick(index)}>
-              <Text style={styles.photoButtonText}>
-                {form.dispatchBillPhoto ? 'Change Photo' : 'Upload Photo'}
-              </Text>
-            </TouchableOpacity>
-            {form.dispatchBillPhoto && (
-              <Text style={styles.photoFileName}>📸 {form.dispatchBillPhoto.fileName}</Text>
-            )}
+            {/* File Upload Section */}
+            <View style={styles.fileUploadSection}>
+              <Text style={styles.sectionSubtitle}>Dispatch Bill File</Text>
+              
+              <View style={styles.fileUploadRow}>
+                {/* Photo Upload */}
+                <View style={styles.fileUploadContainer}>
+                  <TouchableOpacity 
+                    style={[styles.fileButton, form.fileType === 'photo' && styles.fileButtonSelected]} 
+                    onPress={() => handlePhotoPick(index)}
+                  >
+                    <Text style={styles.fileButtonText}>
+                      Upload Photo
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* PDF Upload */}
+                <View style={styles.fileUploadContainer}>
+                  <TouchableOpacity 
+                    style={[styles.fileButton, styles.pdfButton, form.fileType === 'pdf' && styles.fileButtonSelected]} 
+                    onPress={() => handlePdfPick(index)}
+                  >
+                    <Text style={styles.fileButtonText}>
+                      Upload PDF
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* File Display */}
+              {form.dispatchBillFile && (
+                <View style={styles.fileInfoContainer}>
+                  <View style={styles.fileInfo}>
+                    <Text style={styles.fileIcon}>
+                      {getFileIcon(form.fileType)}
+                    </Text>
+                    <View style={styles.fileDetails}>
+                      <Text style={styles.fileName} numberOfLines={1}>
+                        {getFileDisplayName(form.dispatchBillFile, form.fileType)}
+                      </Text>
+                      <Text style={styles.fileType}>
+                        {form.fileType === 'photo' ? 'Photo' : 'PDF Document'}
+                      </Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.removeFileButton}
+                    onPress={() => removeFile(index)}
+                  >
+                    <Text style={styles.removeFileText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              <View style={styles.noteContainer}>
+                <Text style={styles.noteText}>
+                  💡 <Text style={styles.noteBold}>Note:</Text> You can upload either a Photo or PDF. 
+                  {form.fileType === 'pdf' && ' PDF files may not be accepted by the server.'}
+                </Text>
+              </View>
+            </View>
 
             {/* Validation Status */}
             <View style={[
@@ -1991,6 +2778,7 @@ const OutgoingInstallation = () => {
         );
       })}
 
+      {/* Add Another Form Button */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() =>
@@ -2000,7 +2788,8 @@ const OutgoingInstallation = () => {
             selectedServicePerson: '',
             saralId: '',
             farmerDetails: null,
-            dispatchBillPhoto: null,
+            dispatchBillFile: null,
+            fileType: null,
             pumps: [],
             isValid: false,
           })
@@ -2008,7 +2797,7 @@ const OutgoingInstallation = () => {
         <Text style={styles.addButtonText}>+ Add Another Form</Text>
       </TouchableOpacity>
 
-      {/* Common Driver Info */}
+      {/* Driver Information */}
       <View style={styles.driverContainer}>
         <Text style={styles.sectionTitle}>Driver Information</Text>
         
@@ -2062,8 +2851,9 @@ const OutgoingInstallation = () => {
         />
       </View>
 
+      {/* Submit Button */}
       <TouchableOpacity
-        style={[styles.submitButton, loading && {backgroundColor: '#ccc'}]}
+        style={[styles.submitButton, loading && styles.submitButtonDisabled]}
         disabled={loading}
         onPress={handleSubmit(onSubmit)}>
         {loading ? (
@@ -2075,8 +2865,6 @@ const OutgoingInstallation = () => {
     </ScrollView>
   );
 };
-
-export default OutgoingInstallation;
 
 const styles = StyleSheet.create({
   container: {
@@ -2133,6 +2921,12 @@ const styles = StyleSheet.create({
     color: '#000',
     textAlign: 'center',
   },
+  sectionSubtitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000',
+  },
   label: {
     fontWeight: '600',
     marginBottom: 6,
@@ -2186,24 +2980,94 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: '#155724',
   },
-  photoButton: {
+  // File Upload Styles
+  fileUploadSection: {
+    marginBottom: 15,
+  },
+  fileUploadRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 10,
+  },
+  fileUploadContainer: {
+    flex: 1,
+  },
+  fileButton: {
     backgroundColor: '#17a2b8',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 10,
   },
-  photoButtonText: {
+  pdfButton: {
+    backgroundColor: '#6c757d',
+  },
+  fileButtonSelected: {
+    backgroundColor: '#138496',
+    borderWidth: 2,
+    borderColor: '#0c5460',
+  },
+  fileButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 14,
-  },
-  photoFileName: {
-    marginTop: 5,
-    marginBottom: 15,
-    color: '#555',
     fontSize: 12,
-    fontStyle: 'italic',
+  },
+  fileInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dee2e6',
+    marginBottom: 10,
+  },
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  fileIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  fileDetails: {
+    flex: 1,
+  },
+  fileName: {
+    fontSize: 14,
+    color: '#495057',
+    fontWeight: '500',
+  },
+  fileType: {
+    fontSize: 12,
+    color: '#6c757d',
+    marginTop: 2,
+  },
+  removeFileButton: {
+    padding: 6,
+    marginLeft: 10,
+  },
+  removeFileText: {
+    color: '#dc3545',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  noteContainer: {
+    backgroundColor: '#fff3cd',
+    padding: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ffeaa7',
+  },
+  noteText: {
+    fontSize: 12,
+    color: '#856404',
+    lineHeight: 16,
+  },
+  noteBold: {
+    fontWeight: 'bold',
   },
   validationStatus: {
     padding: 10,
@@ -2258,6 +3122,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
   },
+  submitButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
   submitText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -2265,3 +3132,4 @@ const styles = StyleSheet.create({
   },
 });
 
+export default OutgoingInstallation;
