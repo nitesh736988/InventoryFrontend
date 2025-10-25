@@ -69,17 +69,14 @@ const ApprovalData = () => {
       if (response.status === 200) {
         setBtnClickedStatus(prev => ({...prev, [sendTransactionId]: true}));
         fetchOrders();
-      } 
+      }
     } catch (error) {
       console.log('Approval Error:', error.response?.data || error.message);
-      Alert.alert(
-        'Error',
-        error.response?.data?.message 
-      );
+      Alert.alert('Error', error.response?.data?.message);
     }
   };
 
-  const handleDeclineBtn = (transactionId) => {
+  const handleDeclineBtn = transactionId => {
     setSelectedTransactionId(transactionId);
     setDeclineModalVisible(true);
   };
@@ -109,10 +106,7 @@ const ApprovalData = () => {
       }
     } catch (error) {
       console.log('Decline Error:', error.response?.data || error.message);
-      Alert.alert(
-        'Error',
-        error.response?.data?.message ,
-      );
+      Alert.alert('Error', error.response?.data?.message);
     } finally {
       setDeclineLoading(false);
     }
@@ -149,10 +143,13 @@ const ApprovalData = () => {
         fetchOrders();
       }
     } catch (error) {
-      console.log('Update Serial Error:', error?.response?.data?.message || error.message);
+      console.log(
+        'Update Serial Error:',
+        error?.response?.data?.message || error.message,
+      );
       Alert.alert(
         'Error',
-        error?.response?.data?.message || 'Failed to update serial number'
+        error?.response?.data?.message || 'Failed to update serial number',
       );
     } finally {
       setSerialUpdateLoading(false);
@@ -170,19 +167,26 @@ const ApprovalData = () => {
   const filteredOrders = orders.filter(
     order =>
       order.incoming === true &&
-      (
-        order.farmerSaralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.servicePerson?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.farmerSaralId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.servicePerson?.name
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         order.farmerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.farmerVillage?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (order.updatedSerialNumber || order.serialNumber)?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.farmerContact?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        order.farmerVillage
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (order.updatedSerialNumber || order.serialNumber)
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        order.farmerContact
+          ?.toString()
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())),
   );
 
   const formatDate = dateString => {
     if (!dateString) return 'N/A';
-    
+
     const date = new Date(dateString);
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
@@ -208,7 +212,7 @@ const ApprovalData = () => {
         ]}>
         {item.incoming ? 'Incoming' : 'Outgoing'}
       </Text>
-      
+
       {/* Show declined status if status is false */}
       {item.status === false && (
         <View style={styles.declinedContainer}>
@@ -296,11 +300,12 @@ const ApprovalData = () => {
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>Product: </Text>
         </Text>
-        {item.items && item.items.map(({_id, itemName, quantity}) => (
-          <Text key={_id} style={styles.dataText}>
-            {itemName}: {quantity + ' '}
-          </Text>
-        ))}
+        {item.items &&
+          item.items.map(({_id, itemName, quantity}) => (
+            <Text key={_id} style={styles.dataText}>
+              {itemName}: {quantity + ' '}
+            </Text>
+          ))}
       </View>
 
       <View style={styles.serialNumberContainer}>
@@ -315,9 +320,7 @@ const ApprovalData = () => {
             <Text style={styles.previousSerialText}>
               <Text style={styles.titleText}>
                 Updated Serial Number:{' '}
-                <Text style={styles.dataText}>
-                  {item.updatedSerialNumber}
-                </Text>
+                <Text style={styles.dataText}>{item.updatedSerialNumber}</Text>
               </Text>
             </Text>
           )}
@@ -326,10 +329,10 @@ const ApprovalData = () => {
         {(item.status === undefined || item.status === null) && (
           <TouchableOpacity
             style={styles.editSerialButton}
-            onPress={() => 
+            onPress={() =>
               handleEditSerial(
-                item._id, 
-                item.updatedSerialNumber || item.serialNumber
+                item._id,
+                item.updatedSerialNumber || item.serialNumber,
               )
             }>
             <Icon name="edit" size={16} color="#fff" />
@@ -379,11 +382,20 @@ const ApprovalData = () => {
         </Text>
       )}
 
+      <Text style={styles.infoText}>
+        <Text style={styles.titleText}>Approved By: </Text>
+        <Text style={styles.dataText}>{item?.approvedBy || 'Not Approved'}</Text>
+      </Text>
+
       {/* Show decline reason if item is declined */}
       {item.status === false && item.declineRemark && (
         <Text style={styles.infoText}>
-          <Text style={[styles.titleText, {color: 'red'}]}>Decline Reason: </Text>
-          <Text style={[styles.dataText, {color: 'red'}]}>{item.declineRemark}</Text>
+          <Text style={[styles.titleText, {color: 'red'}]}>
+            Decline Reason:{' '}
+          </Text>
+          <Text style={[styles.dataText, {color: 'red'}]}>
+            {item.declineRemark}
+          </Text>
         </Text>
       )}
 
@@ -391,10 +403,9 @@ const ApprovalData = () => {
         {/* Show action buttons only if status is not set (pending approval) */}
         {item.status === undefined || item.status === null ? (
           <>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.declineButton}
-              onPress={() => handleDeclineBtn(item._id)}
-            >
+              onPress={() => handleDeclineBtn(item._id)}>
               <Text style={styles.buttonText}>Decline</Text>
             </TouchableOpacity>
 
@@ -408,14 +419,24 @@ const ApprovalData = () => {
           </>
         ) : item.status === false ? (
           // Show only declined status message, no buttons
-          <Text style={[styles.declinedText, {textAlign: 'center', marginVertical: 10}]}>
+          <Text
+            style={[
+              styles.declinedText,
+              {textAlign: 'center', marginVertical: 10},
+            ]}>
             This item has been declined
           </Text>
-        ) : item.status === true && (
-          // Show approved status
-          <Text style={[styles.approvedText, {textAlign: 'center', marginVertical: 10}]}>
-            Approved
-          </Text>
+        ) : (
+          item.status === true && (
+            // Show approved status
+            <Text
+              style={[
+                styles.approvedText,
+                {textAlign: 'center', marginVertical: 10},
+              ]}>
+              Approved
+            </Text>
+          )
         )}
       </View>
     </View>
@@ -450,8 +471,7 @@ const ApprovalData = () => {
         visible={declineModalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setDeclineModalVisible(false)}
-      >
+        onRequestClose={() => setDeclineModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Decline Item</Text>
@@ -474,15 +494,13 @@ const ApprovalData = () => {
                   setDeclineModalVisible(false);
                   setDeclineRemark('');
                 }}
-                disabled={declineLoading}
-              >
+                disabled={declineLoading}>
                 <Text style={styles.modalButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.submitButton]}
                 onPress={submitDecline}
-                disabled={declineLoading}
-              >
+                disabled={declineLoading}>
                 {declineLoading ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
@@ -499,8 +517,7 @@ const ApprovalData = () => {
         visible={editSerialModalVisible}
         transparent={true}
         animationType="slide"
-        onRequestClose={() => setEditSerialModalVisible(false)}
-      >
+        onRequestClose={() => setEditSerialModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Edit Serial Number</Text>
@@ -521,15 +538,13 @@ const ApprovalData = () => {
                   setEditSerialModalVisible(false);
                   setUpdatedSerialNumber('');
                 }}
-                disabled={serialUpdateLoading}
-              >
+                disabled={serialUpdateLoading}>
                 <Text style={styles.modalButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.submitSerialButton]}
                 onPress={updateSerialNumber}
-                disabled={serialUpdateLoading}
-              >
+                disabled={serialUpdateLoading}>
                 {serialUpdateLoading ? (
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
