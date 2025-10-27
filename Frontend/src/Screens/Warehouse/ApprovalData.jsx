@@ -375,7 +375,7 @@ const ApprovalData = () => {
         </Text>
       </Text>
 
-      {item?.arrivedDate && (
+      {item?.arrivedDate && ( 
         <Text style={styles.infoText}>
           <Text style={styles.titleText}>Approved Date: </Text>
           <Text style={styles.dataText}>{formatDate(item.arrivedDate)}</Text>
