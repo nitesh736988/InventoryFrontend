@@ -31,6 +31,8 @@ const WarehouseDashboard = () => {
   const [systems, setSystems] = useState([]);
   const [selectedSystem, setSelectedSystem] = useState(null);
   const [showSystemDropdown, setShowSystemDropdown] = useState(false);
+  const [dispachableItems, setDispachableItems] = useState(null);
+  const [pumpHeadData, setPumpHeadData] = useState([]);
   const navigation = useNavigation();
 
   const fetchData = async () => {
@@ -82,6 +84,9 @@ const WarehouseDashboard = () => {
         `${API_URL}/warehouse-admin/show-items-stock-status?systemId=${systemId}`,
       );
       if (response.data?.data) {
+        console.log('------------------------Pump head Systems:', response?.data?.pumpHeadData);
+        setDispachableItems(response?.data?.totalDispatchableSystems || 0);
+        setPumpHeadData(response?.data?.pumpHeadData || []);
         setNewInstallationData(response.data.data);
         setFilteredSystemData(response.data.data);
       } else {
@@ -90,6 +95,7 @@ const WarehouseDashboard = () => {
       }
     } catch (error) {
       console.log(
+
         'Error fetching system items:',
         error?.response?.data?.message || error.message,
       );
@@ -247,6 +253,19 @@ const WarehouseDashboard = () => {
               </View>
             </Pressable>
           </Modal>
+          <View style={{height: 18 , display: 'inline-flex', flexDirection: 'row', alignItems: 'center', marginTop: 6}}>
+            <Text style={styles.label}>Dispatchable Systems:</Text>
+            <Text style={{fontWeight:'900', fontSize:16, color:"black"}}>{dispachableItems}</Text>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent:'space-between', marginTop: 4}}>
+            {pumpHeadData.length > 0 && pumpHeadData.map((pumpHead, index) => (
+              <View key={index} style={{flexDirection: 'row', alignItems: 'center', marginRight: 10}}>
+                <Text style={styles.label}>{pumpHead.pumpHead}:</Text>
+                <Text style={{fontWeight:'900', fontSize:16, color:"black"}}>{pumpHead.dispatchableSystems}</Text>
+              </View>
+            ))}
+          </View>
+          
         </View>
       )}
 
@@ -496,6 +515,18 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  // by shiv 
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0c0b0bff',
+    marginRight: 6,
+    marginLeft: 4
+  },
+  value: {
+    fontSize: 14,
+    color: 'black',
   },
 });
 

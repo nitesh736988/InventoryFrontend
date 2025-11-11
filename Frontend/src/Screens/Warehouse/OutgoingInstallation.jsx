@@ -2266,9 +2266,6 @@
 // });
 
 
-
-
-
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -2363,6 +2360,17 @@ const OutgoingInstallation = () => {
       console.log('Error fetching pumps:', err.message);
       Alert.alert('Error', 'Failed to fetch pump data');
     }
+    // by shiv starts here
+    try {
+      const res1 = await axios.get(`${API_URL}/warehouse-admin/show-controller-data?systemId=${systemId}`);
+      const controllerList = res1?.data?.items || [];
+      const form = watch('forms')[index];
+      update(index, {...form, controllers: controllerList});
+    } catch (error) {
+      console.log('Error fetching controllers:', error.message);
+      Alert.alert('Error', 'Failed to fetch controllers data');
+    }
+    // by shiv ends here
   };
 
   const validateSaralId = async (index, saralId) => {
@@ -2496,6 +2504,7 @@ const OutgoingInstallation = () => {
       installerId: f.selectedServicePerson,
       systemId: f.selectedSystem,
       pumpId: f.selectedPump,
+      controllerId: f.selectedController || null, // by shiv
     }));
 
     const formData = new FormData();
@@ -2541,6 +2550,9 @@ const OutgoingInstallation = () => {
       fileCount: validForms.length,
       fileTypes: validForms.map(f => f.fileType)
     });
+    // Debug log by shiv 
+    console.log('Valid Forms Details:', formData);
+
 
     try {
       setLoading(true);
@@ -2644,6 +2656,28 @@ const OutgoingInstallation = () => {
                         <Picker.Item label="Select Pump" value="" />
                         {form.pumps.map(p => (
                           <Picker.Item key={p._id} label={p.itemName} value={p._id} />
+                        ))}
+                      </Picker>
+                    </View>
+                  )}
+                />
+              </>
+            )}
+
+            {/* by shiv starts here */}
+            {/* Controller Selection */}
+            {form.controllers?.length > 0 && (
+              <>
+                <Text style={styles.label}>Select Controller</Text>
+                <Controller
+                  control={control}
+                  name={`forms.${index}.selectedController`}
+                  render={({field: {value, onChange}}) => (
+                    <View style={styles.pickerContainer}>
+                      <Picker selectedValue={value} onValueChange={onChange}>
+                        <Picker.Item label="Select Controller" value="" />
+                        {form.controllers.map(p => (
+                          <Picker.Item key={p.id} label={p.name} value={p.id} />
                         ))}
                       </Picker>
                     </View>
