@@ -168,13 +168,13 @@ const Sidebar = ({userType}) => {
                   <TouchableOpacity
                     onPress={() => navigateAndHighlight('UpperHistory')}
                     style={styles.subOptionButton}>
-                    <Text style={styles.subOptionText}>Upper History</Text>
+                    <Text style={styles.subOptionText}>Third Party Incoming</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => navigateAndHighlight('InstallationHistoryData')}
                     style={styles.subOptionButton}>
                     <Text style={styles.subOptionText}>Installation Data</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <TouchableOpacity 
                     onPress={() => navigateAndHighlight('ThirdPartyOutgoingHistory')} 
                     style={styles.subOptionButton}>
@@ -202,11 +202,11 @@ const Sidebar = ({userType}) => {
                     style={styles.subOptionButton}>
                     <Text style={styles.subOptionText}>Service Person Registration</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => navigateAndHighlight('IncomingStock')}
                     style={styles.subOptionButton}>
                     <Text style={styles.subOptionText}>Incoming Stock</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <TouchableOpacity 
                     onPress={() => navigateAndHighlight('ThirdPartyOutgoingStock')} 
                     style={styles.subOptionButton}>
