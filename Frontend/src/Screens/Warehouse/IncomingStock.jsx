@@ -1,430 +1,540 @@
-import React, {useEffect, useState} from 'react';
+// import React, { useState } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   StyleSheet,
+//   Alert,
+//   ActivityIndicator,
+//   TouchableOpacity,
+//   ScrollView,
+// } from "react-native";
+// import axios from "axios";
+// import { API_URL } from "@env";
+
+// const IncomingStock = ({ route, navigation }) => {
+//   const { outgoingId, receivedItems } = route.params;
+
+//   const [farmersData, setFarmersData] = useState(
+//     receivedItems.map((farmer) => ({
+//       farmerSaralId: farmer.farmerSaralId,
+//       items: farmer.items.map((item) => ({
+//         itemName: item.itemName,
+//         quantity: item.quantity?.toString() || "",
+//       })),
+//     }))
+//   );
+
+//   const [remarks, setRemarks] = useState("");
+//   const [driverName, setDriverName] = useState("");
+//   const [driverContact, setDriverContact] = useState("");
+//   const [vehicleNumber, setVehicleNumber] = useState("");
+//   const [loading, setLoading] = useState(false);
+
+//   // Handle quantity input
+//   const handleItemQuantityChange = (farmerIndex, itemIndex, value) => {
+//     const updated = [...farmersData];
+//     updated[farmerIndex].items[itemIndex].quantity = value;
+//     setFarmersData(updated);
+//   };
+
+//   // Submit data
+//   const handleSubmit = async () => {
+//     const hasEmptyQty = farmersData.some((farmer) =>
+//       farmer.items.some((item) => !item.quantity)
+//     );
+
+//     if (hasEmptyQty) {
+//       Alert.alert("Validation Error", "Please enter quantity for all items.");
+//       return;
+//     }
+
+//     const payload = {
+//       outgoingId,
+//       farmers: farmersData.map((farmer) => ({
+//         farmerSaralId: farmer.farmerSaralId,
+//         receivedItems: farmer.items.map((item) => ({
+//           itemName: item.itemName,
+//           quantity: parseInt(item.quantity, 10),
+//         })),
+//       })),
+//       remarks: remarks.trim(),
+//       driverName: driverName.trim(),
+//       driverContact: driverContact.trim(),
+//       vehicleNumber: vehicleNumber.trim(),
+//     };
+
+//     console.log("Payload Sent:", JSON.stringify(payload, null, 2));
+
+//     try {
+//       setLoading(true);
+//       await axios.post(`${API_URL}/warehouse-admin/add-receiving-items`, payload);
+//       Alert.alert("Success", "Items received successfully!");
+//       navigation.goBack();
+//     } catch (error) {
+//       console.log(error.response?.data || error.message);
+//       Alert.alert("Error", error.response?.data?.message || "Something went wrong");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <Text style={styles.header}>Incoming Stock</Text>
+
+//       {farmersData.map((farmer, fIndex) => (
+//         <View key={fIndex} style={styles.farmerCard}>
+//           <Text style={styles.farmerId}>
+//             Farmer Saral ID: {farmer.farmerSaralId}
+//           </Text>
+
+//           <Text style={styles.label}>Received Items:</Text>
+//           {farmer.items.map((item, iIndex) => (
+//             <View key={iIndex} style={styles.itemRow}>
+//               <Text style={styles.itemText}>• {item.itemName}</Text>
+//               <TextInput
+//                 style={styles.input}
+//                 value={item.quantity}
+//                 keyboardType="numeric"
+//                 onChangeText={(text) =>
+//                   handleItemQuantityChange(fIndex, iIndex, text)
+//                 }
+//                 placeholder="Quantity"
+//               />
+//             </View>
+//           ))}
+//         </View>
+//       ))}
+
+//       {/* Remarks */}
+//       <Text style={styles.label}>Remarks:</Text>
+//       <TextInput
+//         value={remarks}
+//         onChangeText={setRemarks}
+//         style={styles.textArea}
+//         placeholder="Enter remarks"
+//         multiline
+//       />
+
+//       {/* Driver Details - shown after Remarks */}
+//       <Text style={styles.label}>Driver Name:</Text>
+//       <TextInput
+//         value={driverName}
+//         onChangeText={setDriverName}
+//         style={styles.input}
+//         placeholder="Enter driver name"
+//       />
+
+//       <Text style={styles.label}>Driver Contact:</Text>
+//       <TextInput
+//         value={driverContact}
+//         onChangeText={setDriverContact}
+//         style={styles.input}
+//         keyboardType="numeric"
+//         placeholder="Enter driver contact number"
+//       />
+
+//       <Text style={styles.label}>Vehicle Number:</Text>
+//       <TextInput
+//         value={vehicleNumber}
+//         onChangeText={setVehicleNumber}
+//         style={styles.input}
+//         placeholder="Enter vehicle number"
+//       />
+
+//       {/* Submit */}
+//       <TouchableOpacity
+//         style={styles.submitButton}
+//         onPress={handleSubmit}
+//         disabled={loading}
+//       >
+//         {loading ? (
+//           <ActivityIndicator color="#fff" />
+//         ) : (
+//           <Text style={styles.submitText}>Submit</Text>
+//         )}
+//       </TouchableOpacity>
+//     </ScrollView>
+//   );
+// };
+
+// export default IncomingStock;
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: "#fbd33b",
+//     padding: 16,
+//   },
+//   header: {
+//     fontSize: 22,
+//     fontWeight: "bold",
+//     color: "black",
+//     marginBottom: 16,
+//   },
+//   farmerCard: {
+//     backgroundColor: "white",
+//     padding: 12,
+//     borderRadius: 8,
+//     marginBottom: 12,
+//   },
+//   farmerId: {
+//     fontSize: 16,
+//     fontWeight: "600",
+//     color: "black",
+//   },
+//   label: {
+//     fontSize: 15,
+//     fontWeight: "600",
+//     color: "black",
+//     marginTop: 10,
+//   },
+//   itemRow: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     marginVertical: 6,
+//   },
+//   itemText: {
+//     fontSize: 14,
+//     color: "#333",
+//     flex: 1,
+//   },
+//   input: {
+//     backgroundColor: "white",
+//     padding: 10,
+//     borderRadius: 6,
+//     marginTop: 6,
+//     fontSize: 15,
+//     borderWidth: 1,
+//     borderColor: "#ddd",
+//   },
+//   textArea: {
+//     backgroundColor: "white",
+//     padding: 10,
+//     borderRadius: 6,
+//     marginTop: 6,
+//     height: 70,
+//     textAlignVertical: "top",
+//     borderWidth: 1,
+//     borderColor: "#ddd",
+//   },
+//   submitButton: {
+//     backgroundColor: "#007bff",
+//     paddingVertical: 12,
+//     borderRadius: 6,
+//     marginTop: 20,
+//     alignItems: "center",
+//   },
+//   submitText: {
+//     color: "white",
+//     fontWeight: "bold",
+//     fontSize: 16,
+//   },
+// });
+
+import React, {useState} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
   TextInput,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import {API_URL} from '@env';
-import {Picker} from '@react-native-picker/picker';
-import MultiSelect from 'react-native-multiple-select';
-import {useNavigation} from '@react-navigation/native';
 
-const IncomingStock = () => {
-  const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
-  const [allWarehouses, setAllWarehouses] = useState([]);
-  const [selectedWarehouse, setSelectedWarehouse] = useState('');
-  const [allItems, setAllItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [itemQuantities, setItemQuantities] = useState({});
-  const [itemDefectives, setItemDefectives] = useState({});
-  const [formData, setFormData] = useState({
-    itemComingFrom: '',
-    farmerSaralId: '', // Added farmerSaralId field
-    arrivedDate: new Date().toISOString().split('T')[0],
-  });
+const IncomingStock = ({route, navigation}) => {
+  const {outgoingId, receivedItems} = route.params;
 
-  // Fetch warehouses from API
-  const fetchWarehouses = async () => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/warehouse-admin/get-warehouse`,
-      );
-      if (response.data.success) {
-        const warehouses = Array.isArray(response.data.warehouseName)
-          ? response.data.warehouseName
-          : [response.data.warehouseName];
-        setAllWarehouses(warehouses);
-        if (warehouses.length > 0) {
-          setSelectedWarehouse(warehouses[0]);
-        }
-      }
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to fetch warehouses',
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  console.log('Received Items:', JSON.stringify(receivedItems, null, 2));
 
-  // Fetch items from API
-  const fetchItems = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
-      const items =
-        response?.data?.items?.map(item => ({
-          id: item,
-          name: item,
-        })) || [];
-      setAllItems(items);
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to fetch items',
-      );
-    }
-  };
-
-  useEffect(() => {
-    fetchWarehouses();
-    fetchItems();
-  }, []);
-
-  const handleItemSelect = selectedItems => {
-    setSelectedItems(selectedItems);
-
-    const newQuantities = {...itemQuantities};
-    const newDefectives = {...itemDefectives};
-
-    selectedItems.forEach(item => {
-      if (!newQuantities[item]) newQuantities[item] = '';
-      if (!newDefectives[item]) newDefectives[item] = '';
-    });
-
-    Object.keys(newQuantities).forEach(key => {
-      if (!selectedItems.includes(key)) delete newQuantities[key];
-    });
-    Object.keys(newDefectives).forEach(key => {
-      if (!selectedItems.includes(key)) delete newDefectives[key];
-    });
-
-    setItemQuantities(newQuantities);
-    setItemDefectives(newDefectives);
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedWarehouse) {
-      Alert.alert('Error', 'Please select a warehouse');
-      return;
-    }
-    if (!formData.itemComingFrom) {
-      Alert.alert('Error', 'Please enter where items are coming from');
-      return;
-    }
-    if (!formData.farmerSaralId) {
-      Alert.alert('Error', 'Please enter Farmer Saral ID');
-      return;
-    }
-    if (selectedItems.length === 0) {
-      Alert.alert('Error', 'Please select at least one item');
-      return;
-    }
-
-    // Validate all items before proceeding
-    for (const item of selectedItems) {
-      const quantity = itemQuantities[item];
-      const defective = itemDefectives[item] || '0'; // Default to 0 if empty
-
-      // Quantity validation
-      if (quantity === '') {
-        Alert.alert('Error', `Please enter a valid quantity for ${item}`);
-        return;
-      }
-
-      // const quantityNum = parseInt(quantity);
-      // if (quantityNum <= 0) {
-      //   Alert.alert('Error', `Quantity must be greater than 0 for ${item}`);
-      //   return;
-      // }
-
-      // Defective validation
-      // if (isNaN(defective)) {
-      //   Alert.alert('Error', `Please enter valid defective count for ${item}`);
-      //   return;
-      // }
-
-      // const defectiveNum = parseInt(defective);
-      // if (defectiveNum <= 0) {
-      //   Alert.alert('Error', `Defective count cannot be negative for ${item}`);
-      //   return;
-      // }
-
-    //   if (defectiveNum > quantityNum) {
-    //     Alert.alert(
-    //       'Error',
-    //       `Defective count cannot be more than quantity for ${item}`,
-    //     );
-    //     return;
-    //   }
-    }
-
-    // Prepare payload
-    const payload = {
-      warehouse: selectedWarehouse,
-      itemComingFrom: formData.itemComingFrom,
-      farmerSaralId: formData.farmerSaralId, // Added to payload
-      items: selectedItems.map(item => ({
-        itemName: item,
-        quantity: parseInt(itemQuantities[item]),
-        defective: parseInt(itemDefectives[item] || 0),
+  // Initialize with isFullyReceived + receivedQuantity
+  const [farmersData, setFarmersData] = useState(
+    receivedItems.map(farmer => ({
+      farmerSaralId: farmer.farmerSaralId,
+      items: farmer.items.map(item => ({
+        itemName: item.itemName,
+        quantity: item.quantity?.toString() || '',
+        receivedQuantity: item.receivedQuantity || 0,
+        isFullyReceived: item.isFullyReceived || false,
       })),
-      arrivedDate: formData.arrivedDate,
+    })),
+  );
+
+  const [remarks, setRemarks] = useState('');
+  const [driverName, setDriverName] = useState('');
+  const [driverContact, setDriverContact] = useState('');
+  const [vehicleNumber, setVehicleNumber] = useState('');
+  const [loading, setLoading] = useState(false);
+
+
+  // Handle quantity input
+  const handleItemQuantityChange = (farmerIndex, itemIndex, value) => {
+    const updated = [...farmersData];
+    updated[farmerIndex].items[itemIndex].quantity = value;
+    setFarmersData(updated);
+  };
+
+  // Submit data
+  const handleSubmit = async () => {
+    const hasEmptyQty = farmersData.some(farmer =>
+      farmer.items.some(
+        item =>
+          !item.isFullyReceived &&
+          (item.quantity === '' || isNaN(item.quantity)),
+      ),
+    );
+
+    if (hasEmptyQty) {
+      Alert.alert(
+        'Validation Error',
+        'Please enter quantity for all items not fully received.',
+      );
+      return;
+    }
+
+    // ✅ Filter out zero-quantity items and skip fully received ones
+    const filteredFarmers = farmersData
+      .map(farmer => ({
+        farmerSaralId: farmer.farmerSaralId,
+        receivedItems: farmer.items
+          .filter(
+            item => !item.isFullyReceived && parseInt(item.quantity, 10) > 0,
+          )
+          .map(item => ({
+            itemName: item.itemName,
+            quantity: parseInt(item.quantity, 10),
+          })),
+      }))
+      .filter(farmer => farmer.receivedItems.length > 0);
+
+    if (filteredFarmers.length === 0) {
+      Alert.alert(
+        'Validation Error',
+        'No items to receive (all fully received or zero quantity).',
+      );
+      return;
+    }
+
+    const payload = {
+      outgoingId,
+      farmers: filteredFarmers,
+      remarks: remarks.trim(),
+      driverName: driverName.trim(),
+      driverContact: driverContact.trim(),
+      vehicleNumber: vehicleNumber.trim(),
     };
+
+    console.log('Payload Sent:', JSON.stringify(payload, null, 2));
 
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${API_URL}/warehouse-admin/add-incoming-item`,
+      await axios.post(
+        `${API_URL}/warehouse-admin/add-receiving-items`,
         payload,
       );
-
-      // Reset form on success
-      setSelectedItems([]);
-      setItemQuantities({});
-      setItemDefectives({});
-      setFormData({
-        itemComingFrom: '',
-        farmerSaralId: '', // Reset farmerSaralId
-        arrivedDate: new Date().toISOString().split('T')[0],
-      });
-
-      Alert.alert('Success', 'Items added successfully!');
-      navigation.navigate('WarehouseNavigation');
+      Alert.alert('Success', 'Items received successfully!');
+      navigation.goBack();
     } catch (error) {
+      console.log(error.response?.data || error.message);
       Alert.alert(
         'Error',
-        error.response?.data?.message || 'Failed to add items',
+        error.response?.data?.message || 'Something went wrong',
       );
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add Incoming Stock</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>Incoming Stock</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Select Items:</Text>
-        <MultiSelect
-          items={allItems}
-          uniqueKey="id"
-          onSelectedItemsChange={handleItemSelect}
-          selectedItems={selectedItems}
-          selectText="Select Items"
-          searchInputPlaceholderText="Search items..."
-          displayKey="name"
-          hideSubmitButton
-          styleTextDropdown={styles.multiSelectText}
-          styleTextDropdownSelected={styles.multiSelectTextSelected}
-          styleListContainer={styles.listContainer}
-          textColor="#000"
-        />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.section}>
-          <Text style={styles.label}>Warehouse:</Text>
-          {allWarehouses.length > 0 ? (
-            <Picker
-              selectedValue={selectedWarehouse}
-              style={styles.picker}
-              onValueChange={setSelectedWarehouse}>
-              {allWarehouses.map((warehouse, index) => (
-                <Picker.Item key={index} label={warehouse} value={warehouse} />
-              ))}
-            </Picker>
-          ) : (
-            <Text style={styles.errorText}>No warehouses available</Text>
-          )}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Coming From:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter source (e.g., Haridwar)"
-            value={formData.itemComingFrom}
-            onChangeText={text =>
-              setFormData({...formData, itemComingFrom: text})
-            }
-            placeholderTextColor="#999"
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Farmer Saral ID:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Farmer Saral ID"
-            value={formData.farmerSaralId}
-            onChangeText={text =>
-              setFormData({...formData, farmerSaralId: text})
-            }
-            placeholderTextColor="#999"
-          />
-        </View>
-
-        {selectedItems.map(item => (
-          <View key={item} style={styles.itemSection}>
-            <Text style={styles.itemLabel}>{item}</Text>
-
-            <View style={styles.row}>
-              <View style={styles.quantityInput}>
-                <Text style={styles.inputLabel}>Quantity:</Text>
-                <TextInput
-                  style={styles.input}
-                  keyboardType="numeric"
-                  value={itemQuantities[item]}
-                  onChangeText={text => {
-                    setItemQuantities({...itemQuantities, [item]: text});
-                  }}
-                  placeholder="0"
-                  placeholderTextColor="#999"
-                />
-              </View>
-
-              <View style={styles.quantityInput}>
-                <Text style={styles.inputLabel}>Defective:</Text>
-                <TextInput
-                  style={styles.input}
-                  keyboardType="numeric"
-                  value={itemDefectives[item]}
-                  onChangeText={text => {
-                    setItemDefectives({...itemDefectives, [item]: text});
-                  }}
-                  placeholder="0"
-                  placeholderTextColor="#999"
-                />
-              </View>
-            </View>
-          </View>
-        ))}
-
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmit}
-          disabled={loading}>
-          <Text style={styles.buttonText}>
-            {loading ? 'Processing...' : 'Submit Stock'}
+      {farmersData.map((farmer, fIndex) => (
+        <View key={fIndex} style={styles.farmerCard}>
+          <Text style={styles.farmerId}>
+            Farmer Saral ID: {farmer.farmerSaralId}
           </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+
+          <Text style={styles.label}>Received Items:</Text>
+          {farmer.items.map((item, iIndex) => (
+            <View key={iIndex} style={styles.itemRow}>
+              <View style={{flex: 1}}>
+                <Text style={styles.itemText}>• {item.itemName}</Text>
+                <Text style={styles.subText}>
+                  Received: {item.receivedQuantity}
+                </Text>
+                {item.isFullyReceived && (
+                  <Text style={styles.receivedText}>(Fully Received)</Text>
+                )}
+              </View>
+
+              {/* Only show quantity input if not fully received */}
+              {!item.isFullyReceived ? (
+                <TextInput
+                  style={styles.input}
+                  value={item.quantity}
+                  keyboardType="numeric"
+                  onChangeText={text =>
+                    handleItemQuantityChange(fIndex, iIndex, text)
+                  }
+                  placeholder="Qty"
+                />
+              ) : (
+                <View style={styles.disabledBox}>
+                  <Text style={styles.disabledText}>✓ Done</Text>
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      ))}
+
+      {/* Remarks */}
+      <Text style={styles.label}>Remarks:</Text>
+      <TextInput
+        value={remarks}
+        onChangeText={setRemarks}
+        style={styles.textArea}
+        placeholder="Enter remarks"
+        multiline
+      />
+
+      {/* Driver Details */}
+      <Text style={styles.label}>Driver Name:</Text>
+      <TextInput
+        value={driverName}
+        onChangeText={setDriverName}
+        style={styles.input}
+        placeholder="Enter driver name"
+      />
+
+      <Text style={styles.label}>Driver Contact:</Text>
+      <TextInput
+        value={driverContact}
+        onChangeText={setDriverContact}
+        style={styles.input}
+        keyboardType="numeric"
+        placeholder="Enter driver contact number"
+      />
+
+      <Text style={styles.label}>Vehicle Number:</Text>
+      <TextInput
+        value={vehicleNumber}
+        onChangeText={setVehicleNumber}
+        style={styles.input}
+        placeholder="Enter vehicle number"
+      />
+
+      {/* Submit */}
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handleSubmit}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.submitText}>Submit</Text>
+        )}
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
+export default IncomingStock;
+
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: 20,
-  },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fbd33b',
     padding: 16,
   },
-  title: {
+  header: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  section: {
+    color: 'black',
     marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#fbd33b',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
   },
-  itemSection: {
-    marginBottom: 16,
+  farmerCard: {
     backgroundColor: 'white',
+    padding: 12,
     borderRadius: 8,
-    padding: 16,
-    elevation: 2,
-  },
-  listContainer: {
-    backgroundColor: '#fbd33b',
-    maxHeight: 300,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#070604',
-    marginBottom: 8,
-  },
-  itemLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#444',
     marginBottom: 12,
   },
-  inputLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  picker: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    height: 50,
-    justifyContent: 'center',
-    color: '#000',
-  },
-  input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
-    color: '#333',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  quantityInput: {
-    width: '48%',
-  },
-  multiSelectText: {
-    color: '#333',
-  },
-  multiSelectTextSelected: {
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  submitButton: {
-    backgroundColor: '#000',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonText: {
-    color: 'white',
+  farmerId: {
     fontSize: 16,
     fontWeight: '600',
+    color: 'black',
   },
-  errorText: {
-    color: 'red',
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'black',
+    marginTop: 10,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 6,
+  },
+  itemText: {
     fontSize: 14,
-    marginTop: 4,
+    color: '#333',
+  },
+  subText: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 2,
+  },
+  input: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  textArea: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 6,
+    marginTop: 6,
+    height: 70,
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  submitButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
+    borderRadius: 6,
+    marginTop: 20,
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  submitText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  receivedText: {
+    color: 'green',
+    fontSize: 13,
+    marginTop: 2,
+  },
+  disabledBox: {
+    backgroundColor: '#d4edda',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  disabledText: {
+    color: 'green',
+    fontWeight: '600',
   },
 });
-
-export default IncomingStock;

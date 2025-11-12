@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,64 +7,59 @@ import {
   Alert,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import axios from 'axios';
-import {API_URL} from '@env';
-import {Picker} from '@react-native-picker/picker';
-import MultiSelect from 'react-native-multiple-select';
-import {useNavigation} from '@react-navigation/native';
+  FlatList,
+} from "react-native";
+import axios from "axios";
+import { API_URL } from "@env";
+import { Picker } from "@react-native-picker/picker";
+import MultiSelect from "react-native-multiple-select";
+import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const ThirdPartyOutgoingStock = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [allWarehouses, setAllWarehouses] = useState([]);
-  const [selectedWarehouse, setSelectedWarehouse] = useState('');
-  const [toServiceCenter, setToServiceCenter] = useState('');
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [toServiceCenter, setToServiceCenter] = useState("");
   const [allItems, setAllItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [itemDefectives, setItemDefectives] = useState({});
+  const [driverName, setDriverName] = useState("");
+  const [driverContact, setDriverContact] = useState("");
+  const [vehicleNumber, setVehicleNumber] = useState("");
+  const [groups, setGroups] = useState([
+    { id: Date.now().toString(), farmerSaralId: "", selectedItems: [], itemDefectives: {} },
+  ]);
 
-  // Fetch warehouses from API
+  // Fetch warehouses
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}/warehouse-admin/get-warehouse`,
-      );
+      const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
       if (response.data.success) {
         const warehouses = Array.isArray(response.data.warehouseName)
           ? response.data.warehouseName
           : [response.data.warehouseName];
         setAllWarehouses(warehouses);
-        if (warehouses.length > 0) {
-          setSelectedWarehouse(warehouses[0]);
-        }
+        if (warehouses.length > 0) setSelectedWarehouse(warehouses[0]);
       }
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to fetch warehouses',
-      );
+      Alert.alert("Error", error.response?.data?.message || "Failed to fetch warehouses");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch items from API
+  // Fetch items
   const fetchItems = async () => {
     try {
       const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
       const items =
-        response?.data?.items?.map(item => ({
+        response?.data?.items?.map((item) => ({
           id: item,
           name: item,
         })) || [];
       setAllItems(items);
     } catch (error) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to fetch items',
-      );
+      Alert.alert("Error", error.response?.data?.message || "Failed to fetch items");
     }
   };
 
@@ -73,283 +68,296 @@ const ThirdPartyOutgoingStock = () => {
     fetchItems();
   }, []);
 
-  // Handle item selection
-  const handleItemSelect = selectedItems => {
-    setSelectedItems(selectedItems);
+  // Add new group
+  const addGroup = () => {
+    setGroups((prev) => [
+      ...prev,
+      { id: Date.now().toString(), farmerSaralId: "", selectedItems: [], itemDefectives: {} },
+    ]);
+  };
 
-    // Initialize defectives for new items
-    const newDefectives = {...itemDefectives};
-
-    selectedItems.forEach(item => {
-      if (!newDefectives[item]) newDefectives[item] = '';
-    });
-
-    // Remove defectives for deselected items
-    Object.keys(newDefectives).forEach(key => {
-      if (!selectedItems.includes(key)) delete newDefectives[key];
-    });
-
-    setItemDefectives(newDefectives);
+  // Remove group
+  const removeGroup = (id) => {
+    if (groups.length === 1) return Alert.alert("Note", "At least one group is required");
+    setGroups((prev) => prev.filter((g) => g.id !== id));
   };
 
   // Handle form submission
   const handleSubmit = async () => {
-    // Validate form
-    if (!selectedWarehouse) {
-      Alert.alert('Error', 'Please select a warehouse');
-      return;
-    }
-    if (!toServiceCenter) {
-      Alert.alert('Error', 'Please enter service center name');
-      return;
-    }
-    if (selectedItems.length === 0) {
-      Alert.alert('Error', 'Please select at least one item');
-      return;
-    }
+    if (!selectedWarehouse) return Alert.alert("Error", "Select a warehouse");
+    if (!toServiceCenter) return Alert.alert("Error", "Enter service center name");
+    if (!driverName) return Alert.alert("Error", "Enter service center name");
+    if (!driverContact) return Alert.alert("Error", "Enter driver contact");
+    if (!vehicleNumber) return Alert.alert("Error", "Enter vehicle number");
+    // Validate 
 
-    // Validate defectives
-    for (const item of selectedItems) {
-      if (
-        !itemDefectives[item] ||
-        isNaN(itemDefectives[item]) ||
-        parseInt(itemDefectives[item]) < 0
-      ) {
-        Alert.alert('Error', `Please enter valid defective count for ${item}`);
-        return;
+    // Validate groups
+    for (const g of groups) {
+      if (!g.farmerSaralId) return Alert.alert("Error", "Enter Saral ID for all groups");
+      if (g.selectedItems.length === 0)
+        return Alert.alert("Error", "Select at least one item for each group");
+      for (const item of g.selectedItems) {
+        const qty = g.itemDefectives[item];
+        if (!qty || isNaN(qty) || parseInt(qty) < 0)
+          return Alert.alert("Error", `Enter valid defective count for ${item}`);
       }
     }
 
-    // Prepare payload
     const payload = {
       fromWarehouse: selectedWarehouse,
-      toServiceCenter: toServiceCenter,
-      items: selectedItems.map(item => ({
-      itemName: item,
-      quantity: parseInt(itemDefectives[item]),
+      toServiceCenter,
+      driverName,
+      driverContact,
+      vehicleNumber,
+      farmers: groups.map((g) => ({
+        farmerSaralId: g.farmerSaralId,
+        items: g.selectedItems.map((item) => ({
+          itemName: item,
+          quantity: parseInt(g.itemDefectives[item]),
+        })),
       })),
     };
 
-    console.log('Payload:', payload);
-
+    console.log("Payload:", payload);
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${API_URL}/warehouse-admin/add-outgoing-item`,
-        payload,
-      );
-      console.log('Response:', response.data);
-
-      // Reset form on success
-      setSelectedItems([]);
-      setItemDefectives({});
-      setToServiceCenter('');
-
-      Alert.alert('Success', 'Items transferred successfully!');
-      navigation.navigate('WarehouseNavigation');
+      await axios.post(`${API_URL}/warehouse-admin/add-outgoing-item`, payload);
+      Alert.alert("Success", "Items transferred successfully!");
+      setGroups([{ id: Date.now().toString(), farmerSaralId: "", selectedItems: [], itemDefectives: {} }]);
+      setToServiceCenter("");
+      setDriverName("");
+      setDriverContact("");
+      setVehicleNumber("");
+      navigation.navigate("WarehouseNavigation");
     } catch (error) {
-      console.log('Error:', error.response?.data);
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to transfer items',
-      );
+      Alert.alert("Error", error.response?.data?.message || "Transfer failed");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
-      <View style={styles.container}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
-  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Transfer to Service Center</Text>
+    <FlatList
+      data={[{ key: "form" }]}
+      renderItem={() => (
+        <View style={styles.container}>
+          <Text style={styles.title}>Transfer to Service Center</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Select Items:</Text>
-        <MultiSelect
-          items={allItems}
-          uniqueKey="id"
-          onSelectedItemsChange={handleItemSelect}
-          selectedItems={selectedItems}
-          selectText="Select Items"
-          searchInputPlaceholderText="Search items..."
-          displayKey="name"
-          hideSubmitButton
-          styleTextDropdown={styles.multiSelectText}
-          styleTextDropdownSelected={styles.multiSelectTextSelected}
-          styleListContainer={styles.listContainer}
-          textColor="#000"
-        />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.section}>
-          <Text style={styles.label}>From Warehouse:</Text>
-          {allWarehouses.length > 0 ? (
+          {/* Warehouse Section */}
+          <View style={styles.section}>
+            <Text style={styles.label}>From Warehouse:</Text>
             <Picker
               selectedValue={selectedWarehouse}
               style={styles.picker}
               onValueChange={setSelectedWarehouse}>
-              {allWarehouses.map((warehouse, index) => (
-                <Picker.Item key={index} label={warehouse} value={warehouse} />
+              {allWarehouses.map((warehouse, i) => (
+                <Picker.Item key={i} label={warehouse} value={warehouse} />
               ))}
             </Picker>
-          ) : (
-            <Text style={styles.errorText}>No warehouses available</Text>
-          )}
-        </View>
+          </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>To Service Center:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter service center name"
-            value={toServiceCenter}
-            onChangeText={setToServiceCenter}
-            placeholderTextColor="#999"
-          />
-        </View>
+          {/* Service Center */}
+          <View style={styles.section}>
+            <Text style={styles.label}>To Service Center:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter service center name"
+              value={toServiceCenter}
+              onChangeText={setToServiceCenter}
+              placeholderTextColor="#999"
+            />
+          </View>
 
-        {selectedItems.map(item => (
-          <View key={item} style={styles.itemSection}>
-            <Text style={styles.itemLabel}>{item}</Text>
+           <View style={styles.section}>
+            <Text style={styles.label}>Driver Name:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter service center name"
+              value={driverName}
+              onChangeText={setDriverName}
+              placeholderTextColor="#999"
+            />
+          </View>
 
-            <View style={styles.quantityInput}>
-              <Text style={styles.inputLabel}>Defective Count:</Text>
+           <View style={styles.section}>
+            <Text style={styles.label}>Driver Contact:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter service center name"
+              value={driverContact}
+              onChangeText={setDriverContact}
+              placeholderTextColor="#999"
+            />
+          </View>
+
+           <View style={styles.section}>
+            <Text style={styles.label}>Vehicle Number:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter service center name"
+              value={vehicleNumber}
+              onChangeText={setVehicleNumber}
+              placeholderTextColor="#999"
+            />
+          </View>
+
+          {/* Dynamic Groups */}
+          {groups.map((g, index) => (
+            <View key={g.id} style={styles.groupContainer}>
+              <View style={styles.groupHeader}>
+                <Text style={styles.groupTitle}>Group {index + 1}</Text>
+                <TouchableOpacity onPress={() => removeGroup(g.id)}>
+                  <Icon name="delete" size={24} color="red" />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.label}>Select Items:</Text>
+              <MultiSelect
+                items={allItems}
+                uniqueKey="id"
+                onSelectedItemsChange={(selected) => {
+                  const updated = groups.map((grp) =>
+                    grp.id === g.id ? { ...grp, selectedItems: selected } : grp
+                  );
+                  setGroups(updated);
+                }}
+                selectedItems={g.selectedItems}
+                selectText="Select Items"
+                searchInputPlaceholderText="Search items..."
+                displayKey="name"
+                hideSubmitButton
+                textColor="#000"
+              />
+
+              <Text style={styles.label}>Saral ID:</Text>
               <TextInput
                 style={styles.input}
-                keyboardType="numeric"
-                value={itemDefectives[item]}
-                onChangeText={text => {
-                  setItemDefectives({...itemDefectives, [item]: text});
+                placeholder="Enter Saral Id"
+                value={g.farmerSaralId}
+                onChangeText={(text) => {
+                  const updated = groups.map((grp) =>
+                    grp.id === g.id ? { ...grp, farmerSaralId: text } : grp
+                  );
+                  setGroups(updated);
                 }}
-                placeholder="Enter defective count"
                 placeholderTextColor="#999"
               />
-            </View>
-          </View>
-        ))}
 
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmit}
-          disabled={loading}>
-          <Text style={styles.buttonText}>
-            {loading ? 'Processing...' : 'Transfer Items'}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+              {g.selectedItems.map((item) => (
+                <View key={item} style={styles.itemSection}>
+                  <Text style={styles.itemLabel}>{item}</Text>
+                  <TextInput
+                    style={styles.input}
+                    keyboardType="numeric"
+                    placeholder="Enter defective count"
+                    value={g.itemDefectives[item]}
+                    onChangeText={(text) => {
+                      const updatedGroups = groups.map((grp) => {
+                        if (grp.id === g.id) {
+                          return {
+                            ...grp,
+                            itemDefectives: { ...grp.itemDefectives, [item]: text },
+                          };
+                        }
+                        return grp;
+                      });
+                      setGroups(updatedGroups);
+                    }}
+                    placeholderTextColor="#999"
+                  />
+                </View>
+              ))}
+            </View>
+          ))}
+
+          {/* Add new group */}
+          <TouchableOpacity style={styles.addButton} onPress={addGroup}>
+            <Icon name="add-circle-outline" size={24} color="#000" />
+            <Text style={styles.addText}>Add More</Text>
+          </TouchableOpacity>
+
+          {/* Submit */}
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Transfer Items</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: 20,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    padding: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  title: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 24 },
   section: {
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#fbd33b',
+    backgroundColor: "#fbd33b",
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    elevation: 4,
   },
-  itemSection: {
-    marginBottom: 16,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    elevation: 2,
-  },
-  listContainer: {
-    backgroundColor: '#fbd33b',
-    maxHeight: 300,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#070604',
-    marginBottom: 8,
-  },
-  itemLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#444',
-    marginBottom: 12,
-  },
-  inputLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
+  label: { fontSize: 16, fontWeight: "600", color: "#070604", marginBottom: 8 },
   picker: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     height: 50,
-    justifyContent: 'center',
-    color: '#000',
+    color: "#000",
   },
   input: {
     height: 40,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 4,
     paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
-    color: '#333',
+    backgroundColor: "#f9f9f9",
+    color: "#333",
   },
-  quantityInput: {
-    width: '100%',
+  groupContainer: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 20,
   },
-  multiSelectText: {
-    color: '#333',
+  groupHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    alignItems: "center",
   },
-  multiSelectTextSelected: {
-    color: '#333',
-    fontWeight: 'bold',
+  groupTitle: { fontSize: 18, fontWeight: "bold", color: "#000" },
+  itemSection: {
+    marginBottom: 12,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+    padding: 10,
   },
+  itemLabel: { fontSize: 16, fontWeight: "600", color: "#444", marginBottom: 6 },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  addText: { fontSize: 16, fontWeight: "600", marginLeft: 6, color: "#000" },
   submitButton: {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     paddingVertical: 14,
     borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
+    alignItems: "center",
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 14,
-    marginTop: 4,
-  },
+  buttonText: { color: "white", fontSize: 16, fontWeight: "600" },
 });
 
 export default ThirdPartyOutgoingStock;
