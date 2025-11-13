@@ -11,7 +11,7 @@ import {
   RefreshControl,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -24,7 +24,7 @@ const ServiceApprovalDataMh = () => {
   const fetchData = async () => {
     try {
       
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/service-person/show-new-install-data`,
       );
       setServiceData(response.data.data);
@@ -49,7 +49,7 @@ const ServiceApprovalDataMh = () => {
   const handleApprove = async (installation) => {
     try {
       const empId = await AsyncStorage.getItem('_id');
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/service-person/update-incoming-item-status`,
         {
           installationId: installation._id,

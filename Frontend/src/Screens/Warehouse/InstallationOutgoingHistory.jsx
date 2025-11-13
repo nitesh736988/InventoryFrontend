@@ -6,7 +6,7 @@
 //   StyleSheet,
 //   ActivityIndicator,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // const InstallationOutgoingHistory = () => {
@@ -17,7 +17,7 @@
 //   useEffect(() => {
 //     const fetchOutgoingHistory = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/show-outgoing-item`,
 //         );
 
@@ -213,7 +213,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const InstallationOutgoingHistory = () => {
@@ -224,7 +224,7 @@ const InstallationOutgoingHistory = () => {
   useEffect(() => {
     const fetchOutgoingHistory = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/warehouse-admin/show-outgoing-item`,
         );
 

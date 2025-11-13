@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const SurveyRegistration = () => {
@@ -42,7 +42,7 @@ const SurveyRegistration = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/admin/survey-person-signup`,
         {name, email, contact, password, role, createdAt},
       );

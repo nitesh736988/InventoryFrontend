@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const AssignSystem = () => {
@@ -19,7 +19,7 @@ const AssignSystem = () => {
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           '${API_URL}/service-team/all-service-persons',
         );
         console.log('Service persons data', response.data.data);

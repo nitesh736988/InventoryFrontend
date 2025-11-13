@@ -10,7 +10,7 @@ import {
   Dimensions,
   TextInput,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
 
@@ -24,7 +24,7 @@ const ApprovedData = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/service-person/approved-order-history`);
+      const response = await api.get(`${API_URL}/service-person/approved-order-history`);
       console.log(response.data.orderHistory);
       setOrders(response.data.orderHistory || []);
     } catch (error) {

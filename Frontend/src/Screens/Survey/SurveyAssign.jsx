@@ -9,7 +9,7 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 
@@ -27,7 +27,7 @@ const SurveyAssign = () => {
       setError(null);
       const serviceId = await AsyncStorage.getItem('_id');
 
-      const response = await axios.get(
+      const response = await api.get(
         `http://88.222.214.93:8001/filedService/installationSurveyList?fieldEmpID=${serviceId}`,
       );
       setSurveys(response.data.data);

@@ -1,6 +1,6 @@
 // import { View, Text, StyleSheet, FlatList, Alert, TextInput } from 'react-native';
 // import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import { API_URL } from '@env';
 
 // const NewInstallationTransactionData = () => {
@@ -15,7 +15,7 @@
 
 //   const fetchData = async () => {
 //     try {
-//       const response = await axios.get(`${API_URL}/warehouse-admin/new-installation-data`);
+//       const response = await api.get(`${API_URL}/warehouse-admin/new-installation-data`);
 //       setData(response.data.data);
 //       setFilteredData(response.data.data); // Initialize filteredData with all data
 //     } catch (error) {
@@ -372,7 +372,7 @@
 //   Platform,
 //   Linking,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import { API_URL } from '@env';
 // import RNFetchBlob from 'rn-fetch-blob';
 
@@ -388,7 +388,7 @@
 
 //   const fetchDispatchHistory = async () => {
 //     try {
-//       const response = await axios.get(`${API_URL}/warehouse-admin/get-dispatch-history`);
+//       const response = await api.get(`${API_URL}/warehouse-admin/get-dispatch-history`);
       
 //       if (response.data.success) {
 //         setDispatchData(response.data.data || []);
@@ -986,7 +986,7 @@ import {
   Platform,
   Linking,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 import RNFetchBlob from 'rn-fetch-blob';
 import { WebView } from 'react-native-webview';
@@ -1006,7 +1006,7 @@ const NewInstallationTransactionData = () => {
 
   const fetchDispatchHistory = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/get-dispatch-history`);
+      const response = await api.get(`${API_URL}/warehouse-admin/get-dispatch-history`);
       
       if (response.data.success) {
         setDispatchData(response.data.data || []);

@@ -10,7 +10,7 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
 
@@ -23,7 +23,7 @@ const InstallationHistory = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/admin/all-installations-data`,
       );
       setOrders(response.data.data || []);

@@ -10,7 +10,7 @@
 //   TouchableOpacity,
 //   RefreshControl,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import OpenMap from '../../Component/OpenMap/index';
 // import {useNavigation} from '@react-navigation/native';
@@ -39,7 +39,7 @@
 //       // console.log("Field Emp ID:", fieldEmpId);
 //       // console.log("Block List:", parsedBlockList);
       
-//       const response = await axios.post(
+//       const response = await api.post(
 //         'https://service.galosolar.com/api/filedService/complaintList',
 //         {
 //           blockList: parsedBlockList,
@@ -335,7 +335,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OpenMap from '../../Component/OpenMap/index';
 import {useNavigation} from '@react-navigation/native';
@@ -369,7 +369,7 @@ const ShowComplaints = () => {
         parsedBlockList = [];
       }
       
-      const response = await axios.post(
+      const response = await api.post(
         'https://service.galosolar.com/api/filedService/complaintList',
         {
           blockList: parsedBlockList,
@@ -413,11 +413,11 @@ const ShowComplaints = () => {
         setComplaints(Array.from(uniqueMap.values()));
         setLastFetchTime(now);
       } else {
-        Alert.alert("Error", response.data.message || "Failed to fetch complaints");
+        Alert.alert("Error", response.data.message);
       }
     } catch (error) {
-      console.log("Error fetching complaints:", error);
-      Alert.alert("Error", error.response?.data?.message || "Network error");
+      // console.log("Error fetching complaints:", error);
+      Alert.alert("Error", error.response?.data?.message);
     } finally {                 
       setLoading(false);
       setRefreshing(false);

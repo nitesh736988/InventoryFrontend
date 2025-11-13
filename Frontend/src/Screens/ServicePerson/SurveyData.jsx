@@ -13,7 +13,7 @@
 //   TextInput,
 // } from 'react-native';
 // import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {useNavigation} from '@react-navigation/native';
 // import {launchCamera} from 'react-native-image-picker';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -231,7 +231,7 @@
 
 //       console.log('Form Data:', formData);
 
-//       const response = await axios.post(
+//       const response = await api.post(
 //         'http://88.222.214.93:8001/filedService/addInstallationSurvey',
 //         formData,
 //       );
@@ -243,7 +243,7 @@
 //         Alert.alert('Error', 'Failed to submit data.');
 //       }
 //     } catch (error) {
-//       console.error('Error in axios request:', error.response || error);
+//       console.error('Error in api request:', error.response || error);
 //       Alert.alert('Error', 'Failed to submit data.');
 //     }        
 //   };
@@ -514,7 +514,7 @@ import {
   TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 import {launchCamera} from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -727,7 +727,7 @@ const SurveyData = ({route}) => {
 
       console.log('Form Data:', formData);
 
-      const response = await axios.post(
+      const response = await api.post(
         'http://88.222.214.93:8001/filedService/addInstallationSurvey',
         formData,
         {
@@ -745,7 +745,7 @@ const SurveyData = ({route}) => {
         Alert.alert('Error', 'Failed to submit data.');
       }
     } catch (error) {
-      console.log('Error in axios request:', error.response || error);
+      console.log('Error in api request:', error.response || error);
       Alert.alert('Error', error?.response?.data?.message);
     } finally {
       setLoading(false);

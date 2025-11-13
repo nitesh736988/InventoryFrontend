@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const AddSystemSubItem = () => {
@@ -24,7 +24,7 @@ const AddSystemSubItem = () => {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+        const { data } = await api.get(`${API_URL}/warehouse-admin/show-systems`);
         // console.log('Fetched Systems:', data.data);
     
         setSystems(data.data);
@@ -44,7 +44,7 @@ const AddSystemSubItem = () => {
     const fetchItems = async () => {
       setLoadingItems(true);
       try {
-        const { data } = await axios.get(`${API_URL}/admin/show-system-item?systemId=${systemId}`);
+        const { data } = await api.get(`${API_URL}/admin/show-system-item?systemId=${systemId}`);
         console.log('Fetched System Items:', data.data);
         setItems(data.data);
       } catch (error) {
@@ -73,7 +73,7 @@ const AddSystemSubItem = () => {
     console.log('Submitting:', newItem);
   
     try {
-      const { data } = await axios.post(`${API_URL}/admin/add-subItem`, newItem);
+      const { data } = await api.post(`${API_URL}/admin/add-subItem`, newItem);
       console.log('Response:', data);
   
       Alert.alert('Success', 'Item added successfully.');

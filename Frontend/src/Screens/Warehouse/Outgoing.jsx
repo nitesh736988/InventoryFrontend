@@ -10,7 +10,7 @@
 //   Dimensions,
 //   RefreshControl,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import { API_URL } from '@env';
 
 // const Outgoing = () => {
@@ -23,7 +23,7 @@
 //   const fetchOrders = async () => {
 //     try {
 //       console.log("Fetching orders from:", API_URL);
-//       const response = await axios.get(`${API_URL}/warehouse-admin/warehouse-in-out-orders`);
+//       const response = await api.get(`${API_URL}/warehouse-admin/warehouse-in-out-orders`);
 
 //       console.log("API Response:", response.data);
 
@@ -271,7 +271,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const Outgoing = () => {
@@ -291,7 +291,7 @@ const Outgoing = () => {
   const fetchOrders = async () => {
     try {
       console.log("Fetching orders from:", API_URL);
-      const response = await axios.get(`${API_URL}/warehouse-admin/warehouse-in-out-orders`);
+      const response = await api.get(`${API_URL}/warehouse-admin/warehouse-in-out-orders`);
 
       console.log("API Response Data:", response.data);
 
@@ -362,7 +362,7 @@ const Outgoing = () => {
 
     setFetchingFarmer(true);
     try {
-      const response = await axios.get(`http://88.222.214.93:8001/inventory/showFarmerWithComplaint?saralId=${saralId}`);
+      const response = await api.get(`http://88.222.214.93:8001/inventory/showFarmerWithComplaint?saralId=${saralId}`);
       console.log("Farmer API Response:", response.data);
       
       if (response.data && response.data.success) {
@@ -409,7 +409,7 @@ const Outgoing = () => {
       console.log("Updating order with data:", updatedData);
 
       // Make API call to update the order
-      const response = await axios.put(
+      const response = await api.put(
         `http://88.222.214.93:5000/warehouse-admin/update-outgoing-item-farmer-details`,
         updatedData
       );

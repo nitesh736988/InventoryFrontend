@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {View, Text, FlatList, StyleSheet, Alert} from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const RepairRejectData = () => {
@@ -10,7 +10,7 @@ const RepairRejectData = () => {
   const fetchRepairRejectData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/repair-reject-itemData`);
       console.log(response.data.allRepairRejectData);
       setRepairRejectData(response.data.allRepairRejectData);

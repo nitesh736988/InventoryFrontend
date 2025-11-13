@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 
@@ -20,7 +20,7 @@ const W2WApproveData = () => {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/admin/warehouse-to-warehouse-data`);
       // console.log(response.data.defectiveOrderData);
 

@@ -12,10 +12,11 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import axios from 'axios';
+// import api from '../../auth/api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '@env';
+import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 

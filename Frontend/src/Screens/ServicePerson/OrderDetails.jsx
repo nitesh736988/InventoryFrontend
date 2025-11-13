@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 
@@ -22,7 +22,7 @@ const OrderDetails = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/service-person/pickedup-items`,
       );
       console.log("response data", response.data)
@@ -30,7 +30,7 @@ const OrderDetails = () => {
       setFilteredOrders(response.data.pickupItemsDetail);
       setError('');
     } catch (error) {
-      Alert.alert("Error", JSON.stringify(error.response.data?.message));
+      Alert.alert("Error", error?.response?.data?.message || "Unable to fetch orders. Please try again later.");
       setError('Unable to fetch orders. Please try again later.');
     } finally {
       setLoading(false);
@@ -156,8 +156,6 @@ const OrderDetails = () => {
         onChangeText={handleSearch}
         placeholderTextColor={'#000'}
       />
-      {/* Error Alert */}
-      {error ? <Alert>{error}</Alert> : null}
 
       <FlatList
         data={filteredOrders}

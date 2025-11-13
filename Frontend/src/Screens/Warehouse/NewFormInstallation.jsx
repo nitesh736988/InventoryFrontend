@@ -9,7 +9,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import MultiSelect from 'react-native-multiple-select';
 import {API_URL} from '@env';
 import {Picker} from '@react-native-picker/picker';
@@ -40,7 +40,7 @@ const NewFormInstallation = ({route}) => {
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
-        const response = await axios.get(`${API_URL}/service-team/all-service-persons`);
+        const response = await api.get(`${API_URL}/service-team/all-service-persons`);
         setServicePersons(response.data.data);
       } catch (error) {
         console.log('Failed to fetch service persons:', error);
@@ -53,7 +53,7 @@ const NewFormInstallation = ({route}) => {
   useEffect(() => {
     const fetchSystems = async () => {
       try {
-        const {data} = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+        const {data} = await api.get(`${API_URL}/warehouse-admin/show-systems`);
         setSystems(data.data);
       } catch (error) {
         console.log('Error fetching systems:', error);
@@ -70,7 +70,7 @@ const NewFormInstallation = ({route}) => {
     const fetchItems = async () => {
       setLoadingItems(true);
       try {
-        const {data} = await axios.get(`${API_URL}/warehouse-admin/show-subItems?systemId=${systemId}`);
+        const {data} = await api.get(`${API_URL}/warehouse-admin/show-subItems?systemId=${systemId}`);
         setItems(data.data);
       } catch (error) {
         console.log('Error fetching system items:', error);
@@ -153,7 +153,7 @@ const NewFormInstallation = ({route}) => {
     };
 
     try {
-      const response = await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, newInstallation);
+      const response = await api.post(`${API_URL}/warehouse-admin/add-new-installation`, newInstallation);
       console.log('New Installation Response:', response.data);
       Alert.alert('Success', 'Installation data has been submitted.');
 

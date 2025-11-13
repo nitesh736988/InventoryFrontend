@@ -13,7 +13,7 @@
 // } from 'react-native';
 // import {useNavigation} from '@react-navigation/native';
 // import {useForm, Controller} from 'react-hook-form';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {Picker} from '@react-native-picker/picker';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -140,7 +140,7 @@
 //       }
 
 //       try {
-//         const stageResponse = await axios.get(
+//         const stageResponse = await api.get(
 //           `http://88.222.214.93:8001/filedService/showStage`,
 //         );
 //         setStageOptions(stageResponse.data?.stages || []);
@@ -432,7 +432,7 @@
 
 //     try {
 //       setSubmitting(true);
-//       const response = await axios.put(
+//       const response = await api.put(
 //         `https://service.galosolar.com/api/filedService/complaintUpdateWithMulter`,
 //         formData,
 //         {
@@ -1042,7 +1042,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useForm, Controller} from 'react-hook-form';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {Picker} from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -1170,7 +1170,7 @@ const ShowComplaintData = ({route}) => {
       }
 
       try {
-        const stageResponse = await axios.get(
+        const stageResponse = await api.get(
           `http://88.222.214.93:8001/filedService/showStage`,
         );
         setStageOptions(stageResponse.data?.stages || []);
@@ -1490,7 +1490,7 @@ const ShowComplaintData = ({route}) => {
 
     try {
       setSubmitting(true);
-      const response = await axios.put(
+      const response = await api.put(
         `https://service.galosolar.com/api/filedService/complaintUpdateWithMulter`,
         formData,
         {

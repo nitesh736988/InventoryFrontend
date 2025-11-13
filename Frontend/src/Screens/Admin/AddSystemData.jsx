@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const AddSystemData = () => {
@@ -20,7 +20,7 @@ const AddSystemData = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+        const { data } = await api.get(`${API_URL}/warehouse-admin/show-systems`);
         console.log('System data:', data.data);
         setItems(data.data);
       } catch (error) {
@@ -43,7 +43,7 @@ const AddSystemData = () => {
 
     try {
       console.log('Submitting:', newItem);
-      const { data } = await axios.post(`${API_URL}/admin/add-system-item`, newItem);
+      const { data } = await api.post(`${API_URL}/admin/add-system-item`, newItem);
       console.log('Response:', data.data);
 
       Alert.alert('Success', 'Item data has been submitted.');

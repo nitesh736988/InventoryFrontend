@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_URL} from '@env';
@@ -25,7 +25,7 @@ const ApproveDataMh = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/service-person/accepted-installation-data`,
       );
       setServiceData(response.data.data);
@@ -72,7 +72,7 @@ const ApproveDataMh = () => {
   const handleApprove = async installation => {
     try {
       const empId = await AsyncStorage.getItem('_id');
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/service-person/update-incoming-item-status`,
         {
           installationId: installation._id,

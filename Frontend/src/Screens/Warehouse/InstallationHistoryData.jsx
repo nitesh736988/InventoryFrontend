@@ -10,7 +10,7 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 import {API_URL} from '@env';
 
@@ -23,7 +23,7 @@ const InstallationHistoryData = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/warehouse-installation-data`);
+      const response = await api.get(`${API_URL}/warehouse-admin/warehouse-installation-data`);
       setOrders(response.data.data || []);
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error.response.data?.message));

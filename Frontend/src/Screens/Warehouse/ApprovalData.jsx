@@ -11,7 +11,7 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
@@ -38,7 +38,7 @@ const ApprovalData = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/warehouse-in-out-orders`,
       );
       setOrders(response.data.pickupItems);
@@ -57,7 +57,7 @@ const ApprovalData = () => {
 
   const handleApproveBtn = async (sendTransactionId, incoming) => {
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/warehouse-admin/update-incoming-status`,
         {
           status: true,
@@ -89,7 +89,7 @@ const ApprovalData = () => {
 
     setDeclineLoading(true);
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/warehouse-admin/decline-incoming-items`,
         {
           transactionId: selectedTransactionId,
@@ -127,7 +127,7 @@ const ApprovalData = () => {
 
     setSerialUpdateLoading(true);
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/warehouse-admin/update-pickup-item-serial`,
         {
           transactionId: selectedTransactionId,

@@ -8,7 +8,7 @@
 //   ActivityIndicator,
 //   TouchableOpacity,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // const AddData = ({ route }) => {
@@ -47,7 +47,7 @@
 //     });
 //     try {
       
-//       const response = await axios.post(`${API_URL}/warehouse-admin/add-item-stock`, {
+//       const response = await api.post(`${API_URL}/warehouse-admin/add-item-stock`, {
 //         items: [itemData],
 //         defective: defective,
 //       });
@@ -147,7 +147,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const AddData = ({ route }) => {
@@ -194,7 +194,7 @@ const AddData = ({ route }) => {
     });
     try {
       
-      const response = await axios.post(`${API_URL}/warehouse-admin/add-item-stock`, {
+      const response = await api.post(`${API_URL}/warehouse-admin/add-item-stock`, {
         items: [itemData],
         defective: defective,
       });

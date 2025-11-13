@@ -10,7 +10,7 @@ import {
   Dimensions,
   TextInput,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
@@ -26,7 +26,7 @@ const ApprovalHistoryData = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/approved-order-history`,
       );
       console.log(response.data.orderHistory);

@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const AddWareHouse = () => {
@@ -25,7 +25,7 @@ const AddWareHouse = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/admin/add-warehouse`, {
+      const response = await api.post(`${API_URL}/admin/add-warehouse`, {
         warehouseName: trimmedName,
       });
       console.log('Response:', response.data);

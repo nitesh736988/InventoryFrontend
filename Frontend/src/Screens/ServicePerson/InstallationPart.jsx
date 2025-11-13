@@ -15,7 +15,7 @@ import {
 import Geolocation from '@react-native-community/geolocation';
 import {launchCamera} from 'react-native-image-picker';
 import {API_URL} from '@env';
-import axios from 'axios';
+import api from '../../auth/api'
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageResizer from 'react-native-image-resizer';
@@ -90,7 +90,7 @@ const InstallationPart = ({route}) => {
 
       const fetchInstallationData = async () => {
         try {
-          const response = await axios.get(
+          const response = await api.get(
             `${API_URL}/service-person/get-pickupItem-data?pickupItemId=${pickupItemId}`,
           );
           setInstallationData(response.data.data);
@@ -200,7 +200,7 @@ const InstallationPart = ({route}) => {
     };
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/service-person/new-installation-data`,
         dataToSend,
         {

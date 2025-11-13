@@ -13,7 +13,7 @@ import {
   Pressable,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
 import Sidebar from './Sidebar';
@@ -38,13 +38,13 @@ const WarehouseDashboard = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/dashboard`);
+      const response = await api.get(`${API_URL}/warehouse-admin/dashboard`);
       if (response.data?.warehouseData?.items) {
         setData(response.data.warehouseData.items);
         setFilteredData(response.data.warehouseData.items);
       }
 
-      const systemsResponse = await axios.get(
+      const systemsResponse = await api.get(
         `${API_URL}/warehouse-admin/show-systems`,
       );
       if (systemsResponse.data?.data) {
@@ -80,7 +80,7 @@ const WarehouseDashboard = () => {
 
   const fetchSystemItems = async systemId => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/show-items-stock-status?systemId=${systemId}`,
       );
       if (response.data?.data) {
@@ -139,7 +139,7 @@ const WarehouseDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${API_URL}/user/logout`);
+      const response = await api.post(`${API_URL}/user/logout`);
       if (response.data.success) {
         Alert.alert('Logout', 'You have logged out successfully');
         await AsyncStorage.clear();

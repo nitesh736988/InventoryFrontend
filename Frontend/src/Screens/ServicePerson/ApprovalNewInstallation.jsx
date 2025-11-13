@@ -11,8 +11,9 @@ import {
   Alert,
 } from 'react-native';
 import { API_URL } from '@env';
-import axios from 'axios';
+// import api from '../../auth/api';;
 import { useNavigation } from '@react-navigation/native';
+import api from '../../auth/api';;
 
 const { width } = Dimensions.get('window');
 
@@ -29,7 +30,7 @@ const ApprovalNewInstallation = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/service-person/show-new-install-data`);
+      const response = await api.get(`${API_URL}/service-person/show-new-install-data`);
       setData(response.data.data);
     } catch (error) {
       console.log('Error fetching data:', error);
@@ -40,7 +41,7 @@ const ApprovalNewInstallation = () => {
 
   const handleApproveBtn = async (installationId, farmerId, empId) => {
     try {
-      const response = await axios.post(`${API_URL}/service-person/update-incoming-item-status`, {
+      const response = await api.post(`${API_URL}/service-person/update-incoming-item-status`, {
         accepted: true,
         installationId,
         farmerId,

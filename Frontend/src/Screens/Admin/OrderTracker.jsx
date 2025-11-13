@@ -7,7 +7,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const OrderTracker = () => {
@@ -22,7 +22,7 @@ const OrderTracker = () => {
       if (isRefreshing) setIsRefreshing(true);
       else setLoading(true);
 
-      const response = await axios.get(`${API_URL}/admin/upper-order-details`);
+      const response = await api.get(`${API_URL}/admin/upper-order-details`);
       setOrders(response.data.itemDetails || []);
     } catch (error) {
       Alert.alert('Error', error?.response?.data?.message);

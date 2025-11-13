@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const ApprovalOutgoingInstallation = () => {
@@ -24,7 +24,7 @@ const ApprovalOutgoingInstallation = () => {
   const fetchOutgoingHistory = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/show-incoming-item`,
       );
         setOutgoingHistory(response.data.data);
@@ -46,7 +46,7 @@ const ApprovalOutgoingInstallation = () => {
         arrivedDate: new Date().toISOString()
       };
 
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/warehouse-admin/approve-incoming-item`,
         requestData,
         {

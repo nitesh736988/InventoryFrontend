@@ -11,7 +11,7 @@
 // } from 'react-native';
 // import MultiSelect from 'react-native-multiple-select';
 // import {Picker} from '@react-native-picker/picker';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // // const {width} = Dimensions.get('window');
@@ -35,7 +35,7 @@
 //   useEffect(() => {
 //     const fetchItems = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/view-items`,
 //         );
 //         const items = response.data.items.map((item, index) => ({
@@ -51,7 +51,7 @@
 
 //     const fetchWarehouses = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/get-warehouse`,
 //         );
 //         setFormData(prev => ({
@@ -70,7 +70,7 @@
 //   useEffect(() => {
 //     const fetchAllWarehouses = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/all-warehouses`,
 //         );
 //         setAllWarehouse(response.data.allWarehouses);
@@ -171,7 +171,7 @@
 //     };
 
 //     try {
-//       const response = await axios.post(
+//       const response = await api.post(
 //         `${API_URL}/warehouse-admin/defective-order-data`,
 //         data,
 //         {
@@ -502,7 +502,7 @@
 // } from 'react-native';
 // import MultiSelect from 'react-native-multiple-select';
 // import {Picker} from '@react-native-picker/picker';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // const W2W = () => {
@@ -525,7 +525,7 @@
 //   useEffect(() => {
 //     const fetchItems = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/view-items`,
 //         );
 //         const items = response.data.items.map((item, index) => ({
@@ -541,7 +541,7 @@
 
 //     const fetchWarehouses = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/get-warehouse`,
 //         );
 //         setFormData(prev => ({
@@ -560,7 +560,7 @@
 //   useEffect(() => {
 //     const fetchAllWarehouses = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/all-warehouses`,
 //         );
 //         setAllWarehouse(response.data.allWarehouses);
@@ -695,7 +695,7 @@
 //     };
 
 //     try {
-//       const response = await axios.post(
+//       const response = await api.post(
 //         `${API_URL}/warehouse-admin/defective-order-data`,
 //         data,
 //         {
@@ -949,7 +949,7 @@ import {
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const W2W = () => {
@@ -973,7 +973,7 @@ const W2W = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
+        const response = await api.get(`${API_URL}/warehouse-admin/view-items`);
         const formattedItems = response.data.items.map((item, index) => ({
           _id: index + 1,
           itemName: item,
@@ -987,7 +987,7 @@ const W2W = () => {
 
     const fetchWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+        const response = await api.get(`${API_URL}/warehouse-admin/get-warehouse`);
         setFormData(prev => ({
           ...prev,
           fromWarehouse: response.data.warehouseName,
@@ -1004,7 +1004,7 @@ const W2W = () => {
   useEffect(() => {
     const fetchAllWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/warehouse-admin/all-warehouses`);
+        const response = await api.get(`${API_URL}/warehouse-admin/all-warehouses`);
         setAllWarehouse(response.data.allWarehouses);
       } catch (error) {
         Alert.alert('Error', error.response?.data?.message || 'Failed to fetch warehouses');
@@ -1206,7 +1206,7 @@ const W2W = () => {
 
     try {
       console.log('Submitting data:', data);
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/defective-order-data`,
         data,
         {

@@ -10,7 +10,7 @@
 // } from 'react-native';
 // import MultiSelect from 'react-native-multiple-select';
 // import {Picker} from '@react-native-picker/picker';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 // import {useNavigation} from '@react-navigation/native';
 
@@ -41,7 +41,7 @@
 //   useEffect(() => {
 //     const fetchServicePersons = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/service-team/all-service-persons`,
 //         );
 //         setServicePerson(response?.data?.data);
@@ -56,7 +56,7 @@
 //   useEffect(() => {
 //     const fetchItems = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/view-items`,
 //         );
 //         const items = response?.data?.items?.map((item, index) => ({
@@ -72,7 +72,7 @@
 
 //     const fetchWarehouses = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/get-warehouse`,
 //         );
 //         setAllWarehouses(response?.data?.warehouseName);
@@ -167,7 +167,7 @@
 
 //     try {
 //       setLoading(true);
-//       const response = await axios.post(
+//       const response = await api.post(
 //         `${API_URL}/warehouse-admin/outgoing-items`,
 //         data,
 //         {headers: {'Content-Type': 'application/json'}},
@@ -414,7 +414,7 @@ import {
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
 
@@ -445,7 +445,7 @@ const AddTransaction = ({route}) => {
   useEffect(() => {
     const fetchServicePersons = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/service-team/all-service-persons`,
         );
         setServicePerson(response?.data?.data);
@@ -460,7 +460,7 @@ const AddTransaction = ({route}) => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/warehouse-admin/view-items`,
         );
         const items = response?.data?.items?.map((item, index) => ({
@@ -476,7 +476,7 @@ const AddTransaction = ({route}) => {
 
     const fetchWarehouses = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/warehouse-admin/get-warehouse`,
         );
         setAllWarehouses(response?.data?.warehouseName);
@@ -579,7 +579,7 @@ const AddTransaction = ({route}) => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/outgoing-items`,
         data,
         {headers: {'Content-Type': 'application/json'}},

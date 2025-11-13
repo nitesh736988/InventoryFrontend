@@ -12,7 +12,7 @@
 // } from 'react-native';
 // import {Picker} from '@react-native-picker/picker';
 // import CheckBox from '@react-native-community/checkbox';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 // import {useNavigation, useRoute} from '@react-navigation/native';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -135,7 +135,7 @@
 //   useEffect(() => {
 //     const fetchServicePersons = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/service-survey-persons?state=${selectedState}`,
 //         );
 //         setServicePerson(response?.data?.data || []);
@@ -147,7 +147,7 @@
 
 //     const fetchSystems = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/show-systems`,
 //         );
 //         setSystems(response?.data?.data || []);
@@ -162,7 +162,7 @@
 
 //   const fetchAvailablePumps = async () => {
 //     try {
-//       const response = await axios.get(
+//       const response = await api.get(
 //         `${API_URL}/warehouse-admin/show-pump-data?systemId=${selectedSystem}`,
 //       );
 //       setAvailablePumps(response?.data?.data || []);
@@ -177,7 +177,7 @@
 
 //     try {
 //       setFetchingItems(true);
-//       const response = await axios.get(
+//       const response = await api.get(
 //         `${API_URL}/warehouse-admin/show-items-subItems?systemId=${selectedSystem}`,
 //       );
 
@@ -218,7 +218,7 @@
 
 //     try {
 //       setValidatingSaralId(true);
-//       const response = await axios.get(
+//       const response = await api.get(
 //         `http://88.222.214.93:8001/farmer/showFarmerAccordingToSaralIdFrontEnd?saralId=${saralId}&state=${selectedState}`,
 //       );
 
@@ -410,7 +410,7 @@
 //         };
 //       }
 
-//       const response = await axios.post(
+//       const response = await api.post(
 //         url,
 //         payload,
 //         {headers: {'Content-Type': 'application/json'}}
@@ -747,7 +747,7 @@
 //       console.log('Payload to submit:', payload);
 
 //       setLoading(true);
-//       const response = await axios.post(
+//       const response = await api.post(
 //         `${API_URL}/warehouse-admin/add-new-installation`,
 //         payload,
 //         {headers: {'Content-Type': 'application/json'}},
@@ -1614,7 +1614,7 @@
 //   ActivityIndicator,
 // } from 'react-native';
 // import {Picker} from '@react-native-picker/picker';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {launchImageLibrary} from 'react-native-image-picker';
 // import {useForm, useFieldArray, Controller} from 'react-hook-form';
 // import {API_URL} from '@env';
@@ -1664,7 +1664,7 @@
 
 //   const fetchSystems = async () => {
 //     try {
-//       const res = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+//       const res = await api.get(`${API_URL}/warehouse-admin/show-systems`);
 //       setSystems(res?.data?.data || []);
 //     } catch (err) {
 //       console.log('Error fetching systems:', err.message);
@@ -1673,7 +1673,7 @@
 
 //   const fetchServicePersons = async () => {
 //     try {
-//       const res = await axios.get(`${API_URL}/warehouse-admin/get-installer-data`);
+//       const res = await api.get(`${API_URL}/warehouse-admin/get-installer-data`);
 //       setServicePersons(res?.data?.data || []);
 //     } catch (err) {
 //       console.log('Error fetching service persons:', err.message);
@@ -1682,7 +1682,7 @@
 
 //   const fetchPumpData = async (systemId, index) => {
 //     try {
-//       const res = await axios.get(`${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`);
+//       const res = await api.get(`${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`);
 //       const pumpList = res?.data?.data || [];
 //       const form = watch('forms')[index];
 //       update(index, {...form, pumps: pumpList});
@@ -1698,7 +1698,7 @@
 //     }
 
 //     try {
-//       const res = await axios.get(
+//       const res = await api.get(
 //         `http://88.222.214.93:8001/farmer/showFarmerAccordingToSaralIdFrontEnd?saralId=${saralId}`,
 //       );
 
@@ -1809,7 +1809,7 @@
 
 //     try {
 //       setLoading(true);
-//       const res = await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, formData, {
+//       const res = await api.post(`${API_URL}/warehouse-admin/add-new-installation`, formData, {
 //         headers: {
 //           'Content-Type': 'multipart/form-data',
 //         },
@@ -2280,7 +2280,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {launchImageLibrary} from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
 import {useForm, useFieldArray, Controller} from 'react-hook-form';
@@ -2332,7 +2332,7 @@ const OutgoingInstallation = () => {
 
   const fetchSystems = async () => {
     try {
-      const res = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+      const res = await api.get(`${API_URL}/warehouse-admin/show-systems`);
       setSystems(res?.data?.data || []);
     } catch (err) {
       console.log('Error fetching systems:', err.message);
@@ -2342,7 +2342,7 @@ const OutgoingInstallation = () => {
 
   const fetchServicePersons = async () => {
     try {
-      const res = await axios.get(`${API_URL}/warehouse-admin/get-installer-data`);
+      const res = await api.get(`${API_URL}/warehouse-admin/get-installer-data`);
       setServicePersons(res?.data?.data || []);
     } catch (err) {
       console.log('Error fetching service persons:', err.message);
@@ -2352,7 +2352,7 @@ const OutgoingInstallation = () => {
 
   const fetchPumpData = async (systemId, index) => {
     try {
-      const res = await axios.get(`${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`);
+      const res = await api.get(`${API_URL}/warehouse-admin/show-pump-data?systemId=${systemId}`);
       const pumpList = res?.data?.data || [];
       const form = watch('forms')[index];
       update(index, {...form, pumps: pumpList});
@@ -2362,7 +2362,7 @@ const OutgoingInstallation = () => {
     }
     // by shiv starts here
     try {
-      const res1 = await axios.get(`${API_URL}/warehouse-admin/show-controller-data?systemId=${systemId}`);
+      const res1 = await api.get(`${API_URL}/warehouse-admin/show-controller-data?systemId=${systemId}`);
       const controllerList = res1?.data?.items || [];
       const form = watch('forms')[index];
       update(index, {...form, controllers: controllerList});
@@ -2380,7 +2380,7 @@ const OutgoingInstallation = () => {
     }
 
     try {
-      const res = await axios.get(
+      const res = await api.get(
         `http://88.222.214.93:8001/farmer/showFarmerAccordingToSaralIdFrontEnd?saralId=${saralId}`,
       );
 
@@ -2556,7 +2556,7 @@ const OutgoingInstallation = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${API_URL}/warehouse-admin/add-new-installation`, formData, {
+      const res = await api.post(`${API_URL}/warehouse-admin/add-new-installation`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

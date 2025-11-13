@@ -13,7 +13,7 @@
 // } from 'react-native';
 // import { Picker } from '@react-native-picker/picker';
 // import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import { launchCamera } from 'react-native-image-picker';
 // import ImageResizer from 'react-native-image-resizer';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -55,7 +55,7 @@
 //   useEffect(() => {
 //     const fetchCompanies = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           'http://88.222.214.93:8001/common/showCompany',
 //         );
 //         console.log('Response:', response.data);
@@ -95,7 +95,7 @@
 //         companyName: selectedCompany,
 //       };
 //       console.log(formData)
-//       const response = await axios.post(
+//       const response = await api.post(
 //         'http://88.222.214.93:8001/filedService/addSurvey',
 //         formData,
 //       );
@@ -331,7 +331,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useForm, Controller } from 'react-hook-form';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { launchCamera } from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -383,7 +383,7 @@ const QuarterlyVisit = ({ route }) => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           'http://88.222.214.93:8001/common/showCompany'
         );
         if (Array.isArray(response.data.data)) {
@@ -525,7 +525,7 @@ const QuarterlyVisit = ({ route }) => {
 
       console.log("Form Data:", formData);
 
-      await axios.post(
+      await api.post(
         'http://88.222.214.93:8001/filedService/quarterlySurvey',
         formData,
         {

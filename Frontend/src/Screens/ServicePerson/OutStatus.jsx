@@ -10,7 +10,7 @@
 //   Dimensions,
 //   TextInput,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import Icon from 'react-native-vector-icons/FontAwesome';
 // import {API_URL} from '@env';
 
@@ -24,7 +24,7 @@
 //   const fetchOrders = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await axios.get(`${API_URL}/service-person/pickedup-items`);
+//       const response = await api.get(`${API_URL}/service-person/pickedup-items`);
 //       console.log(response.data.pickupItemsDetail);
 //       setOrders(response.data.pickupItemsDetail);
 //     } catch (error) {
@@ -44,7 +44,7 @@
 
 //   const handleApproveBtn = async (sendTransactionId, incoming) => {
 //     try {
-//       const sendRequest = await axios.put(
+//       const sendRequest = await api.put(
 //         `${API_URL}/service-person/update-outgoing-status`,
 //         {
 //           status: true,
@@ -318,7 +318,7 @@ import {
   Dimensions,
   TextInput,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {API_URL} from '@env';
 
@@ -332,7 +332,7 @@ const OutStatus = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/service-person/pickedup-items`,
       );
       console.log(response.data.pickupItemsDetail);
@@ -354,7 +354,7 @@ const OutStatus = () => {
 
   const handleApproveBtn = async (sendTransactionId, incoming) => {
     try {
-      const sendRequest = await axios.put(
+      const sendRequest = await api.put(
         `${API_URL}/service-person/update-outgoing-status`,
         {
           status: true,

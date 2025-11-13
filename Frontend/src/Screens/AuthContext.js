@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const AuthContext = createContext();
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(`${API_URL}/user/logout`);
+      await api.post(`${API_URL}/user/logout`);
     } catch (error) {
       console.error('Logout error:', error);
     }

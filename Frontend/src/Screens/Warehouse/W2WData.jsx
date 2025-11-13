@@ -11,7 +11,7 @@
 //   Dimensions,
 //   RefreshControl,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import Icon from 'react-native-vector-icons/FontAwesome';
 // import { API_URL } from '@env';
 
@@ -25,7 +25,7 @@
 //   const fetchOrders = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await axios.get(
+//       const response = await api.get(
 //         `${API_URL}/warehouse-admin/outgoing-defective-order`
 //       );
 //       setOrders(response.data.defectiveOrderData);
@@ -248,7 +248,7 @@ import {
   Dimensions,
   RefreshControl,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env';
 
@@ -262,7 +262,7 @@ const W2WData = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/outgoing-defective-order`
       );
       setOrders(response.data.defectiveOrderData);

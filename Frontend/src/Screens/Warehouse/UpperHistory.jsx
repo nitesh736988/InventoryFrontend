@@ -10,7 +10,7 @@ import {
   Platform,
   UIManager,
 } from "react-native";
-import axios from "axios";
+import api from "../../auth/api";
 import {API_URL} from '@env';
 
 if (Platform.OS === "android") {
@@ -30,7 +30,7 @@ const UpperHistory = () => {
   const fetchHistoryData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
+      const res = await api.get(
         `${API_URL}/warehouse-admin/receiving-items-data`
       );
       if (res.data.success) {

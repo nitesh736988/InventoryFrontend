@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -49,7 +49,7 @@ const ServicePersonRegistration = ({ navigation }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/service-person-signup`,
         { name, email, contact, password,longitude, latitude,block,district,state, createdAt }
       );

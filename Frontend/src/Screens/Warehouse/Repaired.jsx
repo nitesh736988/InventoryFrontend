@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import { useNavigation } from '@react-navigation/native';
 
@@ -28,7 +28,7 @@ const navigation = useNavigation()
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/warehouse-admin/view-items`,
         );
         const items = response.data.items.map((item, index) => ({
@@ -69,7 +69,7 @@ const navigation = useNavigation()
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/repair-item`,
         newItem,
       );

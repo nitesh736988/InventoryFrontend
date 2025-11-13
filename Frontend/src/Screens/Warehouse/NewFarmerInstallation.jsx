@@ -9,7 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 
@@ -26,7 +26,7 @@ const NewFarmerInstallation = () => {
       console.log('Warehouse ID:', warehouseId);
       if (!warehouseId) throw new Error('Warehouse ID not found');
 
-      const response = await axios.get(
+      const response = await api.get(
         `http://88.222.214.93:8001/warehouse/newFarmerList?warehouseId=${warehouseId}`,
       );
 

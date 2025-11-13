@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import {API_URL} from '@env';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 
 const EditServicePerson = ({route}) => {
@@ -48,7 +48,7 @@ const EditServicePerson = ({route}) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/admin/update-service-person`,
         formData,
       );

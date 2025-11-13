@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -19,7 +19,7 @@ const Warehousepersons = () => {
   const fetchWarehousePersons = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/admin/all-warehouse-persons`,
       );
       console.log('Response:', response);
@@ -36,7 +36,7 @@ const Warehousepersons = () => {
   };
   const deleteWarehousePerson = async id => {
     try {
-      await axios.delete(`${API_URL}/admin/remove-warehouse-person?id=${id}`);
+      await api.delete(`${API_URL}/admin/remove-warehouse-person?id=${id}`);
       Alert.alert('Success', 'Warehouse person deleted successfully');
       setWarehousePersons(prev => prev.filter(person => person._id !== id));
     } catch (error) {

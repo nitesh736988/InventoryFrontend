@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import {RadioButton} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -53,7 +53,7 @@ const InOrder = ({route}) => {
   useEffect(() => {
   const fetchAllWarehouses = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/service-person/all-warehouses`,
       );
       const filteredWarehouses = response.data.allWarehouses.filter(
@@ -73,7 +73,7 @@ const InOrder = ({route}) => {
 
   useEffect(() => {
     const selectedItemList = async () => {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/service-person/warehouse-items?option=${selectedWarehouse}`,
       );
       const updateItemsData = [];
@@ -174,7 +174,7 @@ const InOrder = ({route}) => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/service-person/incoming-items`,
         data,
         {
@@ -457,7 +457,7 @@ export default InOrder;
 // } from 'react-native';
 // import MultiSelect from 'react-native-multiple-select';
 // import {Picker} from '@react-native-picker/picker';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 // import {RadioButton} from 'react-native-paper';
 // import {useNavigation} from '@react-navigation/native';
@@ -501,7 +501,7 @@ export default InOrder;
 //   useEffect(() => {
 //     const fetchAllWarehouses = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/service-person/all-warehouses`,
 //         );
 //         const filteredWarehouses = response.data.allWarehouses.filter(
@@ -521,7 +521,7 @@ export default InOrder;
 
 //   useEffect(() => {
 //     const selectedItemList = async () => {
-//       const response = await axios.get(
+//       const response = await api.get(
 //         `${API_URL}/service-person/warehouse-items?option=${selectedWarehouse}`,
 //       );
 //       const updateItemsData = [];
@@ -642,7 +642,7 @@ export default InOrder;
 
 //     try {
 //       setLoading(true);
-//       const response = await axios.post(
+//       const response = await api.post(
 //         `${API_URL}/service-person/incoming-items`,
 //         data,
 //         {

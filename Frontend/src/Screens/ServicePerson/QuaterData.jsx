@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {useNavigation} from '@react-navigation/native';
 
 const QuaterData = () => {
@@ -30,7 +30,7 @@ const QuaterData = () => {
     try {
       if (!refreshing) setLoading(true);
 
-      const response = await axios.post(
+      const response = await api.post(
         `http://88.222.214.93:8001/filedService/quarterlyList`,
         dataToSend,
       );

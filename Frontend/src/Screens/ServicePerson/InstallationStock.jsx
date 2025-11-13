@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from 'react';
 // import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import MultiSelect from 'react-native-multiple-select';
 // import {API_URL} from '@env';
 // import {useNavigation} from '@react-navigation/native';
@@ -16,7 +16,7 @@
 //   useEffect(() => {
 //     const fetchItems = async () => {
 //       try {
-//         const response = await axios.get(`${API_URL}/service-person/show-holding-items`);
+//         const response = await api.get(`${API_URL}/service-person/show-holding-items`);
 //         console.log('Stock data:', response.data);
 //         const items = response.data.items.map((item) => ({
 //           _id: item._id,
@@ -53,7 +53,7 @@
 //     console.log('Selected Data:', { items: selectedData });
   
 //     try {
-//       const response = await axios.put(
+//       const response = await api.put(
 //         '${API_URL}/service-person/update-holding-items',
 //         { items: selectedData }
 //       );
@@ -159,7 +159,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import MultiSelect from 'react-native-multiple-select';
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
@@ -175,7 +175,7 @@ const InstallationStock = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(`${API_URL}/service-person/show-holding-items`);
+        const response = await api.get(`${API_URL}/service-person/show-holding-items`);
         console.log('Stock data:', response.data);
         const items = response.data.items.map((item) => ({
           _id: item._id,
@@ -227,7 +227,7 @@ const InstallationStock = () => {
 
     try {
       // FIXED: Using backticks instead of single quotes for template literal
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/service-person/update-holding-items`,
         { items: selectedData }
       );

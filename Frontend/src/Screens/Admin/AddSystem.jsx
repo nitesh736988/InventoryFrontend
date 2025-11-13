@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const AddSystem = () => {
@@ -18,7 +18,7 @@ const AddSystem = () => {
   const [systems, setSystems] = useState([]);
   const fetchSystems = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+      const response = await api.get(`${API_URL}/warehouse-admin/show-systems`);
       setSystems(response.data.data);
     } catch (error) {
       console.log('Error fetching systems:', error);
@@ -44,7 +44,7 @@ const AddSystem = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/admin/add-system`, {
+      const response = await api.post(`${API_URL}/admin/add-system`, {
         systemName,
       });
 

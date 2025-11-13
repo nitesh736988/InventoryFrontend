@@ -13,7 +13,7 @@
 // } from 'react-native';
 // import Icon from 'react-native-vector-icons/FontAwesome';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 // import Sidebarmodal from './Sidebarmodal';
 
@@ -30,7 +30,7 @@
 
 //   const fetchServicePersons = async () => {
 //     try {
-//       const response = await axios.get(`${API_URL}/service-person/dashboard`);
+//       const response = await api.get(`${API_URL}/service-person/dashboard`);
 //       console.log('API Response:', response.data);
 
 //       const incoming =
@@ -51,7 +51,7 @@
 //   const fetchMaharashtraData = async () => {
 //     try {
 //       setLoading(true);
-//       const response = await axios.get(`${API_URL}/service-person/show-emp-dashboard`);
+//       const response = await api.get(`${API_URL}/service-person/show-emp-dashboard`);
 //       console.log('Maharashtra API Response:', response.data);
 //       setMaharashtraData(response.data.data);
 //     } catch (error) {
@@ -76,7 +76,7 @@
 
 //   const handleLogout = async () => {
 //     try {
-//       const response = await axios.post(`${API_URL}/user/logout`);
+//       const response = await api.post(`${API_URL}/user/logout`);
 //       if (response.data.success) {
 //         Alert.alert('Logout', 'You have logged out successfully');
 //         await AsyncStorage.clear();
@@ -369,7 +369,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import Sidebarmodal from './Sidebarmodal';
 import {useNavigation} from '@react-navigation/native';
@@ -425,7 +425,7 @@ const ServicePersonDashboard = () => {
       
       const parsedBlocks = storedBlocks ? JSON.parse(storedBlocks) : [];
 
-      const response = await axios.post(`https://service.galosolar.com/api/filedService/dashboard`, 
+      const response = await api.post(`https://service.galosolar.com/api/filedService/dashboard`, 
         { blockList: parsedBlocks },
         {
           headers: {
@@ -450,19 +450,20 @@ const ServicePersonDashboard = () => {
   // Fetch service persons data
   const fetchServicePersons = async () => {
     try {
-      const response = await axios.get(`${API_URL}/service-person/dashboard`);
-      console.log('API Response:', response.data);
+      console.log("before api call");
+      const response = await api.get(`${API_URL}/service-person/dashboard`);
+      console.log('API Response:', response?.data);
 
       const incoming =
-        response.data.mergedData?.filter(item => item.type === 'incoming') || [];
+        response?.data?.mergedData?.filter(item => item.type === 'incoming') || [];
       const outgoing =
-        response.data.mergedData?.filter(item => item.type === 'outgoing') || [];
+        response?.data?.mergedData?.filter(item => item.type === 'outgoing') || [];
 
       setServicePersons(incoming.flatMap(item => item.items || []));
       setServicePersonOutgoing(outgoing.flatMap(item => item.items || []));
     } catch (error) {
       console.log('Error fetching service persons:', error);
-      Alert.alert('Error', JSON.stringify(error.response.data?.message));
+      Alert.alert('Error', JSON.stringify(error?.response?.data?.message));
     } finally {
       setIsRefreshing(false);
     }
@@ -472,7 +473,7 @@ const ServicePersonDashboard = () => {
   const fetchMaharashtraData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/service-person/show-emp-dashboard`);
+      const response = await api.get(`${API_URL}/service-person/show-emp-dashboard`);
       console.log('Maharashtra API Response:', response.data);
       setMaharashtraData(response.data.data);
     } catch (error) {
@@ -498,7 +499,7 @@ const ServicePersonDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${API_URL}/user/logout`);
+      const response = await api.post(`${API_URL}/user/logout`);
       if (response.data.success) {
         Alert.alert('Logout', 'You have logged out successfully');
         await AsyncStorage.clear();

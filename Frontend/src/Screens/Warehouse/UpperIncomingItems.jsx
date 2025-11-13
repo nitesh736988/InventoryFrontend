@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import {Picker} from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
@@ -33,7 +33,7 @@ const UpperIncomingItems = () => {
 
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+      const response = await api.get(`${API_URL}/warehouse-admin/get-warehouse`);
       if (response.data.success) {
         let warehouses = [];
         
@@ -67,7 +67,7 @@ const UpperIncomingItems = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/show-system-items`);
+      const response = await api.get(`${API_URL}/warehouse-admin/show-system-items`);
       
       // Updated to handle the new API response format
       const items = response.data?.data?.map(item => ({
@@ -145,7 +145,7 @@ const UpperIncomingItems = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/incoming-inventory-items`,
         payload,
         {

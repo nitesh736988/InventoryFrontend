@@ -8,7 +8,7 @@
 //   ActivityIndicator,
 //   TouchableOpacity,
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // const ItemStockUpdate = ({route}) => {
@@ -37,7 +37,7 @@
 //     console.log("SubItem Id", updatedQuantity);
 
 //     try {
-//       const response = await axios.put(
+//       const response = await api.put(
 //         `${API_URL}/warehouse-admin/update-subItem-quantity`,
 //         payload,
 //       );
@@ -143,7 +143,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const ItemStockUpdate = ({route}) => {
@@ -172,7 +172,7 @@ const ItemStockUpdate = ({route}) => {
     console.log("payload Data", payload);
 
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `${API_URL}/warehouse-admin/update-subItem-quantity`,
         payload,
       );

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const OTPVerification = ({ route, navigation }) => {
@@ -17,7 +17,7 @@ const OTPVerification = ({ route, navigation }) => {
 
   const sendOtp = async () => {
     try {
-      const response = await axios.post(`${API_URL}/send-otp`, {
+      const response = await api.post(`${API_URL}/send-otp`, {
         pickupItemId,
       });
 
@@ -40,7 +40,7 @@ const OTPVerification = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/resend-otp`, {
+      const response = await api.post(`${API_URL}/resend-otp`, {
         pickupItemId,
       });
 
@@ -71,7 +71,7 @@ const OTPVerification = ({ route, navigation }) => {
 
   const handleVerify = async () => {
     try {
-      const response = await axios.post(`${API_URL}/verify-otp`, {
+      const response = await api.post(`${API_URL}/verify-otp`, {
         pickupItemId,
         otp,
       });

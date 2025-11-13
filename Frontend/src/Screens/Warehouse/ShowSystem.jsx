@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl 
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const ShowSystem = () => {
@@ -17,7 +17,7 @@ const ShowSystem = () => {
 
   const fetchSystems = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/show-systems`);
+      const response = await api.get(`${API_URL}/warehouse-admin/show-systems`);
       if (response.data.success) {
         setSystems(response.data.data);
       }

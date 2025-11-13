@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SurveyPersonLocation = () => {
@@ -22,7 +22,7 @@ const SurveyPersonLocation = () => {
     const checkPunchInStatus = async () => {
       try {
         const empId = await AsyncStorage.getItem('_id');
-        const response = await axios.post('http://88.222.214.93:8001/track/checkDailyPunchIn', {
+        const response = await api.post('http://88.222.214.93:8001/track/checkDailyPunchIn', {
           fieldEmpId: empId
         });
         
@@ -52,7 +52,7 @@ const SurveyPersonLocation = () => {
       const empId = await AsyncStorage.getItem('_id');
       const contact = await AsyncStorage.getItem('Contact');
       
-      const response = await axios.post('http://88.222.214.93:8001/track/empPunchIn', { 
+      const response = await api.post('http://88.222.214.93:8001/track/empPunchIn', { 
         empId, 
         contact 
       });
@@ -78,7 +78,7 @@ const SurveyPersonLocation = () => {
       const empId = await AsyncStorage.getItem('_id');
       const contact = await AsyncStorage.getItem('Contact');
       
-      const response = await axios.post('http://88.222.214.93:8001/track/empPunchOut', { 
+      const response = await api.post('http://88.222.214.93:8001/track/empPunchOut', { 
         empId, 
         contact 
       });

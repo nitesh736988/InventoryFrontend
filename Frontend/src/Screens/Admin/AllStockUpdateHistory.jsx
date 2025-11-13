@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 
 const AllStockUpdateHistory = () => {
   const [stockHistory, setStockHistory] = useState([]);
@@ -17,7 +17,7 @@ const AllStockUpdateHistory = () => {
   useEffect(() => {
     const fetchStockHistory = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/admin/stock-update-history`,
         );
 

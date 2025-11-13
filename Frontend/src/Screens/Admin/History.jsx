@@ -9,7 +9,7 @@ import {
   TextInput,
   Dimensions,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const History = () => {
@@ -23,7 +23,7 @@ const History = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/admin/all-transactions-data`
       );
       setOrders(response.data.pickupItems);

@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
@@ -23,7 +23,7 @@ const Servicepersons = () => {
   const fetchServicepersons = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/admin/all-service-persons`);
+      const response = await api.get(`${API_URL}/admin/all-service-persons`);
       setServicepersons(response.data.allServicePersons);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch service persons');
@@ -36,7 +36,7 @@ const Servicepersons = () => {
   const refreshServicepersons = async () => {
     setRefreshing(true);
     try {
-      const response = await axios.get(`${API_URL}/admin/all-service-persons`);
+      const response = await api.get(`${API_URL}/admin/all-service-persons`);
       setServicepersons(response.data.allServicePersons);
     } catch (error) {
       Alert.alert('Error', 'Failed to refresh service persons');
@@ -48,7 +48,7 @@ const Servicepersons = () => {
 
   const deactivateServicePerson = async id => {
     try {
-      await axios.delete(`${API_URL}/admin/deactivate-service-person?id=${id}`);
+      await api.delete(`${API_URL}/admin/deactivate-service-person?id=${id}`);
       Alert.alert('Success', 'Service person deactivate successfully');
       setServicepersons(prev => prev.filter(person => person._id !== id));
     } catch (error) {

@@ -8,7 +8,7 @@
 //   Alert,
 //   ScrollView
 // } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // const ServicePersonLocation = () => {
@@ -24,7 +24,7 @@
 //     const checkPunchInStatus = async () => {
 //       try {
 //         const empId = await AsyncStorage.getItem('_id');
-//         const response = await axios.post('http://88.222.214.93:8001/track/checkDailyPunchIn', {
+//         const response = await api.post('http://88.222.214.93:8001/track/checkDailyPunchIn', {
 //           fieldEmpId: empId
 //         });
         
@@ -46,7 +46,7 @@
 //     try {
 //       setHistoryLoading(true);
 //       const empId = await AsyncStorage.getItem('_id');
-//       const response = await axios.post('http://88.222.214.93:8001/track/empTravelHistoryForApp', {
+//       const response = await api.post('http://88.222.214.93:8001/track/empTravelHistoryForApp', {
 //         fieldEmpId: empId
 
 //       });
@@ -69,7 +69,7 @@
 //       const empId = await AsyncStorage.getItem('_id');
 //       const contact = await AsyncStorage.getItem('Contact');
       
-//       const response = await axios.post('http://88.222.214.93:8001/track/empPunchIn', { 
+//       const response = await api.post('http://88.222.214.93:8001/track/empPunchIn', { 
 //         empId, 
 //         contact 
 //       });
@@ -94,7 +94,7 @@
 //       const empId = await AsyncStorage.getItem('_id');
 //       const contact = await AsyncStorage.getItem('Contact');
       
-//       const response = await axios.post('http://88.222.214.93:8001/track/empPunchOut', { 
+//       const response = await api.post('http://88.222.214.93:8001/track/empPunchOut', { 
 //         empId, 
 //         contact 
 //       });
@@ -321,7 +321,7 @@ import {
   Alert,
   ScrollView
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ServicePersonLocation = () => {
@@ -337,7 +337,7 @@ const ServicePersonLocation = () => {
     const checkPunchInStatus = async () => {
       try {
         const empId = await AsyncStorage.getItem('_id');
-        const response = await axios.post('http://88.222.214.93:8001/track/checkDailyPunchIn', {
+        const response = await api.post('http://88.222.214.93:8001/track/checkDailyPunchIn', {
           fieldEmpId: empId
         });
         
@@ -359,7 +359,7 @@ const ServicePersonLocation = () => {
     try {
       setHistoryLoading(true);
       const empId = await AsyncStorage.getItem('_id');
-      const response = await axios.post('http://88.222.214.93:8001/track/empTravelHistoryForApp', {
+      const response = await api.post('http://88.222.214.93:8001/track/empTravelHistoryForApp', {
         fieldEmpId: empId
       });
       
@@ -381,7 +381,7 @@ const ServicePersonLocation = () => {
       const empId = await AsyncStorage.getItem('_id');
       const contact = await AsyncStorage.getItem('Contact');
       
-      await axios.post('http://88.222.214.93:8001/track/empPunchIn', { 
+      await api.post('http://88.222.214.93:8001/track/empPunchIn', { 
         empId, 
         contact 
       });
@@ -406,7 +406,7 @@ const ServicePersonLocation = () => {
       const empId = await AsyncStorage.getItem('_id');
       const contact = await AsyncStorage.getItem('Contact');
       
-      await axios.post('http://88.222.214.93:8001/track/empPunchOut', { 
+      await api.post('http://88.222.214.93:8001/track/empPunchOut', { 
         empId, 
         contact 
       });

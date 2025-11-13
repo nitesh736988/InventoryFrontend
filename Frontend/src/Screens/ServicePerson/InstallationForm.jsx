@@ -14,7 +14,7 @@ import {
   Linking,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useForm} from 'react-hook-form';
@@ -388,7 +388,7 @@ const InstallationForm = ({route}) => {
 
       console.log('Submitting form data:', formData);
 
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/service-person/new-system-installation`,
         formData,
         {

@@ -7,7 +7,7 @@ import {
     Alert,
   } from 'react-native';
   import React, { useState, useEffect } from 'react';
-  import axios from 'axios';
+  import api from '../../auth/api';;
   import { Dropdown } from 'react-native-element-dropdown';
   import AntDesign from 'react-native-vector-icons/AntDesign';
   import {API_URL} from '@env';
@@ -23,7 +23,7 @@ import {
     useEffect(() => {
       const fetchSystems = async () => {
         try {
-          const response = await axios.get(
+          const response = await api.get(
             `${API_URL}/warehouse-admin/show-systems`
           );
           if (response.data.success) {
@@ -47,7 +47,7 @@ import {
         const fetchSystemItems = async () => {
           setSystemLoading(true);
           try {
-            const response = await axios.get(
+            const response = await api.get(
               `${API_URL}/warehouse-admin/show-system-item-map?systemId=${selectedSystem}`
             );
             if (response.data.success) {

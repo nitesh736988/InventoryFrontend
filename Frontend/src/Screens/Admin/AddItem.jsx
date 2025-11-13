@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { MultiSelect } from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const AddItem = () => {
@@ -27,7 +27,7 @@ const AddItem = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get(`${API_URL}/admin/all-items`);
+      const response = await api.get(`${API_URL}/admin/all-items`);
       const itemNames = response.data.data[0].items.map(item => ({
         label: item.itemName,
         value: item.itemName
@@ -79,7 +79,7 @@ const AddItem = () => {
         itemsToAdd.push({ itemName: otherInput.trim() });
       }
 
-      const response = await axios.post(`${API_URL}/admin/add-item`, {
+      const response = await api.post(`${API_URL}/admin/add-item`, {
         items: itemsToAdd
       });
       

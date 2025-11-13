@@ -9,7 +9,7 @@
 //   ScrollView,
 // } from 'react-native';
 // import {Picker} from '@react-native-picker/picker';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // const Repaired = () => {
@@ -23,7 +23,7 @@
 //   useEffect(() => {
 //     const fetchItems = async () => {
 //       try {
-//         const response = await axios.get(
+//         const response = await api.get(
 //           `${API_URL}/warehouse-admin/view-items`,
 //         );
 //         const items = response.data.items.map((item, index) => ({
@@ -56,7 +56,7 @@
 //     try {
 //       // console.log(newItem)
 //       setLoading(true);
-//       const response = await axios.post(
+//       const response = await api.post(
 //         `${API_URL}/warehouse-admin/reject-item`,
 //         newItem,
 //       );
@@ -211,7 +211,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
 
@@ -228,7 +228,7 @@ const Reject = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/warehouse-admin/view-items`,
         );
         const items = response.data.items.map((item, index) => ({
@@ -268,7 +268,7 @@ const Reject = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/reject-item`,
         newItem,
       );

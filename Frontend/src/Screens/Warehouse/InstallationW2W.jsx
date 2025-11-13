@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import MultiSelect from 'react-native-multiple-select';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -42,11 +42,11 @@ const InstallationW2W = () => {
         setLoading(true);
         
         // Fetch system items
-        const itemsRes = await axios.get(`${API_URL}/warehouse-admin/show-system-items`);
+        const itemsRes = await api.get(`${API_URL}/warehouse-admin/show-system-items`);
         setSystemItems(itemsRes.data.data);
         
         // Fetch from warehouse
-        const fromWhRes = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+        const fromWhRes = await api.get(`${API_URL}/warehouse-admin/get-warehouse`);
         const fromWh = {
           _id: fromWhRes.data.warehouseId,
           warehouseName: fromWhRes.data.warehouseName
@@ -54,7 +54,7 @@ const InstallationW2W = () => {
         setFromWarehouse(fromWh);
         
         // Fetch all warehouses for destination
-        const toWhRes = await axios.get(`${API_URL}/warehouse-admin/all-warehouses`);
+        const toWhRes = await api.get(`${API_URL}/warehouse-admin/all-warehouses`);
         setWarehouses(toWhRes.data.allWarehouses.filter(wh => wh._id !== fromWh._id));
         
         setFormData(prev => ({
@@ -176,7 +176,7 @@ const InstallationW2W = () => {
     console.log("Data to be sent:", JSON.stringify(data, null, 2));
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/warehouse-admin/wtow-transaction`,
         data,
         {

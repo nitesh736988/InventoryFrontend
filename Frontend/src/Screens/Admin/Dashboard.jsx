@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 import SidebarModal from './SidebarModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,7 +33,7 @@ const Dashboard = () => {
     try {
       while (retries > 0) {
         try {
-          const response = await axios.get(
+          const response = await api.get(
             `${API_URL}/admin/dashboard?option=${selectedWarehouse}`,
           );
           setResponseData(response.data.data || []);
@@ -64,7 +64,7 @@ const Dashboard = () => {
 
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get(`${API_URL}/admin/all-warehouses`);
+      const response = await api.get(`${API_URL}/admin/all-warehouses`);
       if (response.data.success) {
         setAllWarehouses(response.data.allWarehouses);
       } else {
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${API_URL}/user/logout`);
+      const response = await api.post(`${API_URL}/user/logout`);
       if (response.data.success) {
         Alert.alert('Logout', 'You have logged out successfully');
         await AsyncStorage.clear();

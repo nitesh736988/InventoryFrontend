@@ -10,7 +10,7 @@ import {
   Dimensions,
   TextInput,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { API_URL } from '@env';
 
@@ -27,7 +27,7 @@ const W2WmhApproval = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/warehouse-admin/view-defective-orders`
       );
       console.log(response.data);
@@ -48,7 +48,7 @@ const W2WmhApproval = () => {
   const handleApproveBtn = async (sendTransactionId) => {
     try {
       console.log("API ", API_URL)
-      const sendRequest = await axios.put(
+      const sendRequest = await api.put(
         `${API_URL}/warehouse-admin/update-defective-order-status`,
         {
           status: true,

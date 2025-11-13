@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import { API_URL } from '@env';
 
 const RepairReject = () => {
@@ -9,7 +9,7 @@ const RepairReject = () => {
 
   const fetchRepairRejectData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/admin/all-repair-reject-itemData`);
+      const response = await api.get(`${API_URL}/admin/all-repair-reject-itemData`);
       // console.log('Response Data:', response.data);
       setRepairRejectData(response.data.allRepairRejectData);
     } catch (error) {

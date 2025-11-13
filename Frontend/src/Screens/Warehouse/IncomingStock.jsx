@@ -9,7 +9,7 @@
 //   TouchableOpacity,
 //   ScrollView,
 // } from "react-native";
-// import axios from "axios";
+// import api from "api";
 // import { API_URL } from "@env";
 
 // const IncomingStock = ({ route, navigation }) => {
@@ -68,7 +68,7 @@
 
 //     try {
 //       setLoading(true);
-//       await axios.post(`${API_URL}/warehouse-admin/add-receiving-items`, payload);
+//       await api.post(`${API_URL}/warehouse-admin/add-receiving-items`, payload);
 //       Alert.alert("Success", "Items received successfully!");
 //       navigation.goBack();
 //     } catch (error) {
@@ -245,7 +245,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const IncomingStock = ({route, navigation}) => {
@@ -334,7 +334,7 @@ const IncomingStock = ({route, navigation}) => {
 
     try {
       setLoading(true);
-      await axios.post(
+      await api.post(
         `${API_URL}/warehouse-admin/add-receiving-items`,
         payload,
       );

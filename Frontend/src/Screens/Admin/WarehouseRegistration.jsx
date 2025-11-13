@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const WarehouseRegistration = () => {
@@ -27,7 +27,7 @@ const WarehouseRegistration = () => {
   useEffect(() => {
     const fetchWarehouses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/admin/all-warehouses`);
+        const response = await api.get(`${API_URL}/admin/all-warehouses`);
         console.log('API Response:', response.data);
 
         if (response.data.success) {
@@ -64,7 +64,7 @@ const WarehouseRegistration = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/admin/warehouse-person-signup`,
         {name, email, contact, password, warehouse, createdAt},
       );
@@ -80,7 +80,7 @@ const WarehouseRegistration = () => {
           password: '',
           createdAt: new Date(),
         });
-        const warehouseResponse = await axios.get(
+        const warehouseResponse = await api.get(
           `${API_URL}/admin/all-warehouses`,
         );
         if (warehouseResponse.data.success) {

@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+
 import {API_URL} from '@env';
 import Sidebarmodal from './Sidebarmodal';
 
@@ -30,7 +30,7 @@ const TotalIncomingOutgoing = ({navigation}) => {
 
   const fetchServicePersons = async () => {
     try {
-      const response = await axios.get(`${API_URL}/service-person/dashboard`);
+      const response = await api.get(`${API_URL}/service-person/dashboard`);
       console.log('API Response:', response.data);
 
       const incoming =
@@ -51,7 +51,7 @@ const TotalIncomingOutgoing = ({navigation}) => {
   const fetchMaharashtraData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/service-person/show-emp-dashboard`);
+      const response = await api.get(`${API_URL}/service-person/show-emp-dashboard`);
       console.log('Maharashtra API Response:', response.data);
       setMaharashtraData(response.data.data);
     } catch (error) {
@@ -76,7 +76,7 @@ const TotalIncomingOutgoing = ({navigation}) => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${API_URL}/user/logout`);
+      const response = await api.post(`${API_URL}/user/logout`);
       if (response.data.success) {
         Alert.alert('Logout', 'You have logged out successfully');
         await AsyncStorage.clear();

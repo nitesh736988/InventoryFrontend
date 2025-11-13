@@ -1,6 +1,6 @@
 // import React, { useState, useEffect } from 'react';
 // import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
-// import axios from 'axios';
+// import api from '../../auth/api';;
 // import {API_URL} from '@env';
 
 // const InstallationIncomingHistory = () => {
@@ -11,7 +11,7 @@
 //     useEffect(() => {
 //         const fetchOutgoingHistory = async () => {
 //             try {
-//                 const response = await axios.get(`${API_URL}/warehouse-admin/approved-incoming-item`);
+//                 const response = await api.get(`${API_URL}/warehouse-admin/approved-incoming-item`);
 //                 if (response.data.success) {
 //                     setOutgoingHistory(response.data.data);
 //                 } else {
@@ -189,7 +189,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
-import axios from 'axios';
+import api from '../../auth/api';;
 import {API_URL} from '@env';
 
 const InstallationIncomingHistory = () => {
@@ -200,7 +200,7 @@ const InstallationIncomingHistory = () => {
     useEffect(() => {
         const fetchIncomingHistory = async () => {
             try {
-                const response = await axios.get(`${API_URL}/warehouse-admin/approved-incoming-item`);
+                const response = await api.get(`${API_URL}/warehouse-admin/approved-incoming-item`);
                 if (response.data.success) {
                     setIncomingHistory(response.data.data || []);
                 } else {

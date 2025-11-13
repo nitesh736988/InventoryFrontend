@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import axios from "axios";
+import api from "../../auth/api";
 import { API_URL } from "@env";
 import { Picker } from "@react-native-picker/picker";
 import MultiSelect from "react-native-multiple-select";
@@ -33,7 +33,7 @@ const ThirdPartyOutgoingStock = () => {
   // Fetch warehouses
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/get-warehouse`);
+      const response = await api.get(`${API_URL}/warehouse-admin/get-warehouse`);
       if (response.data.success) {
         const warehouses = Array.isArray(response.data.warehouseName)
           ? response.data.warehouseName
@@ -51,7 +51,7 @@ const ThirdPartyOutgoingStock = () => {
   // Fetch items
   const fetchItems = async () => {
     try {
-      const response = await axios.get(`${API_URL}/warehouse-admin/view-items`);
+      const response = await api.get(`${API_URL}/warehouse-admin/view-items`);
       const items =
         response?.data?.items?.map((item) => ({
           id: item,
@@ -121,7 +121,7 @@ const ThirdPartyOutgoingStock = () => {
     console.log("Payload:", payload);
     try {
       setLoading(true);
-      await axios.post(`${API_URL}/warehouse-admin/add-outgoing-item`, payload);
+      await api.post(`${API_URL}/warehouse-admin/add-outgoing-item`, payload);
       Alert.alert("Success", "Items transferred successfully!");
       setGroups([{ id: Date.now().toString(), farmerSaralId: "", selectedItems: [], itemDefectives: {} }]);
       setToServiceCenter("");
